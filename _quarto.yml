@@ -73,7 +73,7 @@ website:
 format:
   html:
     page-layout: article
-    theme: zephyr #sketchy #quartz #morph #cosmo #lumen #sandstone 
+    theme: cosmo #sketchy #quartz #morph #lumen #sandstone #zephyr
     css: styles.css
     toc: true
 
