@@ -1,19 +1,5 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Home",
-    "section": "",
-    "text": "Welcome!\nBayesian methods have had a slow but steady uptake in the pharmacometrics (PMx) community. There are still significant barriers for completely adopting these approaches for routine PMx workflows. Here we try to enhance Bayesian knowledge and understanding in both the general and pharmacometrics-specific sense.\nWe have presented a Bayesian tutorial at ACoP14 with examples from Stan/Torsten and based on the overwhelming interest in this topic, we are extending that to also include NONMEM along with a wealth of learning resources specifically developed and curated for the PMx community.\nWe provide tutorials and code that are both theoretical and practical in nature. We believe that this resource will give users in the PMx community a knowledge platform to implement a fully Bayesian workflow that involves model fitting, model diagnostics, model selection, post-processing, as well as running simulations for any model that they desire.\nWe encourage tutorial and code contributions from subject matter experts as well as the user community. Please reach out to us if you would like to contribute to this resource."
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "Welcome!"
-  },
-  {
     "objectID": "tutorials/Bayesian-Estimation-Methods-in-NONMEM.html",
     "href": "tutorials/Bayesian-Estimation-Methods-in-NONMEM.html",
     "title": "Bayesian Estimation Methods in NONMEM",
@@ -91,25 +77,18 @@
     "text": "Coming Soon!"
   },
   {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Home",
+    "section": "",
+    "text": "Welcome!\nBayesian methods have had a slow but steady uptake in the pharmacometrics (PMx) community. There are still significant barriers for completely adopting these approaches for routine PMx workflows. Here we try to enhance Bayesian knowledge and understanding in both the general and pharmacometrics-specific sense.\nWe have presented a Bayesian tutorial at ACoP14 with examples from Stan/Torsten and based on the overwhelming interest in this topic, we are extending that to also include NONMEM along with a wealth of learning resources specifically developed and curated for the PMx community.\nWe provide tutorials and code that are both theoretical and practical in nature. We believe that this resource will give users in the PMx community a knowledge platform to implement a fully Bayesian workflow that involves model fitting, model diagnostics, model selection, post-processing, as well as running simulations for any model that they desire.\nWe encourage tutorial and code contributions from subject matter experts as well as the user community. Please reach out to us if you would like to contribute to this resource."
+  },
+  {
     "objectID": "contact.html",
     "href": "contact.html",
     "title": "Contact Us",
     "section": "",
-    "text": "Welcome!"
-  },
-  {
-    "objectID": "links.html",
-    "href": "links.html",
-    "title": "Links",
-    "section": "",
-    "text": "Welcome!"
-  },
-  {
-    "objectID": "contributors.html#contributors-1",
-    "href": "contributors.html#contributors-1",
-    "title": "Bayes PMx",
-    "section": "Contributors",
-    "text": "Contributors\n\nYasong Lu\n\n\n\n\n\nYasong was trained as a quantitative toxicologist with specialty in PBPK/PD modeling at Colorado State University. After his PhD training, Yasong worked in the pharmaceutical industry as a PK/PD modeler or pharmacometrician supporting drug discovery (at Pfizer) and development programs (at BMS, Novartis, and currently Daiichi Sankyo). He started learning Bayesian analysis and applying the technique to PopPK and PK/PD analysis from about 10 years ago. Currently he’s learning Stan and trying to apply it to his work.\n\n\nArya Pourzanjani\n\n\n\n\n\nArya Pourzanjani is a senior scientist in the Clinical Pharmacology Modeling and Simulation (CPMS) department at Amgen. He specializes in pharmacometrics, data science, machine learning, and Bayesian applications to these areas."
+    "text": "Coming Soon!"
   },
   {
     "objectID": "contributors.html#contributors",
@@ -119,10 +98,66 @@
     "text": "Contributors\n\nYasong Lu, Daiichi Sankyo, Inc. \nArya Pourzanjani, Amgen"
   },
   {
-    "objectID": "contributors.html#additional-contributors",
-    "href": "contributors.html#additional-contributors",
-    "title": "Bayes PMx",
-    "section": "Additional Contributors",
-    "text": "Additional Contributors\n\nYasong Lu, Daiichi Sankyo, Inc. \nArya Pourzanjani, Amgen"
+    "objectID": "code/simData/mrgsolveModel1.html",
+    "href": "code/simData/mrgsolveModel1.html",
+    "title": "mrgsolveModel1",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "code/simData/mrgsolveModel2.html",
+    "href": "code/simData/mrgsolveModel2.html",
+    "title": "mrgsolveModel2",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "code/scripts/Model-Diagnostics.html",
+    "href": "code/scripts/Model-Diagnostics.html",
+    "title": "Model Diagnostics",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "code/scripts/Simulation-Based-Diagnostics.html",
+    "href": "code/scripts/Simulation-Based-Diagnostics.html",
+    "title": "Simulation Based Diagnostics",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "code/scripts/Simulations.html",
+    "href": "code/scripts/Simulations.html",
+    "title": "Simulations",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "code/models/stan/StanModel1.html",
+    "href": "code/models/stan/StanModel1.html",
+    "title": "StanModel1",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "code/models/stan/StanModel2.html",
+    "href": "code/models/stan/StanModel2.html",
+    "title": "StanModel2",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "code/models/nonmem/NMModel1.html",
+    "href": "code/models/nonmem/NMModel1.html",
+    "title": "NMModel1",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "code/models/nonmem/NMModel2.html",
+    "href": "code/models/nonmem/NMModel2.html",
+    "title": "NMModel2",
+    "section": "",
+    "text": "Coming Soon!"
   }
 ]
