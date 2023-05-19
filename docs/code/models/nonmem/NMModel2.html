@@ -3,7 +3,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="quarto-0.9.80">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Bayes PMx - Incorporating Covariates</title>
+  <title>Bayes PMx - NMModel2</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -13,23 +13,23 @@
     ul.task-list{list-style: none;}
   </style>
 
-  <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-  <script src="../site_libs/clipboard/clipboard.min.js"></script>
-  <meta name="quarto:offset" content="../">
-  <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-  <script src="../site_libs/quarto-search/fuse.min.js"></script>
-  <script src="../site_libs/quarto-search/quarto-search.js"></script>
-  <link href="../tutorials/Matrix-Exponentiation.html" rel="next">
-  <link href="../tutorials/Posterior-Predictive-Check.html" rel="prev">
-  <script src="../site_libs/quarto-html/quarto.js"></script>
-  <script src="../site_libs/quarto-html/popper.min.js"></script>
-  <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-  <script src="../site_libs/quarto-html/anchor.min.js"></script>
-  <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-  <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
-  <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-  <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-  <link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+  <script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+  <meta name="quarto:offset" content="../../../">
+  <script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+  <script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+  <script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+  <link href="../../../code/models/stan/StanModel1.html" rel="next">
+  <link href="../../../code/models/nonmem/NMModel1.html" rel="prev">
+  <script src="../../../site_libs/quarto-html/quarto.js"></script>
+  <script src="../../../site_libs/quarto-html/popper.min.js"></script>
+  <script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+  <script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+  <link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+  <link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
+  <script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+  <link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+  <link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
   <script id="quarto-search-options" type="application/json">{
     "location": "sidebar",
     "copy-button": false,
@@ -52,14 +52,14 @@
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
-  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../../../styles.css">
 </head>
 <body class="docked fullcontent">
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Incorporating Covariates</h1>
+      <h1 class="quarto-secondary-nav-title">NMModel2</h1>
       <button type="button" class="quarto-btn-toggle btn">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -71,8 +71,8 @@
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-center sidebar-header">
-      <a href="../">
-      <img src="../images/bayespmx_logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      <a href="../../../">
+      <img src="../../../images/bayespmx_logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
       </a>
       </div>
       <div class="mt-2 flex-shrink-0 align-items-center">
@@ -84,87 +84,87 @@
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../index.html" class="sidebar-item-text sidebar-link">Home</a>
+  <a href="../../../index.html" class="sidebar-item-text sidebar-link">Home</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../contributors.html" class="sidebar-item-text sidebar-link">Contributors</a>
+  <a href="../../../contributors.html" class="sidebar-item-text sidebar-link">Contributors</a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
     <div class="sidebar-item-container"> 
-        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-tutorials" aria-expanded="true">Tutorials</a>
-      <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-tutorials" aria-expanded="true">
+        <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-tutorials" aria-expanded="false">Tutorials</a>
+      <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-tutorials" aria-expanded="false">
         <i class="bi bi-chevron-right ms-2"></i>
       </a>
     </div>
-    <ul id="quarto-sidebar-section-tutorials" class="collapse list-unstyled sidebar-section depth1 show">  
+    <ul id="quarto-sidebar-section-tutorials" class="collapse list-unstyled sidebar-section depth1 ">  
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/Introduction-to-Bayesian-Inference.html" class="sidebar-item-text sidebar-link">Introduction to Bayesian Inference</a>
+  <a href="../../../tutorials/Introduction-to-Bayesian-Inference.html" class="sidebar-item-text sidebar-link">Introduction to Bayesian Inference</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/Introduction-to-Stan.html" class="sidebar-item-text sidebar-link">Introduction to Stan</a>
+  <a href="../../../tutorials/Introduction-to-Stan.html" class="sidebar-item-text sidebar-link">Introduction to Stan</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/Bayesian-Estimation-Methods-in-NONMEM.html" class="sidebar-item-text sidebar-link">Bayesian Estimation Methods in NONMEM</a>
+  <a href="../../../tutorials/Bayesian-Estimation-Methods-in-NONMEM.html" class="sidebar-item-text sidebar-link">Bayesian Estimation Methods in NONMEM</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/Priors.html" class="sidebar-item-text sidebar-link">Priors</a>
+  <a href="../../../tutorials/Priors.html" class="sidebar-item-text sidebar-link">Priors</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/Prior-Predictive-Check.html" class="sidebar-item-text sidebar-link">Prior Predictive Check</a>
+  <a href="../../../tutorials/Prior-Predictive-Check.html" class="sidebar-item-text sidebar-link">Prior Predictive Check</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/Model-Diagnostics.html" class="sidebar-item-text sidebar-link">Model Diagnostics</a>
+  <a href="../../../tutorials/Model-Diagnostics.html" class="sidebar-item-text sidebar-link">Model Diagnostics</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/Extracting-Individual-Posteriors-in-NONMEM.html" class="sidebar-item-text sidebar-link">Extracting Individual Posteriors in NONMEM</a>
+  <a href="../../../tutorials/Extracting-Individual-Posteriors-in-NONMEM.html" class="sidebar-item-text sidebar-link">Extracting Individual Posteriors in NONMEM</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/Posterior-Predictive-Check.html" class="sidebar-item-text sidebar-link">Posterior Predictive Check</a>
+  <a href="../../../tutorials/Posterior-Predictive-Check.html" class="sidebar-item-text sidebar-link">Posterior Predictive Check</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/Incorporating-Covariates.html" class="sidebar-item-text sidebar-link active">Incorporating Covariates</a>
+  <a href="../../../tutorials/Incorporating-Covariates.html" class="sidebar-item-text sidebar-link">Incorporating Covariates</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/Matrix-Exponentiation.html" class="sidebar-item-text sidebar-link">Matrix Exponentiation</a>
+  <a href="../../../tutorials/Matrix-Exponentiation.html" class="sidebar-item-text sidebar-link">Matrix Exponentiation</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../tutorials/Simulations-Setup.html" class="sidebar-item-text sidebar-link">Simulations Setup</a>
+  <a href="../../../tutorials/Simulations-Setup.html" class="sidebar-item-text sidebar-link">Simulations Setup</a>
   </div>
 </li>
     </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
     <div class="sidebar-item-container"> 
-        <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-code" aria-expanded="false">Code</a>
-      <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-code" aria-expanded="false">
+        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-code" aria-expanded="true">Code</a>
+      <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-code" aria-expanded="true">
         <i class="bi bi-chevron-right ms-2"></i>
       </a>
     </div>
-    <ul id="quarto-sidebar-section-code" class="collapse list-unstyled sidebar-section depth1 ">  
+    <ul id="quarto-sidebar-section-code" class="collapse list-unstyled sidebar-section depth1 show">  
         <li class="sidebar-item sidebar-item-section">
     <div class="sidebar-item-container"> 
         <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-simulated-data" aria-expanded="false">Simulated Data</a>
@@ -175,40 +175,40 @@
     <ul id="quarto-sidebar-section-simulated-data" class="collapse list-unstyled sidebar-section depth2 ">  
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../code/simData/mrgsolveModel1.html" class="sidebar-item-text sidebar-link">mrgsolveModel1</a>
+  <a href="../../../code/simData/mrgsolveModel1.html" class="sidebar-item-text sidebar-link">mrgsolveModel1</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../code/simData/mrgsolveModel2.html" class="sidebar-item-text sidebar-link">mrgsolveModel2</a>
+  <a href="../../../code/simData/mrgsolveModel2.html" class="sidebar-item-text sidebar-link">mrgsolveModel2</a>
   </div>
 </li>
     </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
     <div class="sidebar-item-container"> 
-        <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-models" aria-expanded="false">Models</a>
-      <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-models" aria-expanded="false">
+        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-models" aria-expanded="true">Models</a>
+      <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-models" aria-expanded="true">
         <i class="bi bi-chevron-right ms-2"></i>
       </a>
     </div>
-    <ul id="quarto-sidebar-section-models" class="collapse list-unstyled sidebar-section depth2 ">  
+    <ul id="quarto-sidebar-section-models" class="collapse list-unstyled sidebar-section depth2 show">  
         <li class="sidebar-item sidebar-item-section">
     <div class="sidebar-item-container"> 
-        <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-nonmem" aria-expanded="false">NONMEM</a>
-      <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-nonmem" aria-expanded="false">
+        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-nonmem" aria-expanded="true">NONMEM</a>
+      <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-nonmem" aria-expanded="true">
         <i class="bi bi-chevron-right ms-2"></i>
       </a>
     </div>
-    <ul id="quarto-sidebar-section-nonmem" class="collapse list-unstyled sidebar-section depth3 ">  
+    <ul id="quarto-sidebar-section-nonmem" class="collapse list-unstyled sidebar-section depth3 show">  
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../code/models/nonmem/NMModel1.html" class="sidebar-item-text sidebar-link">NMModel1</a>
+  <a href="../../../code/models/nonmem/NMModel1.html" class="sidebar-item-text sidebar-link">NMModel1</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../code/models/nonmem/NMModel2.html" class="sidebar-item-text sidebar-link">NMModel2</a>
+  <a href="../../../code/models/nonmem/NMModel2.html" class="sidebar-item-text sidebar-link active">NMModel2</a>
   </div>
 </li>
     </ul>
@@ -223,12 +223,12 @@
     <ul id="quarto-sidebar-section-stan" class="collapse list-unstyled sidebar-section depth3 ">  
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../code/models/stan/StanModel1.html" class="sidebar-item-text sidebar-link">StanModel1</a>
+  <a href="../../../code/models/stan/StanModel1.html" class="sidebar-item-text sidebar-link">StanModel1</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../code/models/stan/StanModel2.html" class="sidebar-item-text sidebar-link">StanModel2</a>
+  <a href="../../../code/models/stan/StanModel2.html" class="sidebar-item-text sidebar-link">StanModel2</a>
   </div>
 </li>
     </ul>
@@ -245,17 +245,17 @@
     <ul id="quarto-sidebar-section-scripts" class="collapse list-unstyled sidebar-section depth2 ">  
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../code/scripts/Model-Diagnostics.html" class="sidebar-item-text sidebar-link">Model Diagnostics</a>
+  <a href="../../../code/scripts/Model-Diagnostics.html" class="sidebar-item-text sidebar-link">Model Diagnostics</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../code/scripts/Simulation-Based-Diagnostics.html" class="sidebar-item-text sidebar-link">Simulation Based Diagnostics</a>
+  <a href="../../../code/scripts/Simulation-Based-Diagnostics.html" class="sidebar-item-text sidebar-link">Simulation Based Diagnostics</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../code/scripts/Simulations.html" class="sidebar-item-text sidebar-link">Simulations</a>
+  <a href="../../../code/scripts/Simulations.html" class="sidebar-item-text sidebar-link">Simulations</a>
   </div>
 </li>
     </ul>
@@ -264,12 +264,12 @@
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../references.html" class="sidebar-item-text sidebar-link">References</a>
+  <a href="../../../references.html" class="sidebar-item-text sidebar-link">References</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../contact.html" class="sidebar-item-text sidebar-link">Contact Us</a>
+  <a href="../../../contact.html" class="sidebar-item-text sidebar-link">Contact Us</a>
   </div>
 </li>
     </ul>
@@ -281,7 +281,7 @@
 <main class="content" id="quarto-document-content">
 <header id="title-block-header" class="quarto-title-block default">
 
-<div class="quarto-title"><h1 class="title d-none d-lg-block display-7">Incorporating Covariates</h1></div></header>
+<div class="quarto-title"><h1 class="title d-none d-lg-block display-7">NMModel2</h1></div></header>
 <p>Coming Soon!</p>
 
 
@@ -364,13 +364,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/Posterior-Predictive-Check.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Posterior Predictive Check</span>
+      <a href="../../../code/models/nonmem/NMModel1.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">NMModel1</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/Matrix-Exponentiation.html" class="pagination-link">
-        <span class="nav-page-text">Matrix Exponentiation</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../../code/models/stan/StanModel1.html" class="pagination-link">
+        <span class="nav-page-text">StanModel1</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
