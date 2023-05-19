@@ -1,0 +1,18 @@
+Version: 1
+
+Packages:
+  - tidyverse
+  - tidybayes
+  - bayesplot
+  - gridExtra
+  - patchwork
+  - kableExtra
+
+Repos:
+  - MPN: https://mpn.metworx.com/snapshots/stable/2023-03-13
+  - CRAN: https://packagemanager.rstudio.com/cran/2023-03-13
+
+Lockfile:
+    Type: renv
+
+Rpath: ${R_EXE_4_1}
