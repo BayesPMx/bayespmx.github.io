@@ -1,0 +1,74 @@
+/* css styles */
+/* css styles */
+#quarto-sidebar {
+  width: 100%;
+}
+
+.sidebar-item-text.sidebar-link {
+  font-size: 18px;
+  font-weight: bold;
+  color: #42967E;
+}
+
+.sidebar-item-text.sidebar-link.active {
+  color: #B22C17;
+}
+
+.sidebar-item-text.sidebar-link:hover {
+  color: #848C8E;
+}
+
+.nav-footer {
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
+  min-height: 2.5em;
+}
+
+.footer {
+  text-align: center;
+}
+
+.nav-link {
+  padding-top: 0.6em;
+  padding-bottom: 0.1em;
+  min-height: 2.5em; 
+  color: white;
+}
+
+.bi.bi-chevron-right {
+   color: #42967E;
+   font-size: 20px;
+   font-weight: bold;
+}
+
+.quarto-secondary-nav-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #42967E
+}
+
+#title-block-header.quarto-title-block.default .quarto-title .title {
+ font-size: 20px;
+ font-weight: bold;
+ color: #42967E
+}
+
+.nav-link:hover {
+  color: #848C8E;
+}
+
+.bi.bi-github:hover {
+   color: #848C8E;
+}
+
+.bi.bi-envelope:hover {
+   color: #848C8E;
+}
+
+.bi.bi-globe:hover {
+   color: #848C8E;
+}
+
+.bi.bi-youtube:hover {
+   color: #848C8E;
+}

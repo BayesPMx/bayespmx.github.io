@@ -1,0 +1,81 @@
+project:
+  type: website
+  output-dir: docs 
+
+website:
+  site-url: "https://bayespmx.github.io"
+  page-navigation: true
+  title: "Bayes PMx"
+
+  page-footer:
+    right: "&copy; GNU GPL v3.0"
+    left: 
+      - icon: github
+        href: https://github.com/BayesPMx/bayespmx.github.io
+        # text: "https://github.com/BayesPMx/bayespmx.github.io"
+      - icon: globe
+        href: https://bayespmx.github.io
+        # text: "https://bayespmx.github.io"
+    background: "#AAB1B3"
+
+    
+  sidebar:
+    logo: "images/bayespmx_logo.png"
+    pinned: true
+    align: center
+    style: "docked"
+    search: true
+    collapse-level: 1
+    contents:
+      - text: "Home"
+        file: index.qmd
+      - text: "Contributors"
+        file: contributors.qmd
+      - section: "Tutorials"
+        contents:
+          - tutorials/Introduction-to-Bayesian-Inference.qmd
+          - tutorials/Introduction-to-Stan.qmd
+          - tutorials/Bayesian-Estimation-Methods-in-NONMEM.qmd
+          - tutorials/Priors.qmd
+          - tutorials/Prior-Predictive-Check.qmd
+          - tutorials/Model-Diagnostics.qmd
+          - tutorials/Extracting-Individual-Posteriors-in-NONMEM.qmd
+          - tutorials/Posterior-Predictive-Check.qmd
+          - tutorials/Incorporating-Covariates.qmd
+          - tutorials/Matrix-Exponentiation.qmd
+          - tutorials/Simulations-Setup.qmd
+      - section: "Code"
+        contents:
+          - section: "Simulated Data"
+            contents:
+               - code/simData/mrgsolveModel1.qmd
+               - code/simData/mrgsolveModel2.qmd
+          - section: "Models"
+            contents:
+              - section: "NONMEM"
+                contents:
+                  - code/models/nonmem/NMModel1.qmd
+                  - code/models/nonmem/NMModel2.qmd
+              - section: "Stan"
+                contents: 
+                  - code/models/stan/StanModel1.qmd
+                  - code/models/stan/StanModel2.qmd
+          - section: "Scripts"
+            contents:
+              - code/scripts/Model-Diagnostics.qmd
+              - code/scripts/Simulation-Based-Diagnostics.qmd
+              - code/scripts/Simulations.qmd
+      - text: "References"
+        file: references.qmd
+      - text: "Contact Us"
+        file: contact.qmd
+
+format:
+  html:
+    page-layout: article
+    theme: zephyr #sketchy #quartz #morph #cosmo #lumen #sandstone 
+    css: styles.css
+    toc: true
+
+editor: source
+

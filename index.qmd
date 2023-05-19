@@ -1,0 +1,13 @@
+---
+title: "Home"
+---
+
+Welcome!
+
+Bayesian methods have had a slow but steady uptake in the pharmacometrics (PMx) community. There are still significant barriers for completely adopting these approaches for routine PMx workflows. Here we try to enhance Bayesian knowledge and understanding in both the general and pharmacometrics-specific sense.
+
+We have presented a Bayesian tutorial at ACoP14 with examples from Stan/Torsten and based on the overwhelming interest in this topic, we are extending that to also include NONMEM along with a wealth of learning resources specifically developed and curated for the PMx community.
+
+We provide tutorials and code that are both theoretical and practical in nature. We believe that this resource will give users in the PMx community a knowledge platform to implement a fully Bayesian workflow that involves model fitting, model diagnostics, model selection, post-processing, as well as running simulations for any model that they desire.
+
+We encourage tutorial and code contributions from subject matter experts as well as the user community. Please reach out to us if you would like to contribute to this resource. 
