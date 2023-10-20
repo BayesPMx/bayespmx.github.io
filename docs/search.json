@@ -1,134 +1,8 @@
 [
   {
-    "objectID": "tutorials/Bayesian-Estimation-Methods-in-NONMEM.html",
-    "href": "tutorials/Bayesian-Estimation-Methods-in-NONMEM.html",
-    "title": "Bayesian Estimation Methods in NONMEM",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "tutorials/Posterior-Predictive-Check.html",
-    "href": "tutorials/Posterior-Predictive-Check.html",
-    "title": "Posterior Predictive Check",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "tutorials/Simulations-Setup.html",
-    "href": "tutorials/Simulations-Setup.html",
-    "title": "Simulations Setup",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "tutorials/Model-Diagnostics.html",
-    "href": "tutorials/Model-Diagnostics.html",
-    "title": "Model Diagnostics",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "tutorials/Introduction-to-Bayesian-Inference.html",
-    "href": "tutorials/Introduction-to-Bayesian-Inference.html",
-    "title": "Introduction to Bayesian Inference",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "tutorials/Incorporating-Covariates.html",
-    "href": "tutorials/Incorporating-Covariates.html",
-    "title": "Incorporating Covariates",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "tutorials/Priors.html",
-    "href": "tutorials/Priors.html",
-    "title": "Priors",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "tutorials/Extracting-Individual-Posteriors-in-NONMEM.html",
-    "href": "tutorials/Extracting-Individual-Posteriors-in-NONMEM.html",
-    "title": "Extracting Individual Posteriors in NONMEM",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "tutorials/Matrix-Exponentiation.html",
-    "href": "tutorials/Matrix-Exponentiation.html",
-    "title": "Matrix Exponentiation",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "tutorials/Introduction-to-Stan.html",
-    "href": "tutorials/Introduction-to-Stan.html",
-    "title": "Introduction to Stan",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "tutorials/Prior-Predictive-Check.html",
-    "href": "tutorials/Prior-Predictive-Check.html",
-    "title": "Prior Predictive Check",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Home",
-    "section": "",
-    "text": "Welcome!\nBayesian methods have had a slow but steady uptake in the pharmacometrics (PMx) community. There are still significant barriers for completely adopting these approaches for routine PMx workflows. Here we try to enhance Bayesian knowledge and understanding in both the general and pharmacometrics-specific sense.\nWe have presented a Bayesian tutorial at ACoP14 with examples from Stan/Torsten and based on the overwhelming interest in this topic, we are extending that to also include NONMEM along with a wealth of learning resources specifically developed and curated for the PMx community.\nWe provide tutorials and code that are both theoretical and practical in nature. We believe that this resource will give users in the PMx community a knowledge platform to implement a fully Bayesian workflow that involves model fitting, model diagnostics, model selection, post-processing, as well as running simulations for any model that they desire.\nWe encourage tutorial and code contributions from subject matter experts as well as the user community. Please reach out to us if you would like to contribute to this resource."
-  },
-  {
     "objectID": "contact.html",
     "href": "contact.html",
     "title": "Contact Us",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "contributors.html#contributors",
-    "href": "contributors.html#contributors",
-    "title": "About the Authors",
-    "section": "Contributors",
-    "text": "Contributors\n\nYasong Lu, Daiichi Sankyo, Inc. \nArya Pourzanjani, Amgen"
-  },
-  {
-    "objectID": "code/simData/mrgsolveModel1.html",
-    "href": "code/simData/mrgsolveModel1.html",
-    "title": "mrgsolveModel1",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "code/simData/mrgsolveModel2.html",
-    "href": "code/simData/mrgsolveModel2.html",
-    "title": "mrgsolveModel2",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "code/scripts/Model-Diagnostics.html",
-    "href": "code/scripts/Model-Diagnostics.html",
-    "title": "Model Diagnostics",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "code/scripts/Simulation-Based-Diagnostics.html",
-    "href": "code/scripts/Simulation-Based-Diagnostics.html",
-    "title": "Simulation Based Diagnostics",
-    "section": "",
-    "text": "Coming Soon!"
-  },
-  {
-    "objectID": "code/scripts/Simulations.html",
-    "href": "code/scripts/Simulations.html",
-    "title": "Simulations",
     "section": "",
     "text": "Coming Soon!"
   },
@@ -159,5 +33,194 @@
     "title": "NMModel2",
     "section": "",
     "text": "Coming Soon!"
+  },
+  {
+    "objectID": "code/scripts/Simulation-Based-Diagnostics.html",
+    "href": "code/scripts/Simulation-Based-Diagnostics.html",
+    "title": "Simulation Based Diagnostics",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "code/scripts/Simulations.html",
+    "href": "code/scripts/Simulations.html",
+    "title": "Simulations",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "code/scripts/Model-Diagnostics.html",
+    "href": "code/scripts/Model-Diagnostics.html",
+    "title": "Model Diagnostics",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "code/simData/mrgsolveModel2.html",
+    "href": "code/simData/mrgsolveModel2.html",
+    "title": "mrgsolveModel2",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "code/simData/mrgsolveModel1.html",
+    "href": "code/simData/mrgsolveModel1.html",
+    "title": "mrgsolveModel1",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Home",
+    "section": "",
+    "text": "Welcome!\nBayesian methods have had a slow but steady uptake in the pharmacometrics (PMx) community. There are still significant barriers for completely adopting these approaches for routine PMx workflows. Here we try to enhance Bayesian knowledge and understanding in both the general and pharmacometrics-specific sense.\nWe have presented a Bayesian tutorial at ACoP14 with examples from Stan/Torsten and based on the overwhelming interest in this topic, we are extending that to also include NONMEM along with a wealth of learning resources specifically developed and curated for the PMx community.\nWe provide tutorials and code that are both theoretical and practical in nature. We believe that this resource will give users in the PMx community a knowledge platform to implement a fully Bayesian workflow that involves model fitting, model diagnostics, model selection, post-processing, as well as running simulations for any model that they desire.\nWe encourage tutorial and code contributions from subject matter experts as well as the user community. Please reach out to us if you would like to contribute to this resource."
+  },
+  {
+    "objectID": "tutorials/Introduction-to-Stan.html",
+    "href": "tutorials/Introduction-to-Stan.html",
+    "title": "Introduction to Stan",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "tutorials/Posterior-Predictive-Check.html",
+    "href": "tutorials/Posterior-Predictive-Check.html",
+    "title": "Posterior Predictive Check",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "tutorials/Prior-Predictive-Check.html",
+    "href": "tutorials/Prior-Predictive-Check.html",
+    "title": "Prior Predictive Check",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "tutorials/Matrix-Exponentiation.html",
+    "href": "tutorials/Matrix-Exponentiation.html",
+    "title": "Matrix Exponentiation",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "tutorials/Extracting-Individual-Posteriors-in-NONMEM.html",
+    "href": "tutorials/Extracting-Individual-Posteriors-in-NONMEM.html",
+    "title": "Extracting Individual Posteriors in NONMEM",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "tutorials/Introduction-to-Bayesian-Inference.html",
+    "href": "tutorials/Introduction-to-Bayesian-Inference.html",
+    "title": "Introduction to Bayesian Inference",
+    "section": "",
+    "text": "Code\nlibrary(kableExtra)\nlibrary(patchwork)\nlibrary(plotly)\nlibrary(latex2exp)\nlibrary(magick)\nlibrary(gganimate)\nlibrary(bayesplot)\nlibrary(tidybayes)\nlibrary(loo)\nlibrary(posterior)\nlibrary(cmdstanr)\nlibrary(tidyverse)\n\ntheme_set(theme_bw(base_size = 16, base_line_size = 2))\nregister_knitr_engine()"
+  },
+  {
+    "objectID": "tutorials/Introduction-to-Bayesian-Inference.html#introduction",
+    "href": "tutorials/Introduction-to-Bayesian-Inference.html#introduction",
+    "title": "Introduction to Bayesian Inference",
+    "section": "1 Introduction",
+    "text": "1 Introduction\nThis document is is meant to introduce you to the most basic elements of Bayesian inference. It is in no way comprehensive, but it will hopefully give you a platform of understanding so that you can get as much as possible out of this tutorial.\nHere are a few references that we’ve found useful in our Bayesian lives:\n\nBayesian Data Analysis\nStatistical Rethinking\nRegression and Other Stories\nJose Storopoli’s slides on Bayesian Statistics\nStan Discourse"
+  },
+  {
+    "objectID": "tutorials/Introduction-to-Bayesian-Inference.html#statistical-inference",
+    "href": "tutorials/Introduction-to-Bayesian-Inference.html#statistical-inference",
+    "title": "Introduction to Bayesian Inference",
+    "section": "2 Statistical Inference",
+    "text": "2 Statistical Inference\n\nIn any experiment, survey, observational study, or clinical trial, we are using sample data to try to answer some question(s) about the population of interest.\nWe collect (sample) data \\(\\left(X\\right)\\) to estimate parameters \\(\\left(\\theta\\right)\\) and perform some sort of inference (point estimation, confidence intervals, hypothesis tests, ) to say something/make decisions about the “population.”\nHowever, learning from the data is complicated by the natural variability of the measurements, so we can’t find the “correct” values of the parameters.\nWe want to quantify our knowledge/uncertainty about the parameters with point estimates, i.e., “typical” values, and uncertainty estimates such as standard errors, CV%, and confidence intervals.\n\n\n2.1 Motivating Examples\nWe want to estimate the proportion of the population that likes Mountain Dew Cheesecake.\n\n\n\n\n2.1.1 Example 1\nAfter collecting \\(n = 6\\) data points where \\(x = 5\\) people liked it, we want to make inferences about the population parameter \\(\\theta\\), the proportion of people in the population that likes Mt. Dew Cheesecake.\n\n\n2.1.2 Example 2\nAfter collecting \\(n = 60\\) data points where \\(x = 50\\) people liked it, we want to make inferences about the population parameter \\(\\theta\\)"
+  },
+  {
+    "objectID": "tutorials/Introduction-to-Bayesian-Inference.html#frequentistlikelihoodist-approach",
+    "href": "tutorials/Introduction-to-Bayesian-Inference.html#frequentistlikelihoodist-approach",
+    "title": "Introduction to Bayesian Inference",
+    "section": "3 Frequentist/Likelihoodist Approach",
+    "text": "3 Frequentist/Likelihoodist Approach\nThe most common methods for parameter estimation in non-Bayesian paradigms involve some sort of optimization. For this problem, we’ll use maximum likelihood, 1 where we find the value of \\(\\theta\\) that maximizes the likelihood2, or, in other words, we find the value of \\(\\theta\\) that maximizes the probability of observing the data that we have observed.\nIn the above example, we assume the data has a binomial distribution with \\(n\\) trials and probability of success, \\(\\theta\\), i.e. \\(X \\sim Bin(n,\\theta)\\). Then we can write out the density3 \\(f(x \\;| \\; \\theta)\\), the probability that we would would observe \\(x\\) “successes” out of \\(n\\) trials for a given value of \\(\\theta\\) for any value of \\(x \\in \\{0, 1, 2, \\ldots, n\\}\\) and \\(0 \\leq \\theta \\leq 1\\): \\[ \\begin{align}\nf(x | \\theta) &= P(X = x \\;| \\;\\theta) \\\\\n&= {n \\choose x}\\theta^x(1 - \\theta)^{n-x},\n\\;\\; x = 0, \\; 1, \\; 2, \\;\\ldots, \\; n\n\\end{align}\\]\nFor Example 1 above with \\(n = 6\\), for \\(\\theta\\) values of 0.4 and 0.75, the density of \\(X\\) looks like this:\n\n\nCode\nn_1 &lt;- 6\nprobs &lt;- c(0.40, 0.75)\n\nbinom_data &lt;- tibble(x = rep(0:n_1, times = length(probs)), \n                    theta = rep(probs, each = n_1 + 1)) %&gt;% \n  mutate(density = dbinom(x, n_1, prob = theta))\n\n\nbase_plot &lt;- ggplot(mapping = aes(x = x, y = density,\n                                 text = paste0(\"x: \", x, \"&lt;/br&gt;&lt;/br&gt;density: \", \n                                               round(density, 3)))) +\n  scale_x_continuous(name = \"x\",\n                     breaks = 0:n_1,\n                     labels = 0:n_1) +\n  ggtitle(\"Binomial Density\") +\n  theme(plot.title = element_text(hjust = 0.5))\n\np1 &lt;- (base_plot + \n         geom_bar(data = filter(binom_data, theta == probs[1]),\n                  stat = \"identity\")) %&gt;% \n  ggplotly(tooltip = \"text\") %&gt;% \n  layout(yaxis = list(title = str_c(\"P(X = x | \\U03B8 = \", probs[1],\")\")),\n         xaxis = list(title = \"x\"))\n\np2 &lt;- (base_plot + \n         geom_bar(data = filter(binom_data, theta == probs[2]),\n                  stat = \"identity\")) %&gt;% \n  ggplotly(tooltip = \"text\") %&gt;% \n  layout(yaxis = list(title = str_c(\"P(X = x | \\U03B8 = \", probs[2],\")\")),\n         xaxis = list(title = \"x\"))\n\n\nannot_base &lt;- list(y = 1.0,\n                   font = list(size = 16), \n                   xref = \"paper\", \n                   yref = \"paper\", \n                   xanchor = \"center\", \n                   yanchor = \"bottom\", \n                   showarrow = FALSE)\n\na1 &lt;- c(annot_base,\n        x = 0.2,\n        text = str_c(\"\\U03B8 = \", probs[1])) \n\na2 &lt;- c(annot_base,\n        x = 0.8,\n        text = str_c(\"\\U03B8 = \", probs[2])) \n\n\nsubplot(p1, p2, titleY = TRUE, titleX = TRUE, margin = 0.08) %&gt;% \n  layout(annotations = list(a1, a2))\n\n\n\n\n\nFigure 1: Two Binomial Densities\n\n\n\nBut we want to maximize the likelihood function, \\(\\mathcal{L}(\\theta \\; | \\; x)\\). Luckily for us, it is the same as the density, but is a function of \\(\\theta\\) for a given \\(x\\), instead of \\(X\\) for a given \\(\\theta\\). That is, \\(\\mathcal{L}(\\theta \\; | \\; x) = f(x \\;| \\; \\theta)\\). For Example 1 with \\(n = 6\\) and \\(x = 5\\) the likelihood is as below \\[\\begin{align}\n\\mathcal{L}(\\theta \\; | \\; x)  &= {n \\choose x}\\theta^x(1 - \\theta)^{n-x} \\\\\n&= {6 \\choose 5}\\theta^5(1 - \\theta)^{6 - 5}, \\;\\; 0 \\leq \\theta \\leq 1\n\\end{align}\\]\n\n\nCode\nn_1 &lt;- 6\nx_1 &lt;- 5\n\n(binom_like_plot_1 &lt;- tibble(theta = seq(0, 1, by = 0.01)) %&gt;% \n    mutate(likelihood = dbinom(x_1, n_1, prob = theta)) %&gt;% \n    ggplot(aes(x = theta, y = likelihood)) +\n    geom_line(size = 2) +\n    ylab(str_c(\"L(\\U03B8 | X = \", x_1, \")\")) +\n    xlab(\"\\U03B8\") +\n    ggtitle(str_c(\"Binomial Likelihood, n = \", n_1, \", X = \", x_1)) +\n    theme(plot.title = element_text(hjust = 0.5),\n          plot.subtitle = element_text(hjust = 0.5)))\n\n\n\n\n\nFigure 2: Binomial likelihood.\n\n\n\n\nThe maximum likelihood estimate (MLE), \\(\\hat\\theta\\), is the value of \\(\\theta\\) that maximizes this function. That is, \\[\\hat\\theta = \\underset{\\theta}{\\mathrm{argmax}} \\;\n\\mathcal{L}(\\theta \\; | \\; x)\\]\nIntuitively, it is the value of \\(\\theta\\) that is “most likely” given the observed data. For example, in our example it doesn’t seem likely that we would observe our data if \\(\\theta = 0.25\\), but it seems more likely that we could observe this data if \\(\\theta = 0.8\\) or so.\nWe also want to quantify the uncertainty of this estimate, typically with a standard error. A larger standard error means we are more uncertain about our estimate than a smaller standard error, and in a sense, the standard error is a measure of the “pointiness” of the likelihood. The (asymptotic) standard error can be calculated as the square root of the diagonals of the inverse of the Fisher information matrix evaluated at the MLE (the observed Fisher information. See here for a more thorough discussion of MLEs, Fisher information, and the form when \\(\\theta\\) is a vector). An intuitive explanation of the relationship of the standard errors to the Fisher information matrix is that the standard error is a measure of the curvature of the likelihood. Roughly, more information in the data \\(\\implies\\) large negative values in the observed Fisher information matrix (more curvature) \\(\\implies\\) smaller values after inversion to get the variance.\nThis particular example has a simple, closed-form solution, but most of our problems in the PK/PD world require a numerical optimization, typically by some gradient-based method. So for our example, we can do this numerical optimization in R\n\n\nCode\nx_1 &lt;- 5\nn_2 &lt;- 6\n\nx_2 &lt;- 50\nn_2 &lt;- 60\n\nexample_mle_1 &lt;- optim(par = 0.3, \n                       fn = function(theta, n, x) \n                         -dbinom(x, n, theta, log = TRUE), \n                       n = n_1, x = x_1, \n                       method = \"Brent\", \n                       hessian = TRUE, lower = 0, upper = 1)\n\nexample_mle_2 &lt;- optim(par = 0.3, \n                       fn = function(theta, n, x) \n                         -dbinom(x, n, theta, log = TRUE), \n                       n = n_2, x = x_2, \n                       method = \"Brent\", \n                       hessian = TRUE, lower = 0, upper = 1)\n\ntribble(~Example, ~MLE, ~SE,\n        1, example_mle_1$par, sqrt(1/as.double(example_mle_1$hessian)),\n        2, example_mle_2$par, sqrt(1/as.double(example_mle_2$hessian))) %&gt;% \n  knitr::kable(format = \"html\", digits = 3, align = \"c\",\n               caption = \"Numerical MLE\") %&gt;% \n  kableExtra::kable_styling(bootstrap_options = \"striped\", full_width = FALSE,\n                            position = \"center\")\n\n\n\nNumerical MLE\n\n\nExample\nMLE\nSE\n\n\n\n\n1\n0.833\n0.152\n\n\n2\n0.833\n0.048\n\n\n\n\n\n\n\n\n\nCode\nx_ticks &lt;- sort(c(example_mle_1$par, seq(0, 1, by = 0.25)))\ntick_colors &lt;- if_else(x_ticks == example_mle_1$par, \"red\", \"black\")\n\np1 &lt;- binom_like_plot_1 +\n  geom_segment(aes(x = example_mle_1$par, y = 0, \n                   xend = example_mle_1$par, \n                   yend = dbinom(x_1, n_1, example_mle_1$par)),\n               color = \"red\") +\n  scale_x_continuous(breaks = x_ticks,\n                     labels = as.character(round(x_ticks, 3))) +\n  theme(axis.text.x = element_text(color = tick_colors)) +\n  ggtitle(str_c(\"n = \", n_1, \", X = \", x_1))\n\n\np2 &lt;- tibble(theta = seq(0, 1, by = 0.01)) %&gt;% \n  mutate(likelihood = dbinom(x_2, n_2, prob = theta)) %&gt;% \n  ggplot(aes(x = theta, y = likelihood)) +\n  geom_line(size = 2) +\n  ylab(str_c(\"L(\\U03B8 | X = \", x_2, \")\")) +\n  xlab(\"\\U03B8\") +\n  ggtitle(str_c(\"Binomial Likelihood, n = \", n_2, \", X = \", x_2)) +\n  theme(plot.title = element_text(hjust = 0.5),\n        plot.subtitle = element_text(hjust = 0.5)) +\n  geom_segment(aes(x = example_mle_2$par, y = 0, \n                   xend = example_mle_2$par, \n                   yend = dbinom(x_2, n_2, example_mle_2$par)),\n               color = \"red\") +\n  scale_x_continuous(breaks = x_ticks,\n                     labels = as.character(round(x_ticks, 3))) +\n  theme(axis.text.x = element_text(color = tick_colors)) +\n  ggtitle(str_c(\"n = \", n_2, \", X = \", x_2))\n\n(ggpubr::ggarrange(p1, p2, \n                  ncol = 2) %&gt;% \n    ggpubr::annotate_figure(\n      top = ggpubr::text_grob(\"Binomial Likelihoods with MLE\", \n                              size = 24))) \n\n\n\n\n\nTwo binomial likelihoods with MLE."
+  },
+  {
+    "objectID": "tutorials/Introduction-to-Bayesian-Inference.html#bayesian-approach",
+    "href": "tutorials/Introduction-to-Bayesian-Inference.html#bayesian-approach",
+    "title": "Introduction to Bayesian Inference",
+    "section": "4 Bayesian Approach",
+    "text": "4 Bayesian Approach\nClassical methods treat the parameter(s) as fixed and the data random and then find a point estimate and standard error using only information from the data4. In contrast, Bayesian methods treat the parameter(s) as a random variable and consider the data fixed and then make inferences based on a proper distribution. These methods initially allocate probability to all possible parameter values via a prior distribution and then reallocate probability when new information is gained. Bayesian inference depends on our ability to quantify the posterior distribution of the parameters conditioned on the data. This posterior distribution contains all of our knowledge about \\(\\theta\\) (prior knowledge and knowledge obtained from the data).\n\n4.1 Bayes’ Theorem\nThe form of the posterior distribution follows from Bayes’ Theorem5: \\[\\begin{align}\n\\color{blue}{p\\left( \\theta | x\\right)} &=\n\\frac{p(x, \\theta)}{\\color{red}{f\\left( x \\right)}} \\notag \\\\\n&= \\frac{\\color{green}{f\\left( x | \\theta\\right)}\\color{orange}{p\\left( \\theta\n\\right)}}{\\color{red}{f\\left( x \\right)}} \\notag \\\\\n&= \\frac{\\color{green}{f\\left( x | \\theta\\right)}\\color{orange}{p\\left( \\theta\n\\right)}}{\\color{red}{\\int \\limits_{\\Theta}f\\left( x | \\theta\\right)\np\\left( \\theta \\right) \\mathrm{d}\\theta}}\n\\end{align} \\tag{1}\\]\n\n4.1.1 Prior Distribution\nWe begin with the prior distribution to quantify our knowledge/beliefs about \\(\\theta\\) before we collect data. For our examples, we might assume\n\na “noninformative” prior distribution6 and use a \\(Uniform(0, 1)\\) (equivalent to a \\(Beta(1,1)\\)7 distribution for \\(p(\\theta)\\)). This is a simple way to express our ignorance about \\(\\theta\\).\nan informative prior that expresses our belief that most people will not like Mt. Dew Cheesecake. We might quantify this with a \\(Beta(2, 3)\\) distribution.\n\n\n\nCode\nalpha_1 &lt;- 1\nbeta_1 &lt;- 1\n\nalpha_2 &lt;- 2\nbeta_2 &lt;- 3\n\ntheta &lt;- seq(0, 1, .01)\n\ndf_prior &lt;- tibble(theta = theta, prior_1 = dbeta(theta, alpha_1, beta_1),\n                   prior_2 = dbeta(theta, alpha_2, beta_2)) %&gt;% \n  pivot_longer(c(prior_1, prior_2), names_to = \"example\", values_to = \"value\") %&gt;% \n  arrange(example)\n\n\n(prior_plot &lt;- ggplot(data = df_prior, aes(x = theta, y = value, \n                                          color = example)) +\n  geom_line(size = 2) +\n  ylab(str_c(\"p(\\U03B8)\")) +\n  xlab(\"\\U03B8\") +\n  scale_color_manual(name = \"Prior\",\n                     breaks = c(\"prior_1\", \"prior_2\"),\n                     values = c(\"purple\", \"orange\"),\n                     labels = c(\"Uniform (Beta(1, 1))\",\n                                \"Informative (Beta(2, 3))\")))\n\n\n\n\n\nFigure 3: Two beta priors.\n\n\n\n\n\n\n4.1.2 Likelihood\nThe likelihood is the same (see Figure 2) as we had when we were using optimization methods (recall that \\(\\mathcal{L}(\\theta \\; | \\; x) = f(x \\;| \\; \\theta)\\)).\n\n\nCode\ndf_likelihood &lt;- tibble(theta = theta) %&gt;%\n  mutate(likelihood_1 = dbinom(x_1, n_1, prob = theta),\n         likelihood_2 = dbinom(x_2, n_2, prob = theta)) %&gt;%\n  pivot_longer(c(likelihood_1, likelihood_2), names_to = \"example\",\n               values_to = \"value\") %&gt;%\n  arrange(example)\n\nplot_likelihood &lt;- ggplot(data = df_likelihood, aes(x = theta, y = value,\n                                                  color = example)) +\n  geom_line(size = 2) +\n  ylab(str_c(\"f(x | (\\U03B8) = L(\\U03B8 | X)\")) +\n  xlab(\"\\U03B8\") +\n  scale_color_manual(name = \"Likelihood\",\n                     breaks = c(\"likelihood_1\", \"likelihood_2\"),\n                     values = c(\"green\", \"purple\"),\n                     labels = c(str_c(\"x = \", x_1, \", n = \", n_1),\n                                str_c(\"x = \", x_2, \", n = \", n_2)))\nplot_likelihood\n\n\n\n\n\nUnnormalized Likelihoods.\n\n\n\n\nOne thing to notice for each of these likelihoods is that they do not integrate to 18, one of the requirements for a function to be a probability distribution. However, the likelihood can be normalized to integrate to 1 by multiplying by a constant. This will be touched upon again in the section on marginal distributions and in Appendix A, and all future plots will plot a scaled likelihood for visual purposes.\n\n\nCode\nlike_binom &lt;- function(theta, n, x) dbinom(x, n, theta)\nintegral_1 &lt;- integrate(like_binom, n = n_1, x = x_1, \n                        lower = 0, upper = 1)$value\nintegral_2 &lt;- integrate(like_binom, n = n_2, x = x_2, \n                        lower = 0, upper = 1)$value\n\ntribble(~Example, ~Integral,\n        \"1\", integral_1,\n        \"2\", integral_2) %&gt;% \n  knitr::kable(format = \"html\", digits = 3, align = \"c\",\n               caption = \"Likelihood Integrals\") %&gt;% \n  kableExtra::kable_styling(bootstrap_options = \"striped\", full_width = FALSE,\n                            position = \"center\")\n\n\n\n\nTable 1: Likelihood Integrals\n\n\nExample\nIntegral\n\n\n\n\n1\n0.143\n\n\n2\n0.016\n\n\n\n\n\n\n\n\nRegardless, the likelihood is a key part of Bayes’ Theorem and contains the information about \\(\\theta\\) obtained from the data.\n\n\n4.1.3 Marginal Distribution\nConsider the case where \\(X\\) has the sampling density \\(f(x \\;|\\; \\theta)\\) and \\(\\theta\\) is a random variable with density \\(p(\\theta)\\). Then the joint density of \\(X\\) and \\(\\theta\\) is \\[f(x, \\; \\theta) = f(x \\;|\\; \\theta) \\; p(\\theta),\\] which you will recognize as the numerator in Equation 1. The marginal distribution9 of \\(X\\) is then \\[\\begin{align}\nf(x) &= \\int \\limits_{\\Theta}f(x, \\; \\theta) \\; \\mathrm{d}\\theta \\notag \\\\\n&= \\int \\limits_{\\Theta}f\\left( x | \\theta\\right) p\\left( \\theta \\right)\n\\mathrm{d}\\theta\n\\end{align} \\tag{2}\\]\nThat is, the marginal density of \\(X\\) is equal to the conditional sampling density of \\(X\\) averaged over all possible values of \\(\\theta\\). It can also be thought of as a description of the predictions we would make for \\(X\\) given only our prior knowledge, which is why this is sometimes called the “prior predictive distribution”10. See Appendix A for more discussion on the marginal distribution.\nIn practice, the marginal distribution is often analytically intractable, and it is often just cast aside so that we have the posterior distribution up to a constant: \\[\\begin{align}\n\\color{blue}{p( \\theta \\; | \\; x)} &=\n\\frac{\\color{green}{f( x \\; | \\; \\theta)}\\; \\color{orange}{p( \\theta )}}\n{\\color{red}{f\\left( x \\right)}} \\notag \\\\\n&\\propto \\color{green}{f( x \\; | \\; \\theta)}\\; \\color{orange}{p( \\theta )}\n\\end{align} \\tag{3}\\]\nThis inability to find a closed-form for the marginal distribution is not a problem. Modern computational methods such as Markov Chain Monte Carlo (MCMC) allow us to sample from the posterior in such a way that the sample represents the true posterior distribution arbitrarily closely, and we can perform our inference based on this sample.\n\n\n4.1.4 Posterior Distribution\nThe posterior distribution (See Appendix B for a derivation of the posterior for our examples) is the key to all Bayesian inference. It combines the prior distribution and the likelihood and contains all of the available information about \\(\\theta\\) (prior knowledge and information obtained from the data):\n\n\nCode\ndf_all &lt;- tibble(theta = theta, \n                 posterior_1_1 = dbeta(theta, alpha_1 + x_1, beta_1 + n_1 - x_1),\n                 posterior_1_2 = dbeta(theta, alpha_1 + x_2, beta_1 + n_2 - x_2),\n                 posterior_2_1 = dbeta(theta, alpha_2 + x_1, beta_2 + n_1 - x_1),\n                 posterior_2_2 = dbeta(theta, alpha_2 + x_2, beta_2 + n_2 - x_2)) %&gt;% \n  pivot_longer(starts_with(\"posterior\"), names_to = \"example\", \n               values_to = \"value\") %&gt;% \n  bind_rows(df_prior, \n            df_likelihood) \n\ndf_all %&gt;% \n  filter(example %in% c(\"prior_2\", \"likelihood_1\", \"posterior_2_1\")) %&gt;% \n  mutate(value = if_else(example == \"likelihood_1\", value/(1/n_1), value)) %&gt;% \n  ggplot(aes(x = theta, y = value, group = example, color = example)) +\n  geom_line(size = 1.25) +\n  xlab(\"\\U03B8\") + \n  ylab(NULL) +\n  scale_color_manual(name = NULL,\n                     breaks = c(\"prior_2\", \"likelihood_1\", \"posterior_2_1\"),\n                     values = c(\"orange\", \"green4\", \"blue\"),\n                     labels = c(\"Prior\", \"Likelihood\", \"Posterior\"))\n\n\n\n\n\nPosterior as a combination of the likelihood and prior.\n\n\n\n\nOnce we have our posterior distribution, we can make similar inferences as in frequentist inference:\n\nPoint estimates - We have a proper distribution now, so we can report the posterior mean, median, or mode ( 0.636, 0.645, and 0.667, respectively).\n\n\n\nCode\nposterior_point_estimates &lt;- tribble(\n  ~type, ~value,\n  \"mean\", (alpha_2 + x_1)/(alpha_2 + x_1 + beta_2 + n_1 - x_1),\n  \"median\", qbeta(0.5, alpha_2 + x_1, beta_2 + n_1 - x_1),\n  \"mode\", (alpha_2 + x_1 - 1)/(alpha_2 + x_1 + beta_2 + n_1 - x_1 - 2)) %&gt;% \n  mutate(density = dbeta(value, alpha_2 + x_1, beta_2 + n_1 - x_1))\n\n(p_posterior_with_point_estimates &lt;- df_all %&gt;% \n  filter(example == \"posterior_2_1\") %&gt;%  \n  ggplot(aes(x = theta, y = value)) +\n  geom_line(size = 1.25, color = \"blue\") +\n  xlab(\"\\U03B8\") + \n  ylab(str_c(\"p(\\U03B8 | x)\")) +\n  geom_segment(data = posterior_point_estimates, \n             mapping = aes(x = value, y = 0, xend = value, yend = density,\n                           color = type),\n             size = 1.15) +\n  scale_color_manual(name = \"Point Estimate\",\n                     breaks = c(\"mean\", \"median\", \"mode\"),\n                     labels = c(\"Mean\", \"Median\", \"Mode\"),\n                     values = c(\"red\", \"purple\", \"black\")))\n\n\n\n\n\nPosterior point estimates.\n\n\n\n\n\nStandard deviation (analogous to a standard error) - for our example the standard deviation is 0.139\nEven better, we can make interval estimates, e.g.credible intervals, with a natural probabilistic interpretation:\n\n“There is a 95% chance that the true proportion of people who like Mt. Dew cheesecake is between 0.348 and 0.878.”\n“There is an 82.81% chance that the true proportion of people who like Mt. Dew cheesecake is at least 0.5.”\n\n\n\n\nCode\ninterval_base &lt;- df_all %&gt;% \n  filter(example == \"posterior_2_1\") %&gt;%\n  bind_rows(tibble(theta = c(qbeta(0.025, alpha_2 + x_1, beta_2 + n_1 - x_1),\n                             qbeta(0.975, alpha_2 + x_1, beta_2 + n_1 - x_1)),\n                   example = \"posterior_2_1\") %&gt;% \n              mutate(value = dbeta(theta, alpha_2 + x_1, beta_2 + n_1 - x_1))) %&gt;% \n  arrange(theta) %&gt;% \n  ggplot(aes(x = theta, y = value)) +\n  geom_line(size = 1.25, color = \"blue\") +\n  xlab(\"\\U03B8\") + \n  ylab(str_c(\"p(\\U03B8 | x)\"))\n\nx_ticks &lt;- sort(c(qbeta(c(0.025, 0.975), alpha_2 + x_1, beta_2 + n_1 - x_1), \n                  seq(0, 1, by = 0.25)))\ntick_colors &lt;- if_else(x_ticks %in% \n                         qbeta(c(0.025, 0.975), \n                               alpha_2 + x_1, beta_2 + n_1 - x_1), \n                       \"red\", \"black\")\n\np_ci &lt;- interval_base +\n  geom_area(data = df_all %&gt;% \n              filter(example == \"posterior_2_1\",\n                     between(theta, \n                             qbeta(0.025, alpha_2 + x_1, beta_2 + n_1 - x_1), \n                             qbeta(0.975, alpha_2 + x_1, beta_2 + n_1 - x_1))),\n            fill = \"blue\", alpha = 0.25) + \n  ggtitle(\"95% credible interval\") +\n  theme(plot.title = element_text(hjust = 0.5)) +\n  scale_x_continuous(breaks = x_ticks,\n                     labels = as.character(round(x_ticks, 3))) +\n  theme(axis.text.x = element_text(color = tick_colors))\n\np_gt_50 &lt;- interval_base +\n  geom_area(data = df_all %&gt;% \n              filter(example == \"posterior_2_1\",\n                     between(theta, 0.50, 1)),\n            fill = \"blue\", alpha = 0.25) +\n  ggtitle(\"P(\\U03B8 &gt; 0.50 | X = 5)\") +\n  theme(plot.title = element_text(hjust = 0.5))\n\np_ci + \n  p_gt_50\n\n\n\n\n\n\n\n\n\n\nWe can also look at the posterior predictive distribution (See Appendix C for a derivation of the posterior predictive distribution for our examples). This is the distribution of possible unobserved values conditional on our observed values. For example, we could look at the density for a future observation, \\(x^*\\), for different future values of \\(n, n^*\\).\n\n\n\nCode\nx &lt;- 5\nn &lt;- 6\n\nn_star &lt;- c(6, 10)\n\n(p_analytical_ppd &lt;- tibble(x_star = c(0:n_star[1], 0:n_star[2]),\n       n_star = c(rep(n_star[1], times = n_star[1] + 1),\n                  rep(n_star[2], times = n_star[2] + 1))) %&gt;% \n  mutate(density = extraDistr::dbbinom(x_star, n_star, \n                                       alpha_2 + x, beta_2 + n - x)) %&gt;% \n  ggplot() +\n  geom_bar(aes(x = x_star, y = density),\n           stat = \"identity\") +\n  scale_x_continuous(name = latex2exp::TeX(\"$x^*$\"),\n                     breaks = 0:max(n_star),\n                     labels = 0:max(n_star)) +\n  ylab(latex2exp::TeX(\"$p(x^* | \\\\; x) = P(X^*= x^* | \\\\; x)\")) +\n  ggtitle(\"Posterior Predictive Density\") +\n  theme(plot.title = element_text(hjust = 0.5)) +\n  facet_wrap(~n_star, scales = \"free_x\", \n             labeller = label_bquote(n^\"*\" == .(n_star))))"
+  },
+  {
+    "objectID": "tutorials/Introduction-to-Bayesian-Inference.html#mcmc",
+    "href": "tutorials/Introduction-to-Bayesian-Inference.html#mcmc",
+    "title": "Introduction to Bayesian Inference",
+    "section": "5 Markov Chain Monte Carlo",
+    "text": "5 Markov Chain Monte Carlo\nAs mentioned in the section on marginal distributions, we often have an analytically intractable marginal distribution, which means we cannot get a closed-form solution for the posterior distribution11. Markov Chain Monte Carlo (MCMC) methods allow us to sample from the posterior distribution, and we can perform our inference based on numerical integration of the sample, rather than analytical integration when the closed-form is known.\nTraditional Monte Carlo methods include the Gibbs sampler and Metropolis-Hastings. These methods are fast and easy-to-implement, but often lead to inefficient sampling from the posterior. Stan12 implements a more modern method called the No U-Turn Sampler (NUTS) that is itself an extension of Hamiltonian Monte Carlo. While more computationally intensive than Gibbs sampling or Metropolis-Hastings, it samples more efficiently from the posterior than those more traditional methods.\n\n5.1 MCMC - An Illustration\nLet’s assume we know the posterior density up to a constant, as in Equation 3):\n\n\n\n\n\n\n\n\n\nSince we don’t have the marginal distribution, we can’t analytically integrate our posterior, but we can sample from it using MCMC methods:\n\nVideo\n\nIn practice we use multiple chains to sample from the target distribution:\n\n\nCode\n# time series\nstatic_tsplot &lt;- df %&gt;%\n  rename(Chain = \"chain\") %&gt;% \n  ggplot(aes(x = iteration, y = theta, group = Chain, color = Chain)) +\n  geom_line(size = 1, alpha = 0.7) + \n  scale_linetype_manual(name = \"Chain\", \n                        values = c(2,2)) + \n  labs(color = \"Chain\", x = \"Iteration\", y = \"\\U03B8\") +\n  theme(legend.position = \"none\") +\n  facet_wrap(~Chain, nrow = 4, labeller = label_both)\n\n# animate\nanimated_tsplot &lt;- static_tsplot +\n  transition_reveal(along = iteration, \n                    range = as.integer(c(1, max(df$iteration) + 50))) \n\n# save\na_gif &lt;- animate(animated_tsplot,\n                 width = 600, \n                 height = 600)\n\n# histogram\nstatic_hist &lt;- df %&gt;% \n  rename(Chain = \"chain\") %&gt;% \n  split(.$iteration) %&gt;% \n  accumulate(~ bind_rows(.x, .y)) %&gt;% \n  bind_rows(.id = \"frame\") %&gt;% \n  mutate(frame = as.integer(frame)) %&gt;%\n  ggplot(aes(x = theta, fill = Chain)) +\n  geom_histogram(#aes(y = ..density..), \n    color = \"white\", bins = 15, alpha = 0.7, position = \"identity\") + \n  labs(x = \"\\U03B8\", fill = \"Chain\") +\n  theme(axis.text.y = element_blank(),\n        axis.ticks.y = element_blank(),\n        axis.title.y = element_blank(),\n        legend.position = \"none\") +\n  facet_wrap(~Chain, nrow = 4, labeller = label_both) \n\n# animate\nanim_hist &lt;- static_hist + \n  transition_manual(frame) +\n  ease_aes(\"linear\") +\n  enter_fade() +\n  exit_fade()\n\n# save\nb_gif &lt;- animate(anim_hist,\n                 width = 600, \n                 height = 600)\n\na_mgif &lt;- image_read(a_gif)\nb_mgif &lt;- image_read(b_gif)\n\n# put side-by-side\nnew_gif &lt;- image_append(c(a_mgif[1], b_mgif[1]))\nfor(i in 2:min(length(a_mgif))){\n  combined &lt;- image_append(c(a_mgif[i], b_mgif[i]))\n  new_gif &lt;- c(new_gif, combined)\n}\n\nnew_gif\n\n\n\n\n\nWhen we have collected all of our samples, we combine the chains, and the resulting samples should be distributed according to the true posterior:\n\n\nCode\nmcmc_hist(samples$draws(\"theta\"), freq = FALSE) +\n  geom_line(data = data_1, mapping = aes(x = theta, y = density)) +\n  xlab(\"\\U03B8\")\n\n\n\n\n\nSamples overlayed with the true distribution.\n\n\n\n\n\n\n5.2 MCMC for Our Examples\nOur examples are very simple and have a simple closed form for the posterior distribution (see Appendix B) and posterior predictive distribution (see Appendix C). But let’s imagine the marginal distribution was intractable, and we weren’t able to find the closed form for the posterior. We’ll write the model in Stan and then sample from the posterior.\n\n\nCode\ndata{\n\n  int&lt;lower = 0&gt; x; // observed positive responses\n  int&lt;lower = x&gt; n; // number of responses\n  \n  real&lt;lower = 0&gt; alpha; // Value of alpha for the prior distribution\n  real&lt;lower = 0&gt; beta;  // Value of beta for the prior distribution\n\n  int n_new;               // length of new n values you want to simulate for \n  array[n_new] int n_star; // Number of future respondents for posterior predictions\n  \n}\nparameters{\n\n  real&lt;lower = 0, upper = 1&gt; theta;\n\n}\nmodel{\n  // Priors\n  theta ~ beta(alpha, beta);\n  \n  // Likelihood\n  x ~ binomial(n, theta);\n}\ngenerated quantities{\n  \n  array[n_new] int x_star = binomial_rng(n_star, theta); \n  \n}\n\n\n\n\nCode\nstan_data &lt;- list(x = 5,\n                  n = 6,\n                  alpha = 2,\n                  beta = 3,\n                  n_new = 2,\n                  n_star = c(6, 10))\n\nfit &lt;- model_beta_binomial$sample(data = stan_data,\n                                  iter_warmup = 1000,\n                                  iter_sampling = 1000,\n                                  chains = 4,\n                                  refresh = 0) \n\ntheta_draws &lt;- fit$draws(\"theta\")\n\ndraws_df &lt;- fit$draws(format = \"draws_df\")\n\nsummary &lt;- summarize_draws(theta_draws, \n                           mean, median, sd, pr_gt_half = ~ mean(. &gt;= 0.5),\n                           ~quantile2(.x, probs = c(0.025, 0.975)), rhat,\n                           ess_bulk, ess_tail)\n\n\nNow we can perform inference using our samples. We can look at the full posterior distributions with either histograms or density plots:\n\n\nCode\ncolor_scheme_set(\"blue\")\n\npost_hist &lt;- mcmc_hist(theta_draws, freq = FALSE) +\n  ylab(str_c(\"p(\\U03B8 | x)\")) +\n  scale_x_continuous(name = \"\\U03B8\",\n                     breaks = c(0, 0.25, 0.5, 0.75, 1),\n                     labels = c(0, 0.25, 0.5, 0.75, 1),\n                     limits = c(0, 1))\n\npost_dens &lt;- mcmc_dens(theta_draws) +\n  ylab(str_c(\"p(\\U03B8 | x)\")) +\n  scale_x_continuous(name = \"\\U03B8\",\n                     breaks = c(0, 0.25, 0.5, 0.75, 1),\n                     labels = c(0, 0.25, 0.5, 0.75, 1),\n                     limits = c(0, 1))\n\npost_hist /\n  post_dens\n\n\n\n\n\n\n\n\n\nWe can also make similar inferences as before:\n\nPoint estimates - for these samples, the posterior mean and median are 0.635 and 0.648, respectively.\n\n\n\nCode\npost_dens +\n  geom_vline(data = summary %&gt;% \n               select(mean, median) %&gt;% \n               rename_all(str_to_title) %&gt;% \n               pivot_longer(Mean:Median, names_to = \"Estimate\"), \n             mapping = aes(xintercept = value, color = Estimate),\n               size = 1.15) +\n  scale_color_manual(name = \"Point Estimate\",\n                     breaks = c(\"Mean\", \"Median\"),\n                     labels = c(\"Mean\", \"Median\"),\n                     values = c(\"red\", \"purple\"))\n\n\n\n\n\n\n\n\n\n\nThe posterior standard deviation for \\(\\theta\\) is 0.141.\nInterval estimates\n\n95% credible interval - “There is a 95% chance that the true proportion of people who like Mt. Dew cheesecake is between 0.342 and 0.88.”\n“There is an 82.27% chance that the true proportion of people who like Mt. Dew cheesecake is at least 0.5.”\n\n\n\n\nCode\nx_ticks &lt;- sort(c(as.double(summary$q2.5), as.double(summary$q97.5),\n                  seq(0, 1, by = 0.25)))\ntick_colors &lt;- if_else(x_ticks %in% c(as.double(summary$q2.5), \n                                      as.double(summary$q97.5)), \n                       \"red\", \"black\")\n\nsample_ci &lt;- mcmc_areas(theta_draws, prob = 0.95, point_est = \"none\") +\n  ggtitle(\"95% credible interval\") +\n  scale_x_continuous(name = \"\\U03B8\",\n                     breaks = x_ticks,\n                     labels = as.character(round(x_ticks, 3)),\n                     limits = c(0, 1)) +\n  scale_y_discrete(breaks = \"theta\",\n                   limits = \"theta\",\n                   labels = c(\"theta\" = \"\"),\n                   expand = expansion(add = c(0, 0))) +\n  theme(axis.text.x = element_text(color = tick_colors),\n        plot.title = element_text(hjust = 0.5))\n\n\n\nblah &lt;- mcmc_dens(theta_draws, alpha = 0) +\n  ggtitle(\"P(\\U03B8 &gt; 0.50 | X = 5)\") +\n  scale_x_continuous(name = \"\\U03B8\",\n                     limits = c(0, 1)) +\n  theme(plot.title = element_text(hjust = 0.5))\n\nblah_d &lt;- ggplot_build(blah)$data[[1]]\n\nsample_gt_half &lt;- blah +\n  geom_area(data = subset(blah_d, x &gt;= 0.5), aes(x = x, y = y), fill = \"blue\", \n            alpha = 0.25)\n\n\nsample_ci +\n  sample_gt_half\n\n\n\n\n\n\n\n\n\nWe can look at the posterior predictive distribution13 for \\(n^* = 6\\) and \\(n^* = 10\\):\n\n\nCode\n(p_sample_ppd &lt;- draws_df %&gt;% \n  spread_draws(x_star[i]) %&gt;% \n  ungroup() %&gt;% \n  mutate(n_star = stan_data$n_star[i]) %&gt;% \n  ggplot() +\n  geom_bar(aes(x = x_star, group = n_star, y = ..prop..)) +\n  scale_x_continuous(name = latex2exp::TeX(\"$x^*$\"),\n                     breaks = 0:max(stan_data$n_star),\n                     labels = 0:max(stan_data$n_star)) +\n  ylab(latex2exp::TeX(\"$p(x^* | \\\\; x) = P(X^*= x^* | \\\\; x)\")) +\n  ggtitle(\"Posterior Predictive Density\") +\n  theme(plot.title = element_text(hjust = 0.5)) +\n  facet_wrap(~n_star, scales = \"free_x\", \n             labeller = label_bquote(n^\"*\" == .(n_star))))\n\n\n\n\n\n\n\n\n\n\n5.2.1 Comparison with the Analytical Posterior\nTo compare the true, analytical posterior with the sampled posterior we can look at the full densities:\n\n\nCode\nmcmc_dens(theta_draws) +\n  geom_line(data = df_all %&gt;% \n              filter(example == \"posterior_2_1\"),\n            mapping = aes(x = theta, y = value), color = \"red\", size = 2) +\n  ylab(str_c(\"p(\\U03B8 | x)\")) +\n  scale_x_continuous(name = \"\\U03B8\",\n                     breaks = c(0, 0.25, 0.5, 0.75, 1),\n                     labels = c(0, 0.25, 0.5, 0.75, 1),\n                     limits = c(0, 1))\n\n\n\n\n\n\n\n\n\nand posterior parameter and quantile estimates:\n\n\nCode\nmcmc_estimates &lt;- summary %&gt;% \n  pivot_longer(c(mean, median, sd, starts_with(\"q\")), \n               names_to = \"Variable\", values_to = \"MCMC\") %&gt;% \n  select(Variable, MCMC) %&gt;% \n  mutate(MCMC = as.double(MCMC))\n\nanalytical_estimates &lt;- tibble(Variable = mcmc_estimates$Variable) %&gt;% \n  mutate(Analytical = \n           case_when(Variable == \"mean\" ~ \n                       (alpha_2 + x_1)/(alpha_2 + x_1 + beta_2 + n_1 - x_1),\n                     Variable == \"median\" ~ \n                       qbeta(0.5, alpha_2 + x_1, beta_2 + n_1 - x_1),\n                     Variable == \"sd\" ~\n                       sqrt((alpha_2 + x_1)*(beta_2 + n_1 - x_1)/\n                              ((alpha_2 + beta_2 + n_1)^2*(alpha_2 + beta_2 + n_1 + 1))),\n                     Variable == \"q2.5\" ~\n                       qbeta(0.025, alpha_2 + x_1, beta_2 + n_1 - x_1),\n                     Variable == \"q97.5\" ~\n                       qbeta(0.975, alpha_2 + x_1, beta_2 + n_1 - x_1),\n                     TRUE ~ NA_real_))\n\nestimates &lt;- analytical_estimates %&gt;% \n  inner_join(mcmc_estimates, by = \"Variable\") \n\nestimates %&gt;% \n  mutate(across(Analytical:MCMC, \\(x) round(x, 3)),\n         Variable = case_when(Variable == \"mean\" ~ \"Mean\",\n                              Variable == \"median\" ~ \"Median\",\n                              Variable == \"sd\" ~ \"Std. Dev.\",\n                              Variable == \"q2.5\" ~ \"2.5th percentile\",\n                              Variable == \"q97.5\" ~ \"97.5th percentile\",\n                              TRUE ~ NA_character_)) %&gt;% \n  # kbl(caption = \"&lt;center&gt;Posterior Estimates for &theta;&lt;center&gt;\") %&gt;%\n  kbl(caption = \"Posterior Estimates for \\U03B8\") %&gt;%\n  kable_classic(full_width = F) %&gt;% \n  add_header_above(c(\" \" = 1, \"Estimate\" = 2))\n\n\n\nPosterior Estimates for θ\n\n\n\n\n\n\n\n\n\nEstimate\n\n\n\nVariable\nAnalytical\nMCMC\n\n\n\n\nMean\n0.636\n0.635\n\n\nMedian\n0.645\n0.648\n\n\nStd. Dev.\n0.139\n0.141\n\n\n2.5th percentile\n0.348\n0.342\n\n\n97.5th percentile\n0.878\n0.880\n\n\n\n\n\n\n\nand the posterior predictive densities:\n\n\nCode\nd1 &lt;- ggplot_build(p_sample_ppd)$data[[1]] %&gt;% \n  mutate(type = \"MCMC\")\nd2 &lt;- ggplot_build(p_analytical_ppd)$data[[1]] %&gt;% \n  mutate(type = \"Analytical\")\n\nbind_rows(d1, d2) %&gt;% \n  select(x, y, type) %&gt;% \n  mutate(n_star = rep(c(rep(n_star[1], times = n_star[1] + 1),\n                        rep(n_star[2], times = n_star[2] + 1)), times = 2)) %&gt;% \n  ggplot() +\n  geom_bar(aes(x = x, y = y, group = type, fill = type),\n           stat = \"identity\", position = \"dodge\") +\n  scale_x_continuous(name = latex2exp::TeX(\"$x^*$\"),\n                     breaks = 0:max(n_star),\n                     labels = 0:max(n_star)) +\n  scale_fill_manual(name = NULL,\n                    breaks = c(\"Analytical\", \"MCMC\"),\n                    values = c(\"red\", \"blue\")) +\n  ylab(latex2exp::TeX(\"$p(x^* | \\\\; x) = P(X^*= x^* | \\\\; x)\")) +\n  ggtitle(\"Posterior Predictive Density\") +\n  theme(plot.title = element_text(hjust = 0.5),\n        legend.position = \"bottom\") +\n  facet_wrap(~n_star, scales = \"free_x\", \n             labeller = label_bquote(n^\"*\" == .(n_star)))\n\n\n\n\n\n\n\n\n\nYou can see that all posterior quantities are similar between the analytical solutions and those estimated through MCMC."
+  },
+  {
+    "objectID": "tutorials/Introduction-to-Bayesian-Inference.html#summarytldr",
+    "href": "tutorials/Introduction-to-Bayesian-Inference.html#summarytldr",
+    "title": "Introduction to Bayesian Inference",
+    "section": "6 Summary/tl;dr",
+    "text": "6 Summary/tl;dr\n\nClassical methods find point estimates through optimization of some objective function (often some function of the likelihood) and quantify uncertainty by examining the curvature of the likelihood at the point estimate.\nBayesian methods quantify our knowledge about the parameter(s) with a distribution. From this distribution, we can obtain point estimates, uncertainty estimates, and make predictions for future data.\nThe posterior distribution is a combination of our prior distribution and the data and contains all of our knowledge about the parameter(s).\nThe likelihood contains all of the information from the data.\nThe use of the prior distribution can range from being a nuisance that serves simply as a catalyst that allows us to express uncertainty via Bayes’theorem to a means to stabilize the sampling algorithm to actually incorporating knowledge about the parameter(s) before collecting data.\nWe often can’t get the posterior distribution in closed-form, but we can generally use Markov Chain Monte Carlo methods to obtain a sample that approximates the posterior.\nStan is a great tool for performing the MCMC sampling."
+  },
+  {
+    "objectID": "tutorials/Introduction-to-Bayesian-Inference.html#appendices",
+    "href": "tutorials/Introduction-to-Bayesian-Inference.html#appendices",
+    "title": "Introduction to Bayesian Inference",
+    "section": "7 Appendices",
+    "text": "7 Appendices\n\n7.1 Appendix A - More on the Marginal Distribution\nWhile the marginal distribution is often analytically intractable, there are some cases where we can find the closed form. For our examples, we have assumed \\[\\begin{align}\nX|\\theta &\\sim Binomial(n, \\; \\theta) \\\\\n\\theta &\\sim Beta(\\alpha, \\; \\beta)\n\\end{align}\\] Then \\[\\begin{align}\nf(x) &= \\int \\limits_{\\Theta} p\\left( x, \\; \\theta \\right) \\; \\mathrm{d}\\theta \\\\\n&= \\int \\limits_{\\Theta}f\\left( x | \\theta\\right) p\\left( \\theta \\right) \\;\n\\mathrm{d}\\theta  \\notag \\\\\n&= \\int_0^1 {n \\choose x}\\theta^x(1 - \\theta)^{n-x}\n\\frac{\\Gamma(\\alpha + \\beta)}{\\Gamma(\\alpha)\\Gamma(\\beta)}\n\\theta^{\\alpha - 1}(1 - \\theta)^{\\beta - 1} \\; \\mathrm{d}\\theta \\notag \\\\\n&= {n \\choose x} \\frac{\\Gamma(\\alpha + \\beta)}{\\Gamma(\\alpha) \\; \\Gamma(\\beta)}\n\\frac{\\Gamma(\\alpha + x) \\;\n\\Gamma(\\beta + n - x)}{\\Gamma(\\alpha + \\beta + n)} \\notag \\\\\n&= {n \\choose x} \\frac{B(\\alpha + x, \\; \\beta + n - x)}{B(\\alpha, \\; \\beta)},\n\\; x \\in \\{0, 1, \\ldots, n\\}, \\;\\;\\; \\alpha, \\; \\beta &gt; 0\n\\end{align} \\tag{4}\\] a beta-binomial distribution14.\nIf we assume the prior distribution \\(\\theta \\sim Beta(1, 1)\\) to express our ignorance of \\(\\theta\\), then Equation 4 evaluates to \\[f(x) = \\frac{1}{n+1}, \\; x = 0, 1, \\ldots, n\\] the density for a discrete uniform.\nIf we assume the prior distribution \\(\\theta \\sim Beta(2, 3)\\) to express our prior knowledge of \\(\\theta\\), then \\[\\begin{align}\nf(x) &= \\frac{n!}{x!\\;(n-x)!}\\;\\frac{4!}{1!\\;2!} \\;\n\\frac{(x+1)! \\; (n-x+2)!}{(n+4)!}, \\;\\; x = 0, 1, \\ldots, n\n\\end{align}\\]\nThese two marginal distributions look like this (for Example 1 with \\(n = 6\\)):\n\n\nCode\nn &lt;- 6\nx &lt;- 0:n\n\nalpha_1 &lt;- 1\nbeta_1 &lt;- 1\n\nalpha_2 &lt;- 2\nbeta_2 &lt;- 3\n\ndbetabinomial &lt;- function(x, n, alpha, beta){\n  \n  choose(n, x) * beta(alpha + x, beta + n - x)/(beta(alpha, beta)) \n    \n}\n\nmarg_dists &lt;- tibble(x = x) %&gt;% \n  mutate(marginal_1 = dbetabinomial(x, n, alpha_1, beta_1),\n         marginal_2 = dbetabinomial(x, n, alpha_2, beta_2)) %&gt;% \n  pivot_longer(c(marginal_1, marginal_2), names_to = \"example\", \n               values_to = \"density\") %&gt;% \n  arrange(example)\n\nbase_plot &lt;- ggplot(mapping = aes(x = x, y = density,\n                                  text = paste0(\"x: \", x, \"&lt;/br&gt;&lt;/br&gt;density: \",\n                                                round(density, 3)))) +\n  scale_x_continuous(name = \"x\",\n                     breaks = 0:n,\n                     labels = 0:n) +\n  ggtitle(\"Marginal Density\") +\n  theme(plot.title = element_text(hjust = 0.5))\n\np1 &lt;- (base_plot +\n         geom_bar(data = filter(marg_dists, example == \"marginal_1\"),\n                  stat = \"identity\")) %&gt;%\n  ggplotly(tooltip = \"text\") %&gt;%\n  layout(yaxis = list(title = str_c(\"f(x) = P(X = x)\")),\n         xaxis = list(title = \"x\"))\n\np2 &lt;- (base_plot +\n         geom_bar(data = filter(marg_dists, example == \"marginal_2\"),\n                  stat = \"identity\")) %&gt;%\n  ggplotly(tooltip = \"text\") %&gt;%\n  layout(yaxis = list(title = str_c(\"f(x) = P(X = x)\")),\n         xaxis = list(title = \"x\"))\n\nannot_base &lt;- list(y = 1.0,\n                  font = list(size = 16),\n                  xref = \"paper\",\n                  yref = \"paper\",\n                  xanchor = \"center\",\n                  yanchor = \"bottom\",\n                  showarrow = FALSE)\n\na_1 &lt;- c(annot_base,\n        x = 0.225,\n        text = str_c(\"\\U03B1 = \", alpha_1, \", \\U03B2 = \", beta_1))\n\na_2 &lt;- c(annot_base,\n        x = 0.775,\n        text = str_c(\"\\U03B1 = \", alpha_2, \", \\U03B2 = \", beta_2))\n\nsubplot(p1, p2, titleY = TRUE, titleX = TRUE, margin = 0.08) %&gt;%\n  layout(annotations = list(a_1, a_2))\n\n\n\n\nTwo marginal densities.\n\n\nStopping to think about this, these plots make sense: if we have no knowledge of \\(\\theta\\) (recall that a \\(Beta(1,1)\\) distribution is “noninformative”), then any value of \\(x\\) should be no more or less likely than any other possible value of \\(x\\) conditional on our current knowledge of \\(\\theta\\). If we have some idea of \\(\\theta\\) (a \\(Beta(2, 3)\\) describes our belief that it is likely that \\(\\theta &lt; 0.5\\), see Figure 3), then we would also expect the marginal distribution of \\(X\\) to be skewed towards lower values, as seen above.\nHaving integrated \\(\\theta\\) out of the joint distribution of \\(X\\) and \\(\\theta\\), we can see that the marginal distribution is a constant in \\(\\theta\\). This constant is exactly the value needed to normalize the numerator in Equation 1, making the posterior distribution a true distribution.\nFor example, if \\(\\theta \\sim Beta(1,1)\\), then \\(p(\\theta) = 1, \\; 0 \\leq \\theta \\leq 1\\). So the numerator in Equation 1 is \\[\\begin{align}\nf(x \\; | \\; \\theta)\\;p(\\theta) &= f(x \\;| \\; \\theta) \\times 1 \\\\\n&= f(x \\; | \\; \\theta) \\\\\n&= \\mathcal{L}(\\theta \\; | \\; x)\n\\end{align}\\] and we have already integrated our likelihoods for Examples 1 and 2 in Table 1. If we divide the values in this table by \\(f(x) = \\frac{1}{n+1}\\) for the corresponding \\(n\\), we get exactly 1 for both, i.e., we normalized the numerator, and so the posterior distribution is now a true distribution15.\n\n\n7.2 Appendix B - Derivation of the Posterior in Our Examples\nFor our examples, we have assumed \\[\\begin{align}\nX|\\theta &\\sim Binomial(n, \\; \\theta) \\\\\n\\theta &\\sim Beta(\\alpha, \\; \\beta)\n\\end{align}\\] Then \\[\\begin{align}\np( \\theta \\; | \\; x) &=\n\\frac{f( x \\; | \\; \\theta)\\; p( \\theta )}{f\\left( x \\right)} \\notag \\\\\n&\\propto f( x \\; | \\; \\theta)\\; p( \\theta ) \\notag \\\\\n&= {n \\choose x}\\theta^x(1 - \\theta)^{n-x} \\;\n\\frac{\\Gamma(\\alpha + \\beta)}{\\Gamma(\\alpha)\\;\\Gamma(\\beta)} \\;\n\\theta^{\\alpha - 1}\\;(1-\\theta)^{\\beta - 1} \\notag \\\\\n&\\propto \\theta^{\\alpha + x - 1}\\;(1 - \\theta)^{\\beta + n - x - 1} \\notag \\\\\n&\\implies \\theta\\;|\\;x \\sim Beta(\\alpha + x, \\; \\beta + n - x)\n\\end{align}\\]\n\n\n7.3 Appendix C - Derivation of the Posterior Predictive Distribution in Our Examples\nIn Appendix B we derived the posterior distribution of \\(\\theta\\). Here we will derive the posterior predictive distribution used for posterior predictive checking and to simulate/predict future data.\nAfter collecting \\(x\\) positive responses out of \\(n\\) respondents, we want the density for the number of positive responses, \\(x^*\\), out of \\(n^*\\) future respondents: \\[\\begin{align}\nf(x^* | x) &= \\int \\limits_{\\Theta} p\\left( x^*, \\; \\theta  | x \\right) \\;\n\\mathrm{d}\\theta \\notag \\\\\n&= \\int \\limits_{\\Theta}f\\left( x^* | \\theta, x \\right)\np\\left( \\theta | x \\right) \\; \\mathrm{d}\\theta  \\notag \\\\\n&= \\int \\limits_{\\Theta}f\\left( x^* | \\theta \\right)\np\\left( \\theta | x \\right) \\; \\mathrm{d}\\theta \\\\\n&= \\int_0^1 {n^* \\choose x^*}\\theta^{x^*}(1 - \\theta)^{n^* - x^*}\n\\frac{\\Gamma(\\alpha + \\beta + n)}{\\Gamma(\\alpha + x)\\Gamma(\\beta + n - x)}\n\\theta^{\\alpha + x - 1}(1 - \\theta)^{\\beta + n - x - 1} \\;\n\\mathrm{d}\\theta \\notag \\\\\n&= {n^* \\choose x^*} \\frac{\\Gamma(\\alpha + \\beta + n)}{\\Gamma(\\alpha + x) \\; \\Gamma(\\beta + n - x)}\n\\frac{\\Gamma(\\alpha + x + x^*) \\;\n\\Gamma(\\beta + n - x + n^* - x^*)}{\\Gamma(\\alpha + \\beta + n + n^*)} \\notag \\\\\n&= {n^* \\choose x^*}\n\\frac{B(\\alpha + x + x^*, \\; \\beta + n - x + n^* - x^*)}{B(\\alpha + x, \\; \\beta + n - x)},\n\\; x^* \\in \\{0, 1, \\ldots, n^*\\}\n\\end{align}\\] another beta-binomial distribution.\nYou can see that this is similar to Equation 2 in that it shows the posterior predictive distribution as an average of conditional predictions over the posterior distribution of \\(\\theta\\). That is, it is equal to the conditional sampling density of \\(X^*\\)averaged over all possible values of \\(\\theta\\) conditioned on our data."
+  },
+  {
+    "objectID": "tutorials/Introduction-to-Bayesian-Inference.html#footnotes",
+    "href": "tutorials/Introduction-to-Bayesian-Inference.html#footnotes",
+    "title": "Introduction to Bayesian Inference",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nYou might see least squares, AIC, BIC, or -2 LL, but the idea is the same.↩︎\nThe likelihood contains all the information contained in the data↩︎\nThis might be called a “probability mass function” for discrete \\(x\\), a “probability density function” for continuous \\(x\\) or as a generic term, or simply the “density”, and the reader should know from context what is meant.↩︎\nYou can argue that regularization methods like ridge regression and lasso incorporate prior information with the constraint parameter (\\(\\lambda\\)). Most people don’t think of the constraint as prior information, but there is a direct Bayesian analogue (with maximum a posteriori (MAP) estimation) to (many) regularization methods.↩︎\nThe integral is used generally. If the parameter space of \\(\\theta\\) is discrete, this will be a summation, and if \\(\\theta\\) is a vector, then there will be multiple integrals (and/or summations)↩︎\nFor now, disregard that no priors are truly noninformative. and that “noninformative” priors are often a bad idea.↩︎\nFor \\(X \\sim Beta(\\alpha, \\beta)\\), \\[\\begin{align}\nf(x) &= \\frac{\\Gamma(\\alpha + \\beta)}{\\Gamma(\\alpha)\\;\\Gamma(\\beta)} \\;\nx^{\\alpha - 1}\\;(1-x)^{\\beta - 1} \\\\\n&= \\frac{1}{B(\\alpha, \\beta)}\\;x^{\\alpha - 1}\\;(1-x)^{\\beta - 1},\n\\; 0 \\leq x \\leq 1, \\;\\;\\; \\alpha, \\; \\beta &gt; 0\n\\end{align}\\] where \\(\\Gamma(\\cdot)\\) is the Gamma function and \\(B(\\cdot, \\cdot)\\) is the Beta function↩︎\nThey do integrate to 1 with respect to \\(x\\) (see Figure 1), but they do not with respect to \\(\\theta\\), which is why they are not true probability distributions for \\(\\theta\\)↩︎\nIt should be noted that the marginal distribution is technically dependent on the hyperparameters, e.g., for our examples with hyperpriors \\(\\alpha\\) and \\(\\beta\\) in \\(p(\\theta)\\), \\(f(x)\\) is technically \\(f_{\\alpha, \\beta}(x)\\), but the dependence on the hyperparameters is understood.↩︎\nWe will talk about this later when we go into setting priors for complex problems↩︎\nOur examples here have been simple and used conjugate priors, so we have been able to find a closed-form solution for the posterior. This is rarely the case in our real-life problems in the PK/PD world.↩︎\nPython also has a NUTS implementation in the PyMC package. Julia has a NUTS implementation in the Turing package, NONMEM also can sample from the posterior using either M-H and Gibbs with the BAYES method or using NUTS with the NUTS method.↩︎\nWith \\(n^* = 6 = n\\), we are also doing a posterior predictive check (PPC). The idea of PPC is that if a model is a good fit, then we should be able to use it to generate data that looks a lot like the data we observed.↩︎\nThe beta-binomial distribution is similar to the binomial distribution in that it gives the probability of observing \\(x\\) successes in \\(n\\) trials. However, while the binomial distribution considers \\(\\theta\\) fixed and known, the beta-binomial distribution assumes \\(\\theta\\) is either unknown or random and incorporates this uncertainty in \\(\\theta\\) by treating \\(\\theta\\) as a draw from a Beta distribution. This uncertainty in \\(\\theta\\) has the effect of giving the beta-binomial a slightly larger variance than the binomial↩︎\nThe lack of normalization is why frequentist inference can’t talk about the likelihood as a distribution↩︎"
+  },
+  {
+    "objectID": "tutorials/Model-Diagnostics.html",
+    "href": "tutorials/Model-Diagnostics.html",
+    "title": "Model Diagnostics",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "tutorials/Priors.html",
+    "href": "tutorials/Priors.html",
+    "title": "Priors",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "tutorials/Incorporating-Covariates.html",
+    "href": "tutorials/Incorporating-Covariates.html",
+    "title": "Incorporating Covariates",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "tutorials/Simulations-Setup.html",
+    "href": "tutorials/Simulations-Setup.html",
+    "title": "Simulations Setup",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "tutorials/Bayesian-Estimation-Methods-in-NONMEM.html",
+    "href": "tutorials/Bayesian-Estimation-Methods-in-NONMEM.html",
+    "title": "Bayesian Estimation Methods in NONMEM",
+    "section": "",
+    "text": "Coming Soon!"
+  },
+  {
+    "objectID": "contributors.html",
+    "href": "contributors.html",
+    "title": "About the Authors",
+    "section": "",
+    "text": "Pavan Vaddady currently serves as the Head of Advanced Pharmacometrics within the Quantitative Clinical Pharmacology Department at Daiichi Sankyo, Inc. During his career, he led several early and late-stage development programs across multiple therapeutic areas both as a clinical pharmacologist and a pharmacometrician and applied model informed approaches to impact key drug development decisions. His current role involves developing a team of scientists for advanced pharmacometrics aspects including complex pharmacometrics modeling and simulation, disease progression, AI/ML, Bayesian approaches, MBMA across a portfolio of compounds. He is passionate about teaching and mentoring colleagues and has delivered comprehensive courses and tutorials on NONMEM, R, Stan, and Shiny for pharmacometricians. He obtained his B. Pharm. (Hons.), and M. Pharm. from BITS Pilani, India and his Ph.D. in pharmaceutical sciences from the University of Tennessee Health Science Center, Memphis, USA."
+  },
+  {
+    "objectID": "contributors.html#contributors",
+    "href": "contributors.html#contributors",
+    "title": "About the Authors",
+    "section": "Contributors",
+    "text": "Contributors\n\nYasong Lu, Daiichi Sankyo, Inc. \nArya Pourzanjani, Amgen"
   }
 ]

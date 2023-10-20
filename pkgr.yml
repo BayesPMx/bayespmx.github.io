@@ -3,6 +3,8 @@ Version: 1
 Packages:
   - tidyverse
   - tidybayes
+  - posterior
+  - knitr
   - bayesplot
   - gridExtra
   - patchwork
