@@ -465,7 +465,8 @@ df_all <- tibble(theta = theta,
 
 df_all %>% 
   filter(example %in% c("prior_2", "likelihood_1", "posterior_2_1")) %>% 
-  mutate(value = if_else(example == "likelihood_1", value/(1/n_1), value)) %>% 
+    mutate(value = if_else(example == "likelihood_1", value/(1/(n_1 + 1)), 
+                         value)) %>% 
   ggplot(aes(x = theta, y = value, group = example, color = example)) +
   geom_line(size = 1.25) +
   xlab("\U03B8") + 
