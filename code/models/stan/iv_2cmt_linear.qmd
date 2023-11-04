@@ -11,7 +11,121 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{css, echo = FALSE}
+.scrolling_500 {
+  max-height: 500px;
+  overflow-y: auto;
+}
 
+.scrolling_700 {
+  max-height: 700px;
+  overflow-y: auto;
+}
 
+.cell-output {
+  background-color: WhiteSmoke;
+  border-radius: 4px;
+}
+```
 
+# Proportional Error
 
+```{r}
+#| echo: false
+
+downloadthis::download_file(
+  path = here::here("models/stan/iv_2cmt_prop.stan"),
+  output_name = "iv_2cmt_prop",
+  button_label = "Download 2-cmt IV with proportional error",
+  button_type = "default",
+  has_icon = TRUE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+
+```
+
+::::{.scrolling_700}
+
+:::{.cell-output}
+
+```{r}
+#| echo: false
+#| output: true
+
+readLines(here::here("models/stan/iv_2cmt_prop.stan")) |>
+  writeLines()
+
+```
+
+:::
+
+::::
+
+# Proportional-Plus-Additive Error
+
+```{r}
+#| echo: false
+
+downloadthis::download_file(
+  path = here::here("models/stan/iv_2cmt_ppa.stan"),
+  output_name = "iv_2cmt_ppa",
+  button_label = "Download 2-cmt IV with proportional-plus-additive error",
+  button_type = "default",
+  has_icon = TRUE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+
+```
+
+::::{.scrolling_700}
+
+:::{.cell-output}
+
+```{r}
+#| echo: false
+#| output: true
+
+readLines(here::here("models/stan/iv_2cmt_ppa.stan")) |>
+  writeLines()
+
+```
+
+:::
+
+::::
+
+# Lognormal Error
+
+```{r}
+#| echo: false
+
+downloadthis::download_file(
+  path = here::here("models/stan/iv_2cmt_exp.stan"),
+  output_name = "iv_2cmt_exp",
+  button_label = "Download 2-cmt IV with lognormal error",
+  button_type = "default",
+  has_icon = TRUE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+
+```
+
+::::{.scrolling_700}
+
+:::{.cell-output}
+
+```{r}
+#| echo: false
+#| output: true
+
+readLines(here::here("models/stan/iv_2cmt_exp.stan")) |>
+  writeLines()
+
+```
+
+:::
+
+::::

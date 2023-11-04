@@ -769,9 +769,10 @@ model{
 #| label: model-with-threading
 #| cache: true
 #| echo: false
+#| output: false
 
 model_threaded <- 
-  cmdstan_model(here::here("models/stan/iv_1cmt_prop.stan"),
+  cmdstan_model(here::here("models/stan/iv_1cmt_prop_no_gq.stan"),
                 cpp_options = list(stan_threads = TRUE))
 
 ```

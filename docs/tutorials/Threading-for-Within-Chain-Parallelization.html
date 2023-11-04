@@ -770,7 +770,7 @@ Total execution time: 377.2 seconds.</code></pre>
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="5" data-code-annotation="1">Notice <code>parallel_chains = 4</code>, where it was 1 before.</span>
+<span data-code-lines="5" data-code-annotation="1" data-code-cell="annotated-cell-1">Notice <code>parallel_chains = 4</code>, where it was 1 before.</span>
 </dd>
 </dl>
 </div>
@@ -2258,60 +2258,61 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb9-781"><a href="#cb9-781" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: model-with-threading</span></span>
 <span id="cb9-782"><a href="#cb9-782" aria-hidden="true" tabindex="-1"></a><span class="co">#| cache: true</span></span>
 <span id="cb9-783"><a href="#cb9-783" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb9-784"><a href="#cb9-784" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-785"><a href="#cb9-785" aria-hidden="true" tabindex="-1"></a>model_threaded <span class="ot">&lt;-</span> </span>
-<span id="cb9-786"><a href="#cb9-786" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cmdstan_model</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_1cmt_prop.stan"</span>),</span>
-<span id="cb9-787"><a href="#cb9-787" aria-hidden="true" tabindex="-1"></a>                <span class="at">cpp_options =</span> <span class="fu">list</span>(<span class="at">stan_threads =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb9-788"><a href="#cb9-788" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-789"><a href="#cb9-789" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-790"><a href="#cb9-790" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-784"><a href="#cb9-784" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: false</span></span>
+<span id="cb9-785"><a href="#cb9-785" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-786"><a href="#cb9-786" aria-hidden="true" tabindex="-1"></a>model_threaded <span class="ot">&lt;-</span> </span>
+<span id="cb9-787"><a href="#cb9-787" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cmdstan_model</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_1cmt_prop_no_gq.stan"</span>),</span>
+<span id="cb9-788"><a href="#cb9-788" aria-hidden="true" tabindex="-1"></a>                <span class="at">cpp_options =</span> <span class="fu">list</span>(<span class="at">stan_threads =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb9-789"><a href="#cb9-789" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-790"><a href="#cb9-790" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb9-791"><a href="#cb9-791" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-792"><a href="#cb9-792" aria-hidden="true" tabindex="-1"></a>Here is the implementation of this model in R with within-chain parallelization:</span>
-<span id="cb9-793"><a href="#cb9-793" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-794"><a href="#cb9-794" aria-hidden="true" tabindex="-1"></a>:::{.scrolling_700}</span>
-<span id="cb9-795"><a href="#cb9-795" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-798"><a href="#cb9-798" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-799"><a href="#cb9-799" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fit-threading</span></span>
-<span id="cb9-800"><a href="#cb9-800" aria-hidden="true" tabindex="-1"></a><span class="co">#| cache: true</span></span>
-<span id="cb9-801"><a href="#cb9-801" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
-<span id="cb9-802"><a href="#cb9-802" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-803"><a href="#cb9-803" aria-hidden="true" tabindex="-1"></a>fit_threaded <span class="ot">&lt;-</span> <span class="fu">suppressMessages</span>(model_threaded<span class="sc">$</span><span class="fu">sample</span>(</span>
-<span id="cb9-804"><a href="#cb9-804" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> stan_data,</span>
-<span id="cb9-805"><a href="#cb9-805" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">112358</span>,</span>
-<span id="cb9-806"><a href="#cb9-806" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
-<span id="cb9-807"><a href="#cb9-807" aria-hidden="true" tabindex="-1"></a>  <span class="at">parallel_chains =</span> <span class="dv">4</span>,</span>
-<span id="cb9-808"><a href="#cb9-808" aria-hidden="true" tabindex="-1"></a>  <span class="co"># threads_per_chain = parallel::detectCores()/4,</span></span>
-<span id="cb9-809"><a href="#cb9-809" aria-hidden="true" tabindex="-1"></a>  <span class="at">threads_per_chain =</span> <span class="dv">2</span>,</span>
-<span id="cb9-810"><a href="#cb9-810" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_warmup =</span> <span class="dv">500</span>,</span>
-<span id="cb9-811"><a href="#cb9-811" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_sampling =</span> <span class="dv">1000</span>,</span>
-<span id="cb9-812"><a href="#cb9-812" aria-hidden="true" tabindex="-1"></a>  <span class="at">adapt_delta =</span> <span class="fl">0.8</span>,</span>
-<span id="cb9-813"><a href="#cb9-813" aria-hidden="true" tabindex="-1"></a>  <span class="at">refresh =</span> <span class="dv">0</span>,</span>
-<span id="cb9-814"><a href="#cb9-814" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_treedepth =</span> <span class="dv">10</span>,</span>
-<span id="cb9-815"><a href="#cb9-815" aria-hidden="true" tabindex="-1"></a>  <span class="at">init =</span> <span class="cf">function</span>() <span class="fu">list</span>(<span class="at">TVCL =</span> <span class="fu">rlnorm</span>(<span class="dv">1</span>, <span class="fu">log</span>(<span class="fl">0.25</span>), <span class="fl">0.3</span>),</span>
-<span id="cb9-816"><a href="#cb9-816" aria-hidden="true" tabindex="-1"></a>                         <span class="at">TVVC =</span> <span class="fu">rlnorm</span>(<span class="dv">1</span>, <span class="fu">log</span>(<span class="dv">3</span>), <span class="fl">0.3</span>),</span>
-<span id="cb9-817"><a href="#cb9-817" aria-hidden="true" tabindex="-1"></a>                         <span class="at">omega =</span> <span class="fu">rlnorm</span>(<span class="dv">2</span>, <span class="fu">log</span>(<span class="fl">0.3</span>), <span class="fl">0.3</span>),</span>
-<span id="cb9-818"><a href="#cb9-818" aria-hidden="true" tabindex="-1"></a>                         <span class="at">sigma_p =</span> <span class="fu">rlnorm</span>(<span class="dv">1</span>, <span class="fu">log</span>(<span class="fl">0.2</span>), <span class="fl">0.3</span>))))</span>
-<span id="cb9-819"><a href="#cb9-819" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-820"><a href="#cb9-820" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-821"><a href="#cb9-821" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-822"><a href="#cb9-822" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb9-823"><a href="#cb9-823" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-824"><a href="#cb9-824" aria-hidden="true" tabindex="-1"></a>You can see that there is a small speed-up. If you have more available cores,</span>
-<span id="cb9-825"><a href="#cb9-825" aria-hidden="true" tabindex="-1"></a>then there will be a larger speed-up.</span>
-<span id="cb9-826"><a href="#cb9-826" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-827"><a href="#cb9-827" aria-hidden="true" tabindex="-1"></a>A guide for choosing the <span class="in">`chains, parallel_chains,`</span> and <span class="in">`threads_per_chain`</span> </span>
-<span id="cb9-828"><a href="#cb9-828" aria-hidden="true" tabindex="-1"></a>arguments is to</span>
-<span id="cb9-829"><a href="#cb9-829" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-830"><a href="#cb9-830" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>Figure out how many cores you have available (<span class="in">`parallel::detectCores()`</span>)</span>
-<span id="cb9-831"><a href="#cb9-831" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>Choose the number of <span class="in">`chains`</span> you want to sample (we recommend 4)</span>
-<span id="cb9-832"><a href="#cb9-832" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>If <span class="in">`chains &lt; parallel::detectCores()`</span>, then have <span class="in">`parallel_chains = chains`</span> </span>
-<span id="cb9-833"><a href="#cb9-833" aria-hidden="true" tabindex="-1"></a>(almost all modern machines have at least 4 cores)</span>
-<span id="cb9-834"><a href="#cb9-834" aria-hidden="true" tabindex="-1"></a><span class="ss">4.  </span><span class="in">`threads_per_chain`</span> should be anywhere between 1 and $\frac{parallel::detectCores()}{parallel<span class="sc">\_</span>chains}$</span>
-<span id="cb9-835"><a href="#cb9-835" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-836"><a href="#cb9-836" aria-hidden="true" tabindex="-1"></a>For example, if your machine has 32 cores, we recommend having 4 <span class="in">`chains`</span>, 4 </span>
-<span id="cb9-837"><a href="#cb9-837" aria-hidden="true" tabindex="-1"></a><span class="in">`parallel_chains`</span>, and 8 <span class="in">`threads_per_chain`</span>. This will make use of all the </span>
-<span id="cb9-838"><a href="#cb9-838" aria-hidden="true" tabindex="-1"></a>available cores. Using more <span class="in">`threads_per_chain`</span> than this won't be helpful in </span>
-<span id="cb9-839"><a href="#cb9-839" aria-hidden="true" tabindex="-1"></a>reducing execution time, since the available cores are already in use.</span>
+<span id="cb9-792"><a href="#cb9-792" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-793"><a href="#cb9-793" aria-hidden="true" tabindex="-1"></a>Here is the implementation of this model in R with within-chain parallelization:</span>
+<span id="cb9-794"><a href="#cb9-794" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-795"><a href="#cb9-795" aria-hidden="true" tabindex="-1"></a>:::{.scrolling_700}</span>
+<span id="cb9-796"><a href="#cb9-796" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-799"><a href="#cb9-799" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb9-800"><a href="#cb9-800" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fit-threading</span></span>
+<span id="cb9-801"><a href="#cb9-801" aria-hidden="true" tabindex="-1"></a><span class="co">#| cache: true</span></span>
+<span id="cb9-802"><a href="#cb9-802" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb9-803"><a href="#cb9-803" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-804"><a href="#cb9-804" aria-hidden="true" tabindex="-1"></a>fit_threaded <span class="ot">&lt;-</span> <span class="fu">suppressMessages</span>(model_threaded<span class="sc">$</span><span class="fu">sample</span>(</span>
+<span id="cb9-805"><a href="#cb9-805" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> stan_data,</span>
+<span id="cb9-806"><a href="#cb9-806" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">112358</span>,</span>
+<span id="cb9-807"><a href="#cb9-807" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
+<span id="cb9-808"><a href="#cb9-808" aria-hidden="true" tabindex="-1"></a>  <span class="at">parallel_chains =</span> <span class="dv">4</span>,</span>
+<span id="cb9-809"><a href="#cb9-809" aria-hidden="true" tabindex="-1"></a>  <span class="co"># threads_per_chain = parallel::detectCores()/4,</span></span>
+<span id="cb9-810"><a href="#cb9-810" aria-hidden="true" tabindex="-1"></a>  <span class="at">threads_per_chain =</span> <span class="dv">2</span>,</span>
+<span id="cb9-811"><a href="#cb9-811" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_warmup =</span> <span class="dv">500</span>,</span>
+<span id="cb9-812"><a href="#cb9-812" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_sampling =</span> <span class="dv">1000</span>,</span>
+<span id="cb9-813"><a href="#cb9-813" aria-hidden="true" tabindex="-1"></a>  <span class="at">adapt_delta =</span> <span class="fl">0.8</span>,</span>
+<span id="cb9-814"><a href="#cb9-814" aria-hidden="true" tabindex="-1"></a>  <span class="at">refresh =</span> <span class="dv">0</span>,</span>
+<span id="cb9-815"><a href="#cb9-815" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_treedepth =</span> <span class="dv">10</span>,</span>
+<span id="cb9-816"><a href="#cb9-816" aria-hidden="true" tabindex="-1"></a>  <span class="at">init =</span> <span class="cf">function</span>() <span class="fu">list</span>(<span class="at">TVCL =</span> <span class="fu">rlnorm</span>(<span class="dv">1</span>, <span class="fu">log</span>(<span class="fl">0.25</span>), <span class="fl">0.3</span>),</span>
+<span id="cb9-817"><a href="#cb9-817" aria-hidden="true" tabindex="-1"></a>                         <span class="at">TVVC =</span> <span class="fu">rlnorm</span>(<span class="dv">1</span>, <span class="fu">log</span>(<span class="dv">3</span>), <span class="fl">0.3</span>),</span>
+<span id="cb9-818"><a href="#cb9-818" aria-hidden="true" tabindex="-1"></a>                         <span class="at">omega =</span> <span class="fu">rlnorm</span>(<span class="dv">2</span>, <span class="fu">log</span>(<span class="fl">0.3</span>), <span class="fl">0.3</span>),</span>
+<span id="cb9-819"><a href="#cb9-819" aria-hidden="true" tabindex="-1"></a>                         <span class="at">sigma_p =</span> <span class="fu">rlnorm</span>(<span class="dv">1</span>, <span class="fu">log</span>(<span class="fl">0.2</span>), <span class="fl">0.3</span>))))</span>
+<span id="cb9-820"><a href="#cb9-820" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-821"><a href="#cb9-821" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-822"><a href="#cb9-822" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-823"><a href="#cb9-823" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-824"><a href="#cb9-824" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-825"><a href="#cb9-825" aria-hidden="true" tabindex="-1"></a>You can see that there is a small speed-up. If you have more available cores,</span>
+<span id="cb9-826"><a href="#cb9-826" aria-hidden="true" tabindex="-1"></a>then there will be a larger speed-up.</span>
+<span id="cb9-827"><a href="#cb9-827" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-828"><a href="#cb9-828" aria-hidden="true" tabindex="-1"></a>A guide for choosing the <span class="in">`chains, parallel_chains,`</span> and <span class="in">`threads_per_chain`</span> </span>
+<span id="cb9-829"><a href="#cb9-829" aria-hidden="true" tabindex="-1"></a>arguments is to</span>
+<span id="cb9-830"><a href="#cb9-830" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-831"><a href="#cb9-831" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>Figure out how many cores you have available (<span class="in">`parallel::detectCores()`</span>)</span>
+<span id="cb9-832"><a href="#cb9-832" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>Choose the number of <span class="in">`chains`</span> you want to sample (we recommend 4)</span>
+<span id="cb9-833"><a href="#cb9-833" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>If <span class="in">`chains &lt; parallel::detectCores()`</span>, then have <span class="in">`parallel_chains = chains`</span> </span>
+<span id="cb9-834"><a href="#cb9-834" aria-hidden="true" tabindex="-1"></a>(almost all modern machines have at least 4 cores)</span>
+<span id="cb9-835"><a href="#cb9-835" aria-hidden="true" tabindex="-1"></a><span class="ss">4.  </span><span class="in">`threads_per_chain`</span> should be anywhere between 1 and $\frac{parallel::detectCores()}{parallel<span class="sc">\_</span>chains}$</span>
+<span id="cb9-836"><a href="#cb9-836" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-837"><a href="#cb9-837" aria-hidden="true" tabindex="-1"></a>For example, if your machine has 32 cores, we recommend having 4 <span class="in">`chains`</span>, 4 </span>
+<span id="cb9-838"><a href="#cb9-838" aria-hidden="true" tabindex="-1"></a><span class="in">`parallel_chains`</span>, and 8 <span class="in">`threads_per_chain`</span>. This will make use of all the </span>
+<span id="cb9-839"><a href="#cb9-839" aria-hidden="true" tabindex="-1"></a>available cores. Using more <span class="in">`threads_per_chain`</span> than this won't be helpful in </span>
+<span id="cb9-840"><a href="#cb9-840" aria-hidden="true" tabindex="-1"></a>reducing execution time, since the available cores are already in use.</span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
