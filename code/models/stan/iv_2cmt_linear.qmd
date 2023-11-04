@@ -1,0 +1,17 @@
+---
+title: "Two-Compartment IV Infusion"
+format:
+  html:
+    code-fold: false  
+    code-summary: "Code"
+    code-tools: true
+    number-sections: true
+    toc-depth: 5
+editor_options: 
+  chunk_output_type: console
+---
+
+
+
+
+
