@@ -1130,7 +1130,7 @@ You can see that all posterior quantities are similar between the analytical sol
 
 -   We often can't get the posterior distribution in closed-form, but we can generally use Markov Chain Monte Carlo methods to obtain a sample that approximates the posterior.
 
--   Stan is a great tool for performing the MCMC sampling.
+-   Stan and NONMEM are great tools for performing the MCMC sampling.
 
 ## Appendices
 
@@ -1249,7 +1249,7 @@ f(x \; | \; \theta)\;p(\theta) &= f(x \;| \; \theta) \times 1 \\
 
 ### Appendix B - Derivation of the Posterior in Our Examples {#appendix-b}
 
-For our examples, we have assumed $$\begin{align}
+For our examples, we have assumed a binomial likelihood with a beta prior (this is a [conjugate prior](https://en.wikipedia.org/wiki/Conjugate_prior))  $$\begin{align}
 X|\theta &\sim Binomial(n, \; \theta) \\
 \theta &\sim Beta(\alpha, \; \beta)
 \end{align}$$ Then $$\begin{align}

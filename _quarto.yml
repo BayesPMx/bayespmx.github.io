@@ -38,6 +38,7 @@ website:
           - tutorials/Bayesian-Estimation-Methods-in-NONMEM.qmd
           - tutorials/Priors.qmd
           - tutorials/Prior-Predictive-Check.qmd
+          - tutorials/Threading-for-Within-Chain-Parallelization.qmd
           - tutorials/Model-Diagnostics.qmd
           - tutorials/Extracting-Individual-Posteriors-in-NONMEM.qmd
           - tutorials/Posterior-Predictive-Check.qmd
@@ -58,7 +59,7 @@ website:
                   - code/models/nonmem/NMModel2.qmd
               - section: "Stan"
                 contents: 
-                  - code/models/stan/StanModel1.qmd
+                  - code/models/stan/iv_2cmt_linear.qmd
                   - code/models/stan/StanModel2.qmd
           - section: "Scripts"
             contents:
