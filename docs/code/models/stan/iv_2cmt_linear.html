@@ -95,6 +95,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 <script src="../../../site_libs/font-awesome-5.13.0/js/script.js"></script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../../../styles.css">
 </head>
@@ -370,9 +372,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#proportional-error" id="toc-proportional-error" class="nav-link active" data-scroll-target="#proportional-error"><span class="header-section-number">1</span> Proportional Error</a></li>
-  <li><a href="#proportional-plus-additive-error" id="toc-proportional-plus-additive-error" class="nav-link" data-scroll-target="#proportional-plus-additive-error"><span class="header-section-number">2</span> Proportional-Plus-Additive Error</a></li>
-  <li><a href="#lognormal-error" id="toc-lognormal-error" class="nav-link" data-scroll-target="#lognormal-error"><span class="header-section-number">3</span> Lognormal Error</a></li>
+  <li><a href="#pk-model" id="toc-pk-model" class="nav-link active" data-scroll-target="#pk-model"><span class="header-section-number">1</span> PK Model</a></li>
+  <li><a href="#statistical-model" id="toc-statistical-model" class="nav-link" data-scroll-target="#statistical-model"><span class="header-section-number">2</span> Statistical Model</a></li>
+  <li><a href="#stan-code" id="toc-stan-code" class="nav-link" data-scroll-target="#stan-code"><span class="header-section-number">3</span> Stan Code</a>
+  <ul>
+  <li><a href="#proportional-error" id="toc-proportional-error" class="nav-link" data-scroll-target="#proportional-error"><span class="header-section-number">3.1</span> Proportional Error</a></li>
+  <li><a href="#proportional-plus-additive-error" id="toc-proportional-plus-additive-error" class="nav-link" data-scroll-target="#proportional-plus-additive-error"><span class="header-section-number">3.2</span> Proportional-Plus-Additive Error</a></li>
+  <li><a href="#lognormal-error-1" id="toc-lognormal-error-1" class="nav-link" data-scroll-target="#lognormal-error-1"><span class="header-section-number">3.3</span> Lognormal Error</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -414,8 +421,205 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }
 </style>
 </div>
-<section id="proportional-error" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Proportional Error</h1>
+<p>Here, we write down the PK model for a two-compartment model with IV infusion and linear elimination. We also write down the statistical model for multiple error models. The Stan models are free to download using the corresponding download buttons.</p>
+<section id="pk-model" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> PK Model</h1>
+<p>The data-generating model is <span class="math display">\[C_{ij} = f(\mathbf{\theta}_i, t_{ij}) + error\]</span> where <span class="math inline">\(error\)</span> can be</p>
+<ul>
+<li>additive: <span class="math inline">\(C_{ij} = f(\mathbf{\theta}_i, t_{ij}) + \epsilon_{a_{ij}}\)</span></li>
+<li>proportional: <span class="math inline">\(C_{ij} = f(\mathbf{\theta}_i, t_{ij})*\left( 1 + \epsilon_{p_{ij}} \right)\)</span></li>
+<li>proportional-plus-additive: <span class="math inline">\(C_{ij} = f(\mathbf{\theta}_i, t_{ij})*\left( 1 + \epsilon_{p_{ij}} \right) + \epsilon_{a_{ij}}\)</span></li>
+<li>lognormal: <span class="math inline">\(C_{ij} = f(\mathbf{\theta}_i, t_{ij})*e^{\epsilon_{ij}}\)</span></li>
+</ul>
+<p>where <span class="math inline">\(\mathbf{\theta}_i = \left[CL_i, \, V_{c_i}, \, Q_i, \,V_{p_i}\right]^\top\)</span> is a vector containing the individual parameters for individual <span class="math inline">\(i\)</span><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, <span class="math inline">\(f(\cdot, \cdot)\)</span> is the two-compartment model mean function seen <a href="https://r-forge.r-project.org/scm/viewvc.php/*checkout*/PFIM3.2.2/PFIM_PKPD_library.pdf?root=pkpd">here</a>, and <span class="math inline">\(\epsilon_p, \epsilon_a,\)</span> and <span class="math inline">\(\epsilon\)</span> are normally distributed. The corresponding system of ODEs is:</p>
+<p><span id="eq-2cmt-macro-genode-no-depot"><span class="math display">\[\begin{align}
+\frac{dA_c}{dt} &amp;= -\left(\frac{CL}{V_c} + \frac{Q}{V_c}\right)A_C + \frac{Q}{V_p}A_p + rate_{in} \notag \\
+\frac{dA_p}{dt} &amp;= \frac{Q}{V_c}A_c - \frac{Q}{V_p}A_p \\
+\end{align} \tag{1}\]</span></span></p>
+<p>and then <span class="math inline">\(C = \frac{A_c}{V_c}\)</span><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
+</section>
+<section id="statistical-model" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Statistical Model</h1>
+<p>I’ll model the <em>correlation matrix</em> <span class="math inline">\(R_{\Omega}\)</span> and <em>standard deviations</em> (<span class="math inline">\(\omega_p\)</span>) of the random effects rather than the covariance matrix <span class="math inline">\(\Omega\)</span> that is the more traditional method.</p>
+<p><span class="math display">\[\begin{align}
+\Omega &amp;=
+\begin{pmatrix}
+\omega^2_{CL} &amp; \omega_{CL, V_c} &amp; \omega_{CL, Q} &amp; \omega_{CL, V_p} \\
+\omega_{CL, V_c} &amp; \omega^2_{V_c} &amp; \omega_{V_c, Q} &amp; \omega_{V_c, V_p} \\
+\omega_{CL, Q} &amp; \omega_{V_c, Q} &amp; \omega^2_{Q} &amp; \omega_{Q, V_p} \\
+\omega_{CL, V_p} &amp; \omega_{V_c, V_p} &amp; \omega_{Q, V_p} &amp; \omega^2_{V_p} \\
+\end{pmatrix} \\
+&amp;= \begin{pmatrix}
+\omega_{CL} &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; \omega_{V_c} &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; \omega_{Q} &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; \omega_{V_p} \\
+\end{pmatrix} \mathbf{R_{\Omega}}
+\begin{pmatrix}
+\omega_{CL} &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; \omega_{V_c} &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; \omega_{Q} &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; \omega_{V_p} \\
+\end{pmatrix} \\
+&amp;= \begin{pmatrix}
+\omega_{CL} &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; \omega_{V_c} &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; \omega_{Q} &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; \omega_{V_p} \\
+\end{pmatrix}
+\begin{pmatrix}
+1 &amp; \rho_{CL, V_c} &amp; \rho_{CL, Q} &amp; \rho_{CL, V_p} \\
+\rho_{CL, V_c} &amp; 1 &amp; \rho_{V_c, Q} &amp; \rho_{V_c, V_p} \\
+\rho_{CL, Q} &amp; \rho_{V_c, Q} &amp; 1 &amp; \rho_{Q, V_p} \\
+\rho_{CL, V_p} &amp; \rho_{V_c, V_p} &amp; \rho_{Q, V_p} &amp; 1 \\
+\end{pmatrix}
+\begin{pmatrix}
+\omega_{CL} &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; \omega_{V_c} &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; \omega_{Q} &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; \omega_{V_p} \\
+\end{pmatrix}
+\end{align}\]</span></p>
+<p>When the random effects are modeled this way, we get all of the same information as if they were modeled with a full covariance matrix, <em>i.e.</em>, we can transform the standard deviations and correlation matrix into the covariance matrix if we want. In addition, standard deviations and correlations are more interpretable than variances and covariances. It’s also much easier to set a prior distribution on the standard deviations and the correlation matrix with an <a href="https://en.wikipedia.org/wiki/Lewandowski-Kurowicka-Joe_distribution">LKJ</a> distribution than it is to set a prior on a covariance matrix with an <a href="https://en.wikipedia.org/wiki/Inverse-Wishart_distribution">inverse-Wishart</a> distribution.</p>
+<p>The full statistical model is</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">Proportional Error Model</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Proportional-plus-Additive Error Model</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Lognormal Error</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p><span class="math display">\[\begin{align}
+C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \mathbf{\Sigma}
+&amp;\sim Normal\left( f(\mathbf{\theta}_i, t_{ij}), \; \sigma_{ij} \right)
+I(C_{ij} &gt; 0) \notag \\
+\mathbf{\eta}_i \; | \; \Omega &amp;\sim Normal\left(
+\begin{pmatrix}
+0 \\ 0 \\ 0 \\ 0 \\
+\end{pmatrix}
+, \; \Omega\right) \notag \\
+TVCL &amp;\sim Lognormal\left(log\left(location_{TVCL}\right), scale_{TVCL}\right) \notag \\
+TVVC &amp;\sim Lognormal\left(log\left(location_{TVVC}\right), scale_{TVVC}\right) \notag \\
+TVQ &amp;\sim Lognormal\left(log\left(location_{TVQ}\right), scale_{TVQ}\right) \notag \\
+TVVP &amp;\sim Lognormal\left(log\left(location_{TVVP}\right), scale_{TVVP}\right) \notag \\
+\omega_{CL} &amp;\sim Half-Normal(0, scale_{\omega_{CL}}) \notag \\
+\omega_{V_c} &amp;\sim Half-Normal(0, scale_{\omega_{V_c}}) \notag \\
+\omega_{Q} &amp;\sim Half-Normal(0, scale_{\omega_{Q}}) \notag \\
+\omega_{V_p} &amp;\sim Half-Normal(0, scale_{\omega_{V_p}}) \notag \\
+R_{\Omega} &amp;\sim LKJ(df_{R_{\Omega}}) \notag \\
+\sigma_p &amp;\sim Half-Normal(0, scale_{\sigma_p}) \\
+\end{align}\]</span></p>
+<p>where <span class="math display">\[\begin{align}
+\mathbf{TV} &amp;=
+\begin{pmatrix}
+TVCL \\ TVVC \\ TVQ \\ TVVP \\
+\end{pmatrix} \\
+\mathbf{\theta}_i &amp;=
+\begin{pmatrix}
+CL_i \\ V_{c_i} \\ Q_i \\ V_{p_i} \\
+\end{pmatrix} =
+\begin{pmatrix}
+TVCL \times e^{\eta_{CL_i}} \\ TVVC \times e^{\eta_{V_{c_i}}} \\ TVQ \times e^{\eta_{Q_i}} \\ TVVP \times e^{\eta_{V_{p_i}}} \\
+\end{pmatrix} \\
+\mathbf{\eta}_i &amp;=
+\begin{pmatrix}
+\eta_{CL_i} \\ \eta_{V_{c_i}} \\ \eta_{Q_i} \\ \eta_{V_{p_i}} \\
+\end{pmatrix} \\
+\sigma_{ij} &amp;= f(\mathbf{\theta}_i, t_{ij})\sigma^2_p  \\
+\end{align}\]</span></p>
+<p>Note: The indicator for <span class="math inline">\(C_{ij} | \ldots\)</span> indicates that we are truncating the distribution of the observed concentrations to be greater than 0.</p>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p><span class="math display">\[\begin{align}
+C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \mathbf{\Sigma}
+&amp;\sim Normal\left( f(\mathbf{\theta}_i, t_{ij}), \; \sigma_{ij} \right)
+I(C_{ij} &gt; 0) \notag \\
+\mathbf{\eta}_i \; | \; \Omega &amp;\sim Normal\left(
+\begin{pmatrix}
+0 \\ 0 \\ 0 \\ 0 \\
+\end{pmatrix}
+, \; \Omega\right) \notag \\
+TVCL &amp;\sim Lognormal\left(log\left(location_{TVCL}\right), scale_{TVCL}\right) \notag \\
+TVVC &amp;\sim Lognormal\left(log\left(location_{TVVC}\right), scale_{TVVC}\right) \notag \\
+TVQ &amp;\sim Lognormal\left(log\left(location_{TVQ}\right), scale_{TVQ}\right) \notag \\
+TVVP &amp;\sim Lognormal\left(log\left(location_{TVVP}\right), scale_{TVVP}\right) \notag \\
+\omega_{CL} &amp;\sim Half-Normal(0, scale_{\omega_{CL}}) \notag \\
+\omega_{V_c} &amp;\sim Half-Normal(0, scale_{\omega_{V_c}}) \notag \\
+\omega_{Q} &amp;\sim Half-Normal(0, scale_{\omega_{Q}}) \notag \\
+\omega_{V_p} &amp;\sim Half-Normal(0, scale_{\omega_{V_p}}) \notag \\
+R_{\Omega} &amp;\sim LKJ(df_{R_{\Omega}}) \notag \\
+\sigma_p &amp;\sim Half-Normal(0, scale_{\sigma_p}) \\
+\sigma_a &amp;\sim Half-Normal(0, scale_{\sigma_a}) \\
+R_{\Sigma} &amp;\sim LKJ(df_{R_{\Sigma}}) \notag \\
+\end{align}\]</span></p>
+<p>where <span class="math display">\[\begin{align}
+\mathbf{TV} &amp;=
+\begin{pmatrix}
+TVCL \\ TVVC \\ TVQ \\ TVVP \\
+\end{pmatrix} \\
+\mathbf{\theta}_i &amp;=
+\begin{pmatrix}
+CL_i \\ V_{c_i} \\ Q_i \\ V_{p_i} \\
+\end{pmatrix} =
+\begin{pmatrix}
+TVCL \times e^{\eta_{CL_i}} \\ TVVC \times e^{\eta_{V_{c_i}}} \\ TVQ \times e^{\eta_{Q_i}} \\ TVVP \times e^{\eta_{V_{p_i}}} \\
+\end{pmatrix} \\
+\mathbf{\eta}_i &amp;=
+\begin{pmatrix}
+\eta_{CL_i} \\ \eta_{V_{c_i}} \\ \eta_{Q_i} \\ \eta_{V_{p_i}} \\
+\end{pmatrix} \\
+\mathbf{\Sigma} &amp;=
+\begin{pmatrix}
+\sigma^2_{p} &amp; \rho_{p,a}\sigma_{p}\sigma_{a} \\
+\rho_{p,a}\sigma_{p}\sigma_{a} &amp; \sigma^2_{z} \\
+\end{pmatrix} \\
+\sigma_{ij} &amp;= \sqrt{f(\mathbf{\theta}_i, t_{ij})^2\sigma^2_p + \sigma^2_a + 2f(\mathbf{\theta}_i, t_{ij})\rho_{p,a}\sigma_{p}\sigma_{a}} \\
+\end{align}\]</span></p>
+<p>Note: The indicator for <span class="math inline">\(C_{ij} | \ldots\)</span> indicates that we are truncating the distribution of the observed concentrations to be greater than 0.</p>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p><span class="math display">\[\begin{align}
+C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \mathbf{\Sigma}
+&amp;\sim Lognormal\left( log\left(f(\mathbf{\theta}_i, t_{ij})\right), \; \sigma \right)
+\notag \\
+\mathbf{\eta}_i \; | \; \Omega &amp;\sim Normal\left(
+\begin{pmatrix}
+0 \\ 0 \\ 0 \\ 0 \\
+\end{pmatrix}
+, \; \Omega\right) \notag \\
+TVCL &amp;\sim Lognormal\left(log\left(location_{TVCL}\right), scale_{TVCL}\right) \notag \\
+TVVC &amp;\sim Lognormal\left(log\left(location_{TVVC}\right), scale_{TVVC}\right) \notag \\
+TVQ &amp;\sim Lognormal\left(log\left(location_{TVQ}\right), scale_{TVQ}\right) \notag \\
+TVVP &amp;\sim Lognormal\left(log\left(location_{TVVP}\right), scale_{TVVP}\right) \notag \\
+\omega_{CL} &amp;\sim Half-Normal(0, scale_{\omega_{CL}}) \notag \\
+\omega_{V_c} &amp;\sim Half-Normal(0, scale_{\omega_{V_c}}) \notag \\
+\omega_{Q} &amp;\sim Half-Normal(0, scale_{\omega_{Q}}) \notag \\
+\omega_{V_p} &amp;\sim Half-Normal(0, scale_{\omega_{V_p}}) \notag \\
+R_{\Omega} &amp;\sim LKJ(df_{R_{\Omega}}) \notag \\
+\sigma &amp;\sim Half-Normal(0, scale_{\sigma}) \\
+\end{align}\]</span></p>
+<p>where <span class="math display">\[\begin{align}
+\mathbf{TV} &amp;=
+\begin{pmatrix}
+TVCL \\ TVVC \\ TVQ \\ TVVP \\
+\end{pmatrix} \\
+\mathbf{\theta}_i &amp;=
+\begin{pmatrix}
+CL_i \\ V_{c_i} \\ Q_i \\ V_{p_i} \\
+\end{pmatrix} =
+\begin{pmatrix}
+TVCL \times e^{\eta_{CL_i}} \\ TVVC \times e^{\eta_{V_{c_i}}} \\ TVQ \times e^{\eta_{Q_i}} \\ TVVP \times e^{\eta_{V_{p_i}}} \\
+\end{pmatrix} \\
+\mathbf{\eta}_i &amp;=
+\begin{pmatrix}
+\eta_{CL_i} \\ \eta_{V_{c_i}} \\ \eta_{Q_i} \\ \eta_{V_{p_i}} \\
+\end{pmatrix} \\
+\end{align}\]</span></p>
+</div>
+</div>
+</div>
+</section>
+<section id="stan-code" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Stan Code</h1>
+<section id="proportional-error" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="proportional-error"><span class="header-section-number">3.1</span> Proportional Error</h2>
 <div class="cell">
 <div class="cell-output-display">
 <a onclick="fetch('data:application/octet-stream;base64,Ly8gSVYgaW5mdXNpb24KLy8gVHdvLWNvbXBhcnRtZW50IFBLIE1vZGVsCi8vIElJViBvbiBDTCwgVkMsIFEsIGFuZCBWUCAoZnVsbCBjb3ZhcmlhbmNlIG1hdHJpeCkKLy8gcHJvcG9ydGlvbmFsIGVycm9yIC0gRFYgPSBJUFJFRCooMSArIGVwc19wKQovLyBNYXRyaXgtZXhwb25lbnRpYWwgc29sdXRpb24gdXNpbmcgVG9yc3RlbiAodGhlIG1hdHJpeC1leHBvbmVudGlhbCBzZWVtcyB0byBiZQovLyAgIGZhc3RlciB0aGFuIHRoZSBhbmFseXRpY2FsIHNvbHV0aW9uIGZvciB0aGlzIG1vZGVsKQovLyBJbXBsZW1lbnRzIHRocmVhZGluZyBmb3Igd2l0aGluLWNoYWluIHBhcmFsbGVsaXphdGlvbiAKLy8gRGVhbHMgd2l0aCBCTE9RIHZhbHVlcyBieSB0aGUgIkNERiB0cmljayIgKE00KQovLyBTaW5jZSB3ZSBoYXZlIGEgbm9ybWFsIGRpc3RyaWJ1dGlvbiBvbiB0aGUgZXJyb3IsIGJ1dCB0aGUgRFYgbXVzdCBiZSA+IDAsIGl0Ci8vICAgdHJ1bmNhdGVzIHRoZSBsaWtlbGlob29kIGJlbG93IGF0IDAKLy8gRm9yIFBQQywgaXQgZ2VuZXJhdGVzIHZhbHVlcyBmcm9tIGEgbm9ybWFsIHRoYXQgaXMgdHJ1bmNhdGVkIGJlbG93IGF0IDAKCmZ1bmN0aW9uc3sKCiAgYXJyYXlbXSBpbnQgc2VxdWVuY2UoaW50IHN0YXJ0LCBpbnQgZW5kKSB7IAogICAgYXJyYXlbZW5kIC0gc3RhcnQgKyAxXSBpbnQgc2VxOwogICAgZm9yIChuIGluIDE6bnVtX2VsZW1lbnRzKHNlcSkpIHsKICAgICAgc2VxW25dID0gbiArIHN0YXJ0IC0gMTsKICAgIH0KICAgIHJldHVybiBzZXE7IAogIH0gCiAgCiAgaW50IG51bV9iZXR3ZWVuKGludCBsYiwgaW50IHViLCBhcnJheVtdIGludCB5KXsKICAgIAogICAgaW50IG4gPSAwOwogICAgZm9yKGkgaW4gMTpudW1fZWxlbWVudHMoeSkpewogICAgICBpZih5W2ldID49IGxiICYmIHlbaV0gPD0gdWIpCiAgICAgICAgIG4gPSBuICsgMTsKICAgIH0KICAgIHJldHVybiBuOwogICAgCiAgfQogIAogIGFycmF5W10gaW50IGZpbmRfYmV0d2VlbihpbnQgbGIsIGludCB1YiwgYXJyYXlbXSBpbnQgeSkgewogICAgLy8gdmVjdG9yW251bV9iZXR3ZWVuKGxiLCB1YiwgeSldIHJlc3VsdDsKICAgIGFycmF5W251bV9iZXR3ZWVuKGxiLCB1YiwgeSldIGludCByZXN1bHQ7CiAgICBpbnQgbiA9IDE7CiAgICBmb3IgKGkgaW4gMTpudW1fZWxlbWVudHMoeSkpIHsKICAgICAgaWYgKHlbaV0gPj0gbGIgJiYgeVtpXSA8PSB1YikgewogICAgICAgIHJlc3VsdFtuXSA9IHlbaV07CiAgICAgICAgbiA9IG4gKyAxOwogICAgICB9CiAgICB9CiAgICByZXR1cm4gcmVzdWx0OwogIH0KICAKICB2ZWN0b3IgZmluZF9iZXR3ZWVuX3ZlYyhpbnQgbGIsIGludCB1YiwgYXJyYXlbXSBpbnQgaWR4LCB2ZWN0b3IgeSkgewogICAgCiAgICB2ZWN0b3JbbnVtX2JldHdlZW4obGIsIHViLCBpZHgpXSByZXN1bHQ7CiAgICBpbnQgbiA9IDE7CiAgICBpZihudW1fZWxlbWVudHMoaWR4KSAhPSBudW1fZWxlbWVudHMoeSkpIHJlamVjdCgiaWxsZWdhbCBpbnB1dCIpOwogICAgZm9yIChpIGluIDE6cm93cyh5KSkgewogICAgICBpZiAoaWR4W2ldID49IGxiICYmIGlkeFtpXSA8PSB1YikgewogICAgICAgIHJlc3VsdFtuXSA9IHlbaV07CiAgICAgICAgbiA9IG4gKyAxOwogICAgICB9CiAgICB9CiAgICByZXR1cm4gcmVzdWx0OwogIH0KICAKICByZWFsIG5vcm1hbF9sYl9ybmcocmVhbCBtdSwgcmVhbCBzaWdtYSwgcmVhbCBsYil7CiAgICAKICAgIHJlYWwgcF9sYiA9IG5vcm1hbF9jZGYobGIgfCBtdSwgc2lnbWEpOwogICAgcmVhbCB1ID0gdW5pZm9ybV9ybmcocF9sYiwgMSk7CiAgICByZWFsIHkgPSBtdSArIHNpZ21hICogaW52X1BoaSh1KTsKICAgIHJldHVybiB5OyAKCiAgfQogIAogIHJlYWwgcGFydGlhbF9zdW1fbHBtZihhcnJheVtdIGludCBzZXFfc3ViaiwgaW50IHN0YXJ0LCBpbnQgZW5kLAogICAgICAgICAgICAgICAgICAgICAgICB2ZWN0b3IgZHZfb2JzLCBhcnJheVtdIGludCBkdl9vYnNfaWQsIGFycmF5W10gaW50IGlfb2JzLAogICAgICAgICAgICAgICAgICAgICAgICBhcnJheVtdIHJlYWwgYW10LCBhcnJheVtdIGludCBjbXQsIGFycmF5W10gaW50IGV2aWQsIAogICAgICAgICAgICAgICAgICAgICAgICBhcnJheVtdIHJlYWwgdGltZSwgYXJyYXlbXSByZWFsIHJhdGUsIGFycmF5W10gcmVhbCBpaSwgCiAgICAgICAgICAgICAgICAgICAgICAgIGFycmF5W10gaW50IGFkZGwsIGFycmF5W10gaW50IHNzLAogICAgICAgICAgICAgICAgICAgICAgICBhcnJheVtdIGludCBzdWJqX3N0YXJ0LCBhcnJheVtdIGludCBzdWJqX2VuZCwgCiAgICAgICAgICAgICAgICAgICAgICAgIHZlY3RvciBDTCwgdmVjdG9yIFZDLCB2ZWN0b3IgUSwgdmVjdG9yIFZQLCAKICAgICAgICAgICAgICAgICAgICAgICAgcmVhbCBzaWdtYV9wLCAKICAgICAgICAgICAgICAgICAgICAgICAgdmVjdG9yIGxsb3EsIGFycmF5W10gaW50IGJsb3EsCiAgICAgICAgICAgICAgICAgICAgICAgIGludCBuX3JhbmRvbSwgaW50IG5fc3ViamVjdHMsIGludCBuX3RvdGFsLAogICAgICAgICAgICAgICAgICAgICAgICBhcnJheVtdIHJlYWwgYmlvYXYsIGFycmF5W10gcmVhbCB0bGFnLCBpbnQgbl9jbXQpewogICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgIHJlYWwgcHRhcmdldCA9IDA7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgaW50IE4gPSBlbmQgLSBzdGFydCArIDE7ICAgIC8vIG51bWJlciBvZiBzdWJqZWN0cyBpbiB0aGlzIHNsaWNlICAKICAgIHZlY3RvcltuX3RvdGFsXSBkdl9pcHJlZDsgICAKICAgIG1hdHJpeFtuX3RvdGFsLCBuX2NtdF0geF9pcHJlZDsKICAKICAgIGludCBuX29ic19zbGljZSA9IG51bV9iZXR3ZWVuKHN1Ympfc3RhcnRbc3RhcnRdLCBzdWJqX2VuZFtlbmRdLCBpX29icyk7CiAgICBhcnJheVtuX29ic19zbGljZV0gaW50IGlfb2JzX3NsaWNlID0gZmluZF9iZXR3ZWVuKHN1Ympfc3RhcnRbc3RhcnRdLCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3Vial9lbmRbZW5kXSwgaV9vYnMpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgIHZlY3RvcltuX29ic19zbGljZV0gZHZfb2JzX3NsaWNlID0gZmluZF9iZXR3ZWVuX3ZlYyhzdGFydCwgZW5kLCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBkdl9vYnNfaWQsIGR2X29icyk7CiAgICAKICAgIHZlY3RvcltuX29ic19zbGljZV0gaXByZWRfc2xpY2U7CiAgICAKICAgIHZlY3RvcltuX29ic19zbGljZV0gbGxvcV9zbGljZSA9IGxsb3FbaV9vYnNfc2xpY2VdOwogICAgYXJyYXlbbl9vYnNfc2xpY2VdIGludCBibG9xX3NsaWNlID0gYmxvcVtpX29ic19zbGljZV07CiAgICAKICAgIAogICAgZm9yKG4gaW4gMTpOKXsgICAgICAgICAgICAvLyBsb29wIG92ZXIgc3ViamVjdHMgaW4gdGhpcyBzbGljZQogICAgCiAgICAgIGludCBqID0gbiArIHN0YXJ0IC0gMTsgLy8gaiBpcyB0aGUgSUQgb2YgdGhlIGN1cnJlbnQgc3ViamVjdAogICAgICAgIAogICAgICByZWFsIGtlID0gQ0xbal0vVkNbal07CiAgICAgIHJlYWwga19jcCA9IFFbal0vVkNbal07CiAgICAgIHJlYWwga19wYyA9IFFbal0vVlBbal07CiAgICAgICAgCiAgICAgIG1hdHJpeFtuX2NtdCwgbl9jbXRdIEsgPSByZXBfbWF0cml4KDAsIG5fY210LCBuX2NtdCk7CiAgICAgIEtbMSwgMV0gPSAtKGtlICsga19jcCk7CiAgICAgIEtbMSwgMl0gPSBrX3BjOwogICAgICBLWzIsIDFdID0ga19jcDsKICAgICAgS1syLCAyXSA9IC1rX3BjOwogICAgICAKICAgICAgeF9pcHJlZFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdLCBdID0KICAgICAgICBwbXhfc29sdmVfbGlub2RlKHRpbWVbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICBhbXRbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICByYXRlW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgaWlbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICBldmlkW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgY210W3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgYWRkbFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIHNzW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgSywgYmlvYXYsIHRsYWcpJzsKICAgICAgICAgICAgICAgICAgICAgIAogICAgICBkdl9pcHJlZFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSA9IAogICAgICAgIHhfaXByZWRbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXSwgMV0gLi8gVkNbal07CiAgICAKICAgIH0KICAKICAgIGlwcmVkX3NsaWNlID0gZHZfaXByZWRbaV9vYnNfc2xpY2VdOwogICAgCiAgICBmb3IoaSBpbiAxOm5fb2JzX3NsaWNlKXsKICAgICAgcmVhbCBzaWdtYV90bXAgPSBpcHJlZF9zbGljZVtpXSpzaWdtYV9wOwogICAgICBpZihibG9xX3NsaWNlW2ldID09IDEpewogICAgICAgIHB0YXJnZXQgKz0gbG9nX2RpZmZfZXhwKG5vcm1hbF9sY2RmKGxsb3Ffc2xpY2VbaV0gfCBpcHJlZF9zbGljZVtpXSwgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNpZ21hX3RtcCksCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbm9ybWFsX2xjZGYoMC4wIHwgaXByZWRfc2xpY2VbaV0sIHNpZ21hX3RtcCkpIC0KICAgICAgICAgICAgICAgICAgIG5vcm1hbF9sY2NkZigwLjAgfCBpcHJlZF9zbGljZVtpXSwgc2lnbWFfdG1wKTsgCiAgICAgIH1lbHNlewogICAgICAgIHB0YXJnZXQgKz0gbm9ybWFsX2xwZGYoZHZfb2JzX3NsaWNlW2ldIHwgaXByZWRfc2xpY2VbaV0sIHNpZ21hX3RtcCkgLQogICAgICAgICAgICAgICAgICAgbm9ybWFsX2xjY2RmKDAuMCB8IGlwcmVkX3NsaWNlW2ldLCBzaWdtYV90bXApOwogICAgICB9CiAgICB9ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICByZXR1cm4gcHRhcmdldDsKICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgfQogIAp9CmRhdGF7CiAgCiAgaW50IG5fc3ViamVjdHM7CiAgaW50IG5fdG90YWw7CiAgaW50IG5fb2JzOwogIGFycmF5W25fb2JzXSBpbnQgaV9vYnM7CiAgYXJyYXlbbl90b3RhbF0gaW50IElEOwogIGFycmF5W25fdG90YWxdIHJlYWwgYW10OwogIGFycmF5W25fdG90YWxdIGludCBjbXQ7CiAgYXJyYXlbbl90b3RhbF0gaW50IGV2aWQ7CiAgYXJyYXlbbl90b3RhbF0gcmVhbCByYXRlOwogIGFycmF5W25fdG90YWxdIHJlYWwgaWk7CiAgYXJyYXlbbl90b3RhbF0gaW50IGFkZGw7CiAgYXJyYXlbbl90b3RhbF0gaW50IHNzOwogIGFycmF5W25fdG90YWxdIHJlYWwgdGltZTsKICB2ZWN0b3I8bG93ZXIgPSAwPltuX3RvdGFsXSBkdjsKICBhcnJheVtuX3N1YmplY3RzXSBpbnQgc3Vial9zdGFydDsKICBhcnJheVtuX3N1YmplY3RzXSBpbnQgc3Vial9lbmQ7CiAgdmVjdG9yW25fdG90YWxdIGxsb3E7CiAgYXJyYXlbbl90b3RhbF0gaW50IGJsb3E7CiAgCiAgcmVhbDxsb3dlciA9IDA+IGxvY2F0aW9uX3R2Y2w7ICAvLyBQcmlvciBMb2NhdGlvbiBwYXJhbWV0ZXIgZm9yIENMCiAgcmVhbDxsb3dlciA9IDA+IGxvY2F0aW9uX3R2dmM7ICAvLyBQcmlvciBMb2NhdGlvbiBwYXJhbWV0ZXIgZm9yIFZDCiAgcmVhbDxsb3dlciA9IDA+IGxvY2F0aW9uX3R2cTsgICAvLyBQcmlvciBMb2NhdGlvbiBwYXJhbWV0ZXIgZm9yIFEKICByZWFsPGxvd2VyID0gMD4gbG9jYXRpb25fdHZ2cDsgIC8vIFByaW9yIExvY2F0aW9uIHBhcmFtZXRlciBmb3IgVlAKICAKICByZWFsPGxvd2VyID0gMD4gc2NhbGVfdHZjbDsgICAgIC8vIFByaW9yIFNjYWxlIHBhcmFtZXRlciBmb3IgQ0wKICByZWFsPGxvd2VyID0gMD4gc2NhbGVfdHZ2YzsgICAgIC8vIFByaW9yIFNjYWxlIHBhcmFtZXRlciBmb3IgVkMKICByZWFsPGxvd2VyID0gMD4gc2NhbGVfdHZxOyAgICAgIC8vIFByaW9yIFNjYWxlIHBhcmFtZXRlciBmb3IgUQogIHJlYWw8bG93ZXIgPSAwPiBzY2FsZV90dnZwOyAgICAgLy8gUHJpb3IgU2NhbGUgcGFyYW1ldGVyIGZvciBWUAogIAogIHJlYWw8bG93ZXIgPSAwPiBzY2FsZV9vbWVnYV9jbDsgLy8gUHJpb3Igc2NhbGUgcGFyYW1ldGVyIGZvciBvbWVnYV9jbAogIHJlYWw8bG93ZXIgPSAwPiBzY2FsZV9vbWVnYV92YzsgLy8gUHJpb3Igc2NhbGUgcGFyYW1ldGVyIGZvciBvbWVnYV92YwogIHJlYWw8bG93ZXIgPSAwPiBzY2FsZV9vbWVnYV9xOyAgLy8gUHJpb3Igc2NhbGUgcGFyYW1ldGVyIGZvciBvbWVnYV9xCiAgcmVhbDxsb3dlciA9IDA+IHNjYWxlX29tZWdhX3ZwOyAvLyBQcmlvciBzY2FsZSBwYXJhbWV0ZXIgZm9yIG9tZWdhX3ZwCiAgCiAgcmVhbDxsb3dlciA9IDA+IGxral9kZl9vbWVnYTsgICAvLyBQcmlvciBkZWdyZWVzIG9mIGZyZWVkb20gZm9yIG9tZWdhIGNvciBtYXQKICAKICByZWFsPGxvd2VyID0gMD4gc2NhbGVfc2lnbWFfcDsgIC8vIFByaW9yIFNjYWxlIHBhcmFtZXRlciBmb3IgcHJvcG9ydGlvbmFsIGVycm9yCiAgCiAgaW50PGxvd2VyID0gMCwgdXBwZXIgPSAxPiBwcmlvcl9vbmx5OyAvLyBXYW50IHRvIHNpbXVsYXRlIGZyb20gdGhlIHByaW9yPwogIAp9CnRyYW5zZm9ybWVkIGRhdGF7IAogIAogIGludCBncmFpbnNpemUgPSAxOwogIAogIHZlY3Rvcjxsb3dlciA9IDA+W25fb2JzXSBkdl9vYnMgPSBkdltpX29ic107CiAgYXJyYXlbbl9vYnNdIGludCBkdl9vYnNfaWQgPSBJRFtpX29ic107CiAgCiAgdmVjdG9yW25fb2JzXSBsbG9xX29icyA9IGxsb3FbaV9vYnNdOwogIGFycmF5W25fb2JzXSBpbnQgYmxvcV9vYnMgPSBibG9xW2lfb2JzXTsKICAKICBpbnQgbl9yYW5kb20gPSA0OyAgICAgICAgICAgICAgICAgICAgLy8gTnVtYmVyIG9mIHJhbmRvbSBlZmZlY3RzCiAgaW50IG5fY210ID0gMjsgICAgICAgICAgICAgICAgICAgICAgIC8vIE51bWJlciBvZiBzdGF0ZXMgaW4gdGhlIE9ERXMKICAKICBhcnJheVtuX3JhbmRvbV0gcmVhbCBzY2FsZV9vbWVnYSA9IHtzY2FsZV9vbWVnYV9jbCwgc2NhbGVfb21lZ2FfdmMsIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNjYWxlX29tZWdhX3EsIHNjYWxlX29tZWdhX3ZwfTsgCiAgCiAgYXJyYXlbbl9zdWJqZWN0c10gaW50IHNlcV9zdWJqID0gc2VxdWVuY2UoMSwgbl9zdWJqZWN0cyk7IC8vIHJlZHVjZV9zdW0gb3ZlciBzdWJqZWN0cwogIAogIGFycmF5W25fY210XSByZWFsIGJpb2F2ID0gcmVwX2FycmF5KDEuMCwgbl9jbXQpOyAvLyBIYXJkY29kaW5nLCBidXQgY291bGQgYmUgZGF0YSBvciBhIHBhcmFtZXRlciBpbiBhbm90aGVyIHNpdHVhdGlvbgogIGFycmF5W25fY210XSByZWFsIHRsYWcgPSByZXBfYXJyYXkoMC4wLCBuX2NtdCk7CiAgCn0KcGFyYW1ldGVyc3sgCiAgCiAgcmVhbDxsb3dlciA9IDA+IFRWQ0w7ICAgICAgIAogIHJlYWw8bG93ZXIgPSAwPiBUVlZDOyAKICByZWFsPGxvd2VyID0gMD4gVFZROyAgICAgICAKICByZWFsPGxvd2VyID0gMD4gVFZWUDsKICAKICB2ZWN0b3I8bG93ZXIgPSAwPltuX3JhbmRvbV0gb21lZ2E7CiAgY2hvbGVza3lfZmFjdG9yX2NvcnJbbl9yYW5kb21dIEw7CiAgCiAgcmVhbDxsb3dlciA9IDA+IHNpZ21hX3A7CiAgCiAgbWF0cml4W25fcmFuZG9tLCBuX3N1YmplY3RzXSBaOwogIAp9CnRyYW5zZm9ybWVkIHBhcmFtZXRlcnN7CiAgCiAgdmVjdG9yW25fc3ViamVjdHNdIGV0YV9jbDsKICB2ZWN0b3Jbbl9zdWJqZWN0c10gZXRhX3ZjOwogIHZlY3RvcltuX3N1YmplY3RzXSBldGFfcTsKICB2ZWN0b3Jbbl9zdWJqZWN0c10gZXRhX3ZwOwogIHZlY3RvcltuX3N1YmplY3RzXSBDTDsKICB2ZWN0b3Jbbl9zdWJqZWN0c10gVkM7CiAgdmVjdG9yW25fc3ViamVjdHNdIFE7CiAgdmVjdG9yW25fc3ViamVjdHNdIFZQOwoKICB7CiAgCiAgICByb3dfdmVjdG9yW25fcmFuZG9tXSB0eXBpY2FsX3ZhbHVlcyA9IHRvX3Jvd192ZWN0b3Ioe1RWQ0wsIFRWVkMsIFRWUSwgVFZWUH0pOwoKICAgIG1hdHJpeFtuX3N1YmplY3RzLCBuX3JhbmRvbV0gZXRhID0gZGlhZ19wcmVfbXVsdGlwbHkob21lZ2EsIEwgKiBaKSc7CgogICAgbWF0cml4W25fc3ViamVjdHMsIG5fcmFuZG9tXSB0aGV0YSA9CiAgICAgICAgICAgICAgICAgICAgICAgICAgKHJlcF9tYXRyaXgodHlwaWNhbF92YWx1ZXMsIG5fc3ViamVjdHMpIC4qIGV4cChldGEpKTsKICAgIAogICAgZXRhX2NsID0gY29sKGV0YSwgMSk7CiAgICBldGFfdmMgPSBjb2woZXRhLCAyKTsKICAgIGV0YV9xID0gY29sKGV0YSwgMyk7CiAgICBldGFfdnAgPSBjb2woZXRhLCA0KTsKICAgIENMID0gY29sKHRoZXRhLCAxKTsKICAgIFZDID0gY29sKHRoZXRhLCAyKTsKICAgIFEgPSBjb2wodGhldGEsIDMpOwogICAgVlAgPSBjb2wodGhldGEsIDQpOwogIAogIH0KICAKfQptb2RlbHsgCiAgCiAgLy8gUHJpb3JzCiAgVFZDTCB+IGxvZ25vcm1hbChsb2cobG9jYXRpb25fdHZjbCksIHNjYWxlX3R2Y2wpOwogIFRWVkMgfiBsb2dub3JtYWwobG9nKGxvY2F0aW9uX3R2dmMpLCBzY2FsZV90dnZjKTsKICBUVlEgfiBsb2dub3JtYWwobG9nKGxvY2F0aW9uX3R2cSksIHNjYWxlX3R2cSk7CiAgVFZWUCB+IGxvZ25vcm1hbChsb2cobG9jYXRpb25fdHZ2cCksIHNjYWxlX3R2dnApOwoKICBvbWVnYSB+IG5vcm1hbCgwLCBzY2FsZV9vbWVnYSk7CiAgTCB+IGxral9jb3JyX2Nob2xlc2t5KGxral9kZl9vbWVnYSk7CiAgCiAgc2lnbWFfcCB+IG5vcm1hbCgwLCBzY2FsZV9zaWdtYV9wKTsKICAKICB0b192ZWN0b3IoWikgfiBzdGRfbm9ybWFsKCk7CiAgCiAgLy8gTGlrZWxpaG9vZAogIGlmKHByaW9yX29ubHkgPT0gMCl7CiAgICB0YXJnZXQgKz0gcmVkdWNlX3N1bShwYXJ0aWFsX3N1bV9sdXBtZiwgc2VxX3N1YmosIGdyYWluc2l6ZSwKICAgICAgICAgICAgICAgICAgICAgICAgIGR2X29icywgZHZfb2JzX2lkLCBpX29icywKICAgICAgICAgICAgICAgICAgICAgICAgIGFtdCwgY210LCBldmlkLCB0aW1lLCAKICAgICAgICAgICAgICAgICAgICAgICAgIHJhdGUsIGlpLCBhZGRsLCBzcywgc3Vial9zdGFydCwgc3Vial9lbmQsIAogICAgICAgICAgICAgICAgICAgICAgICAgQ0wsIFZDLCBRLCBWUCwKICAgICAgICAgICAgICAgICAgICAgICAgIHNpZ21hX3AsCiAgICAgICAgICAgICAgICAgICAgICAgICBsbG9xLCBibG9xLAogICAgICAgICAgICAgICAgICAgICAgICAgbl9yYW5kb20sIG5fc3ViamVjdHMsIG5fdG90YWwsCiAgICAgICAgICAgICAgICAgICAgICAgICBiaW9hdiwgdGxhZywgbl9jbXQpOwogIH0KfQpnZW5lcmF0ZWQgcXVhbnRpdGllc3sKICAKICByZWFsPGxvd2VyID0gMD4gc2lnbWFfc3FfcCA9IHNxdWFyZShzaWdtYV9wKTsKCiAgcmVhbDxsb3dlciA9IDA+IG9tZWdhX2NsID0gb21lZ2FbMV07CiAgcmVhbDxsb3dlciA9IDA+IG9tZWdhX3ZjID0gb21lZ2FbMl07CiAgcmVhbDxsb3dlciA9IDA+IG9tZWdhX3EgPSBvbWVnYVszXTsKICByZWFsPGxvd2VyID0gMD4gb21lZ2FfdnAgPSBvbWVnYVs0XTsKCiAgcmVhbDxsb3dlciA9IDA+IG9tZWdhX3NxX2NsID0gc3F1YXJlKG9tZWdhX2NsKTsKICByZWFsPGxvd2VyID0gMD4gb21lZ2Ffc3FfdmMgPSBzcXVhcmUob21lZ2FfdmMpOwogIHJlYWw8bG93ZXIgPSAwPiBvbWVnYV9zcV9xID0gc3F1YXJlKG9tZWdhX3EpOwogIHJlYWw8bG93ZXIgPSAwPiBvbWVnYV9zcV92cCA9IHNxdWFyZShvbWVnYV92cCk7CgogIHJlYWwgY29yX2NsX3ZjOwogIHJlYWwgY29yX2NsX3E7CiAgcmVhbCBjb3JfY2xfdnA7CiAgcmVhbCBjb3JfdmNfcTsKICByZWFsIGNvcl92Y192cDsKICByZWFsIGNvcl9xX3ZwOwogIHJlYWwgb21lZ2FfY2xfdmM7CiAgcmVhbCBvbWVnYV9jbF9xOwogIHJlYWwgb21lZ2FfY2xfdnA7CiAgcmVhbCBvbWVnYV92Y19xOwogIHJlYWwgb21lZ2FfdmNfdnA7CiAgcmVhbCBvbWVnYV9xX3ZwOwoKICB2ZWN0b3Jbbl9vYnNdIGlwcmVkOwogIHZlY3RvcltuX29ic10gcHJlZDsKICB2ZWN0b3Jbbl9vYnNdIGR2X3BwYzsKICB2ZWN0b3Jbbl9vYnNdIGxvZ19saWs7CiAgdmVjdG9yW25fb2JzXSByZXM7CiAgdmVjdG9yW25fb2JzXSB3cmVzOwogIHZlY3RvcltuX29ic10gaXJlczsKICB2ZWN0b3Jbbl9vYnNdIGl3cmVzOwogCiAgewoKICAgIG1hdHJpeFtuX3JhbmRvbSwgbl9yYW5kb21dIFIgPSBtdWx0aXBseV9sb3dlcl90cmlfc2VsZl90cmFuc3Bvc2UoTCk7CiAgICBtYXRyaXhbbl9yYW5kb20sIG5fcmFuZG9tXSBPbWVnYSA9IHF1YWRfZm9ybV9kaWFnKFIsIG9tZWdhKTsKCiAgICB2ZWN0b3Jbbl90b3RhbF0gZHZfcHJlZDsKICAgIG1hdHJpeFtuX3RvdGFsLCBuX2NtdF0geF9wcmVkOwogICAgdmVjdG9yW25fdG90YWxdIGR2X2lwcmVkOwogICAgbWF0cml4W25fdG90YWwsIG5fY210XSB4X2lwcmVkOwoKICAgIGNvcl9jbF92YyA9IFJbMSwgMl07CiAgICBjb3JfY2xfcSA9IFJbMSwgM107CiAgICBjb3JfY2xfdnAgPSBSWzEsIDRdOwogICAgY29yX3ZjX3EgPSBSWzIsIDNdOwogICAgY29yX3ZjX3ZwID0gUlsyLCA0XTsKICAgIGNvcl9xX3ZwID0gUlszLCA0XTsKICAgIAogICAgb21lZ2FfY2xfdmMgPSBPbWVnYVsxLCAyXTsKICAgIG9tZWdhX2NsX3EgPSBPbWVnYVsxLCAzXTsKICAgIG9tZWdhX2NsX3ZwID0gT21lZ2FbMSwgNF07CiAgICBvbWVnYV92Y19xID0gT21lZ2FbMiwgM107CiAgICBvbWVnYV92Y192cCA9IE9tZWdhWzIsIDRdOwogICAgb21lZ2FfcV92cCA9IE9tZWdhWzMsIDRdOwoKICAgIGZvcihqIGluIDE6bl9zdWJqZWN0cyl7CiAgICAgICAgCiAgICAgIHJlYWwga2UgPSBDTFtqXS9WQ1tqXTsKICAgICAgcmVhbCBrX2NwID0gUVtqXS9WQ1tqXTsKICAgICAgcmVhbCBrX3BjID0gUVtqXS9WUFtqXTsKICAgICAgICAKICAgICAgcmVhbCB0dmtlID0gVFZDTC9UVlZDOwogICAgICByZWFsIHR2a19jcCA9IFRWUS9UVlZDOwogICAgICByZWFsIHR2a19wYyA9IFRWUS9UVlZQOwogICAgICAgIAogICAgICBtYXRyaXhbbl9jbXQsIG5fY210XSBLID0gcmVwX21hdHJpeCgwLCBuX2NtdCwgbl9jbXQpOwogICAgICBtYXRyaXhbbl9jbXQsIG5fY210XSBLX3R2ID0gcmVwX21hdHJpeCgwLCBuX2NtdCwgbl9jbXQpOwogICAgICBLWzEsIDFdID0gLShrZSArIGtfY3ApOwogICAgICBLWzEsIDJdID0ga19wYzsKICAgICAgS1syLCAxXSA9IGtfY3A7CiAgICAgIEtbMiwgMl0gPSAta19wYzsKICAgICAgCiAgICAgIHhfaXByZWRbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXSwgXSA9CiAgICAgICAgcG14X3NvbHZlX2xpbm9kZSh0aW1lW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgYW10W3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgcmF0ZVtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIGlpW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgZXZpZFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIGNtdFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIGFkZGxbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICBzc1tzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIEssIGJpb2F2LCB0bGFnKSc7CiAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICBLX3R2WzEsIDFdID0gLSh0dmtlICsgdHZrX2NwKTsKICAgICAgS190dlsxLCAyXSA9IHR2a19wYzsKICAgICAgS190dlsyLCAxXSA9IHR2a19jcDsKICAgICAgS190dlsyLCAyXSA9IC10dmtfcGM7CgogICAgICB4X3ByZWRbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXSxdID0KICAgICAgICBwbXhfc29sdmVfbGlub2RlKHRpbWVbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICBhbXRbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICByYXRlW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgaWlbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICBldmlkW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgY210W3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgYWRkbFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIHNzW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgS190diwgYmlvYXYsIHRsYWcpJzsKICAgICAgCiAgICAgIGR2X2lwcmVkW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dID0KICAgICAgICB4X2lwcmVkW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal0sIDFdIC4vIFZDW2pdOwogICAgICAKICAgICAgZHZfcHJlZFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSA9CiAgICAgICAgeF9wcmVkW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal0sIDFdIC4vIFRWVkM7CiAgICAgIAogICAgfQoKICAgIHByZWQgPSBkdl9wcmVkW2lfb2JzXTsKICAgIGlwcmVkID0gZHZfaXByZWRbaV9vYnNdOwoKICB9CgogIHJlcyA9IGR2X29icyAtIHByZWQ7CiAgaXJlcyA9IGR2X29icyAtIGlwcmVkOwoKICBmb3IoaSBpbiAxOm5fb2JzKXsKICAgIHJlYWwgaXByZWRfdG1wID0gaXByZWRbaV07CiAgICByZWFsIHNpZ21hX3RtcCA9IGlwcmVkX3RtcCpzaWdtYV9wOwogICAgZHZfcHBjW2ldID0gbm9ybWFsX2xiX3JuZyhpcHJlZF90bXAsIHNpZ21hX3RtcCwgMC4wKTsKICAgIGlmKGJsb3Ffb2JzW2ldID09IDEpewogICAgICAvLyBsb2dfbGlrW2ldID0gbG9nKG5vcm1hbF9jZGYobGxvcV9vYnNbaV0gfCBpcHJlZF90bXAsIHNpZ21hX3RtcCkgLQogICAgICAvLyAgICAgICAgICAgICAgICAgIG5vcm1hbF9jZGYoMC4wIHwgaXByZWRfdG1wLCBzaWdtYV90bXApKSAtCiAgICAgIC8vICAgICAgICAgICAgICBub3JtYWxfbGNjZGYoMC4wIHwgaXByZWRfdG1wLCBzaWdtYV90bXApOwogICAgICBsb2dfbGlrW2ldID0gbG9nX2RpZmZfZXhwKG5vcm1hbF9sY2RmKGxsb3Ffb2JzW2ldIHwgaXByZWRfdG1wLCBzaWdtYV90bXApLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG5vcm1hbF9sY2RmKDAuMCB8IGlwcmVkX3RtcCwgc2lnbWFfdG1wKSkgLQogICAgICAgICAgICAgICAgICAgbm9ybWFsX2xjY2RmKDAuMCB8IGlwcmVkX3RtcCwgc2lnbWFfdG1wKTsKICAgIH1lbHNlewogICAgICBsb2dfbGlrW2ldID0gbm9ybWFsX2xwZGYoZHZfb2JzW2ldIHwgaXByZWRfdG1wLCBzaWdtYV90bXApIC0KICAgICAgICAgICAgICAgICAgIG5vcm1hbF9sY2NkZigwLjAgfCBpcHJlZF90bXAsIHNpZ21hX3RtcCk7CiAgICB9CiAgICB3cmVzW2ldID0gcmVzW2ldL3NpZ21hX3RtcDsKICAgIGl3cmVzW2ldID0gaXJlc1tpXS9zaWdtYV90bXA7CiAgfQogIAp9Cgo=').then(res => res.blob()).then(blob => {
@@ -870,8 +1074,8 @@ generated quantities{
 </div>
 </div>
 </section>
-<section id="proportional-plus-additive-error" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Proportional-Plus-Additive Error</h1>
+<section id="proportional-plus-additive-error" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="proportional-plus-additive-error"><span class="header-section-number">3.2</span> Proportional-Plus-Additive Error</h2>
 <div class="cell">
 <div class="cell-output-display">
 <a onclick="fetch('data:application/octet-stream;base64,Ly8gSVYgaW5mdXNpb24KLy8gVHdvLWNvbXBhcnRtZW50IFBLIE1vZGVsCi8vIElJViBvbiBDTCwgVkMsIFEsIGFuZCBWUCAoZnVsbCBjb3ZhcmlhbmNlIG1hdHJpeCkKLy8gcHJvcG9ydGlvbmFsIHBsdXMgYWRkaXRpdmUgZXJyb3IgLSBEViA9IElQUkVEKigxICsgZXBzX3ApICsgZXBzX2EKLy8gTWF0cml4LWV4cG9uZW50aWFsIHNvbHV0aW9uIHVzaW5nIFRvcnN0ZW4gKHRoZSBtYXRyaXgtZXhwb25lbnRpYWwgc2VlbXMgdG8gYmUKLy8gICBmYXN0ZXIgdGhhbiB0aGUgYW5hbHl0aWNhbCBzb2x1dGlvbiBmb3IgdGhpcyBtb2RlbCkKLy8gSW1wbGVtZW50cyB0aHJlYWRpbmcgZm9yIHdpdGhpbi1jaGFpbiBwYXJhbGxlbGl6YXRpb24gCi8vIERlYWxzIHdpdGggQkxPUSB2YWx1ZXMgYnkgdGhlICJDREYgdHJpY2siIChNNCkKLy8gU2luY2Ugd2UgaGF2ZSBhIG5vcm1hbCBkaXN0cmlidXRpb24gb24gdGhlIGVycm9yLCBidXQgdGhlIERWIG11c3QgYmUgPiAwLCBpdAovLyAgIHRydW5jYXRlcyB0aGUgbGlrZWxpaG9vZCBiZWxvdyBhdCAwCi8vIEZvciBQUEMsIGl0IGdlbmVyYXRlcyB2YWx1ZXMgZnJvbSBhIG5vcm1hbCB0aGF0IGlzIHRydW5jYXRlZCBiZWxvdyBhdCAwCgpmdW5jdGlvbnN7CgogIGFycmF5W10gaW50IHNlcXVlbmNlKGludCBzdGFydCwgaW50IGVuZCkgeyAKICAgIGFycmF5W2VuZCAtIHN0YXJ0ICsgMV0gaW50IHNlcTsKICAgIGZvciAobiBpbiAxOm51bV9lbGVtZW50cyhzZXEpKSB7CiAgICAgIHNlcVtuXSA9IG4gKyBzdGFydCAtIDE7CiAgICB9CiAgICByZXR1cm4gc2VxOyAKICB9IAogIAogIGludCBudW1fYmV0d2VlbihpbnQgbGIsIGludCB1YiwgYXJyYXlbXSBpbnQgeSl7CiAgICAKICAgIGludCBuID0gMDsKICAgIGZvcihpIGluIDE6bnVtX2VsZW1lbnRzKHkpKXsKICAgICAgaWYoeVtpXSA+PSBsYiAmJiB5W2ldIDw9IHViKQogICAgICAgICBuID0gbiArIDE7CiAgICB9CiAgICByZXR1cm4gbjsKICAgIAogIH0KICAKICBhcnJheVtdIGludCBmaW5kX2JldHdlZW4oaW50IGxiLCBpbnQgdWIsIGFycmF5W10gaW50IHkpIHsKICAgIC8vIHZlY3RvcltudW1fYmV0d2VlbihsYiwgdWIsIHkpXSByZXN1bHQ7CiAgICBhcnJheVtudW1fYmV0d2VlbihsYiwgdWIsIHkpXSBpbnQgcmVzdWx0OwogICAgaW50IG4gPSAxOwogICAgZm9yIChpIGluIDE6bnVtX2VsZW1lbnRzKHkpKSB7CiAgICAgIGlmICh5W2ldID49IGxiICYmIHlbaV0gPD0gdWIpIHsKICAgICAgICByZXN1bHRbbl0gPSB5W2ldOwogICAgICAgIG4gPSBuICsgMTsKICAgICAgfQogICAgfQogICAgcmV0dXJuIHJlc3VsdDsKICB9CiAgCiAgdmVjdG9yIGZpbmRfYmV0d2Vlbl92ZWMoaW50IGxiLCBpbnQgdWIsIGFycmF5W10gaW50IGlkeCwgdmVjdG9yIHkpIHsKICAgIAogICAgdmVjdG9yW251bV9iZXR3ZWVuKGxiLCB1YiwgaWR4KV0gcmVzdWx0OwogICAgaW50IG4gPSAxOwogICAgaWYobnVtX2VsZW1lbnRzKGlkeCkgIT0gbnVtX2VsZW1lbnRzKHkpKSByZWplY3QoImlsbGVnYWwgaW5wdXQiKTsKICAgIGZvciAoaSBpbiAxOnJvd3MoeSkpIHsKICAgICAgaWYgKGlkeFtpXSA+PSBsYiAmJiBpZHhbaV0gPD0gdWIpIHsKICAgICAgICByZXN1bHRbbl0gPSB5W2ldOwogICAgICAgIG4gPSBuICsgMTsKICAgICAgfQogICAgfQogICAgcmV0dXJuIHJlc3VsdDsKICB9CiAgCiAgcmVhbCBub3JtYWxfbGJfcm5nKHJlYWwgbXUsIHJlYWwgc2lnbWEsIHJlYWwgbGIpewogICAgCiAgICByZWFsIHBfbGIgPSBub3JtYWxfY2RmKGxiIHwgbXUsIHNpZ21hKTsKICAgIHJlYWwgdSA9IHVuaWZvcm1fcm5nKHBfbGIsIDEpOwogICAgcmVhbCB5ID0gbXUgKyBzaWdtYSAqIGludl9QaGkodSk7CiAgICByZXR1cm4geTsgCgogIH0KICAKICByZWFsIHBhcnRpYWxfc3VtX2xwbWYoYXJyYXlbXSBpbnQgc2VxX3N1YmosIGludCBzdGFydCwgaW50IGVuZCwKICAgICAgICAgICAgICAgICAgICAgICAgdmVjdG9yIGR2X29icywgYXJyYXlbXSBpbnQgZHZfb2JzX2lkLCBhcnJheVtdIGludCBpX29icywKICAgICAgICAgICAgICAgICAgICAgICAgYXJyYXlbXSByZWFsIGFtdCwgYXJyYXlbXSBpbnQgY210LCBhcnJheVtdIGludCBldmlkLCAKICAgICAgICAgICAgICAgICAgICAgICAgYXJyYXlbXSByZWFsIHRpbWUsIGFycmF5W10gcmVhbCByYXRlLCBhcnJheVtdIHJlYWwgaWksIAogICAgICAgICAgICAgICAgICAgICAgICBhcnJheVtdIGludCBhZGRsLCBhcnJheVtdIGludCBzcywKICAgICAgICAgICAgICAgICAgICAgICAgYXJyYXlbXSBpbnQgc3Vial9zdGFydCwgYXJyYXlbXSBpbnQgc3Vial9lbmQsIAogICAgICAgICAgICAgICAgICAgICAgICB2ZWN0b3IgQ0wsIHZlY3RvciBWQywgdmVjdG9yIFEsIHZlY3RvciBWUCwgCiAgICAgICAgICAgICAgICAgICAgICAgIHJlYWwgc2lnbWFfc3FfcCwgcmVhbCBzaWdtYV9zcV9hLCByZWFsIHNpZ21hX3BfYSwgCiAgICAgICAgICAgICAgICAgICAgICAgIHZlY3RvciBsbG9xLCBhcnJheVtdIGludCBibG9xLAogICAgICAgICAgICAgICAgICAgICAgICBpbnQgbl9yYW5kb20sIGludCBuX3N1YmplY3RzLCBpbnQgbl90b3RhbCwKICAgICAgICAgICAgICAgICAgICAgICAgYXJyYXlbXSByZWFsIGJpb2F2LCBhcnJheVtdIHJlYWwgdGxhZywgaW50IG5fY210KXsKICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICByZWFsIHB0YXJnZXQgPSAwOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgIGludCBOID0gZW5kIC0gc3RhcnQgKyAxOyAgICAvLyBudW1iZXIgb2Ygc3ViamVjdHMgaW4gdGhpcyBzbGljZSAgCiAgICB2ZWN0b3Jbbl90b3RhbF0gZHZfaXByZWQ7ICAgCiAgICBtYXRyaXhbbl90b3RhbCwgbl9jbXRdIHhfaXByZWQ7CiAgCiAgICBpbnQgbl9vYnNfc2xpY2UgPSBudW1fYmV0d2VlbihzdWJqX3N0YXJ0W3N0YXJ0XSwgc3Vial9lbmRbZW5kXSwgaV9vYnMpOwogICAgYXJyYXlbbl9vYnNfc2xpY2VdIGludCBpX29ic19zbGljZSA9IGZpbmRfYmV0d2VlbihzdWJqX3N0YXJ0W3N0YXJ0XSwgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN1YmpfZW5kW2VuZF0sIGlfb2JzKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICB2ZWN0b3Jbbl9vYnNfc2xpY2VdIGR2X29ic19zbGljZSA9IGZpbmRfYmV0d2Vlbl92ZWMoc3RhcnQsIGVuZCwgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZHZfb2JzX2lkLCBkdl9vYnMpOwogICAgCiAgICB2ZWN0b3Jbbl9vYnNfc2xpY2VdIGlwcmVkX3NsaWNlOwogICAgCiAgICB2ZWN0b3Jbbl9vYnNfc2xpY2VdIGxsb3Ffc2xpY2UgPSBsbG9xW2lfb2JzX3NsaWNlXTsKICAgIGFycmF5W25fb2JzX3NsaWNlXSBpbnQgYmxvcV9zbGljZSA9IGJsb3FbaV9vYnNfc2xpY2VdOwogICAgCiAgICAKICAgIGZvcihuIGluIDE6Til7ICAgICAgICAgICAgLy8gbG9vcCBvdmVyIHN1YmplY3RzIGluIHRoaXMgc2xpY2UKICAgIAogICAgICBpbnQgaiA9IG4gKyBzdGFydCAtIDE7IC8vIGogaXMgdGhlIElEIG9mIHRoZSBjdXJyZW50IHN1YmplY3QKICAgICAgICAKICAgICAgcmVhbCBrZSA9IENMW2pdL1ZDW2pdOwogICAgICByZWFsIGtfY3AgPSBRW2pdL1ZDW2pdOwogICAgICByZWFsIGtfcGMgPSBRW2pdL1ZQW2pdOwogICAgICAgIAogICAgICBtYXRyaXhbbl9jbXQsIG5fY210XSBLID0gcmVwX21hdHJpeCgwLCBuX2NtdCwgbl9jbXQpOwogICAgICBLWzEsIDFdID0gLShrZSArIGtfY3ApOwogICAgICBLWzEsIDJdID0ga19wYzsKICAgICAgS1syLCAxXSA9IGtfY3A7CiAgICAgIEtbMiwgMl0gPSAta19wYzsKICAgICAgCiAgICAgIHhfaXByZWRbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXSwgXSA9CiAgICAgICAgcG14X3NvbHZlX2xpbm9kZSh0aW1lW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgYW10W3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgcmF0ZVtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIGlpW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgZXZpZFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIGNtdFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIGFkZGxbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICBzc1tzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIEssIGJpb2F2LCB0bGFnKSc7CiAgICAgICAgICAgICAgICAgICAgICAKICAgICAgZHZfaXByZWRbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0gPSAKICAgICAgICB4X2lwcmVkW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal0sIDFdIC4vIFZDW2pdOwogICAgCiAgICB9CiAgCiAgICBpcHJlZF9zbGljZSA9IGR2X2lwcmVkW2lfb2JzX3NsaWNlXTsKICAgIAogICAgZm9yKGkgaW4gMTpuX29ic19zbGljZSl7CiAgICAgIHJlYWwgaXByZWRfdG1wID0gaXByZWRfc2xpY2VbaV07CiAgICAgIHJlYWwgc2lnbWFfdG1wID0gc3FydChzcXVhcmUoaXByZWRfdG1wKSAqIHNpZ21hX3NxX3AgKyBzaWdtYV9zcV9hICsgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAyKmlwcmVkX3RtcCpzaWdtYV9wX2EpOwogICAgICAKICAgICAgaWYoYmxvcV9zbGljZVtpXSA9PSAxKXsKICAgICAgICBwdGFyZ2V0ICs9IGxvZ19kaWZmX2V4cChub3JtYWxfbGNkZihsbG9xX3NsaWNlW2ldIHwgaXByZWRfdG1wLCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2lnbWFfdG1wKSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBub3JtYWxfbGNkZigwLjAgfCBpcHJlZF90bXAsIHNpZ21hX3RtcCkpIC0KICAgICAgICAgICAgICAgICAgIG5vcm1hbF9sY2NkZigwLjAgfCBpcHJlZF90bXAsIHNpZ21hX3RtcCk7IAogICAgICB9ZWxzZXsKICAgICAgICBwdGFyZ2V0ICs9IG5vcm1hbF9scGRmKGR2X29ic19zbGljZVtpXSB8IGlwcmVkX3RtcCwgc2lnbWFfdG1wKSAtCiAgICAgICAgICAgICAgICAgICBub3JtYWxfbGNjZGYoMC4wIHwgaXByZWRfdG1wLCBzaWdtYV90bXApOwogICAgICB9CiAgICB9ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICByZXR1cm4gcHRhcmdldDsKICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgfQogIAp9CmRhdGF7CiAgCiAgaW50IG5fc3ViamVjdHM7CiAgaW50IG5fdG90YWw7CiAgaW50IG5fb2JzOwogIGFycmF5W25fb2JzXSBpbnQgaV9vYnM7CiAgYXJyYXlbbl90b3RhbF0gaW50IElEOwogIGFycmF5W25fdG90YWxdIHJlYWwgYW10OwogIGFycmF5W25fdG90YWxdIGludCBjbXQ7CiAgYXJyYXlbbl90b3RhbF0gaW50IGV2aWQ7CiAgYXJyYXlbbl90b3RhbF0gcmVhbCByYXRlOwogIGFycmF5W25fdG90YWxdIHJlYWwgaWk7CiAgYXJyYXlbbl90b3RhbF0gaW50IGFkZGw7CiAgYXJyYXlbbl90b3RhbF0gaW50IHNzOwogIGFycmF5W25fdG90YWxdIHJlYWwgdGltZTsKICB2ZWN0b3I8bG93ZXIgPSAwPltuX3RvdGFsXSBkdjsKICBhcnJheVtuX3N1YmplY3RzXSBpbnQgc3Vial9zdGFydDsKICBhcnJheVtuX3N1YmplY3RzXSBpbnQgc3Vial9lbmQ7CiAgdmVjdG9yW25fdG90YWxdIGxsb3E7CiAgYXJyYXlbbl90b3RhbF0gaW50IGJsb3E7CiAgCiAgcmVhbDxsb3dlciA9IDA+IGxvY2F0aW9uX3R2Y2w7ICAvLyBQcmlvciBMb2NhdGlvbiBwYXJhbWV0ZXIgZm9yIENMCiAgcmVhbDxsb3dlciA9IDA+IGxvY2F0aW9uX3R2dmM7ICAvLyBQcmlvciBMb2NhdGlvbiBwYXJhbWV0ZXIgZm9yIFZDCiAgcmVhbDxsb3dlciA9IDA+IGxvY2F0aW9uX3R2cTsgICAvLyBQcmlvciBMb2NhdGlvbiBwYXJhbWV0ZXIgZm9yIFEKICByZWFsPGxvd2VyID0gMD4gbG9jYXRpb25fdHZ2cDsgIC8vIFByaW9yIExvY2F0aW9uIHBhcmFtZXRlciBmb3IgVlAKICAKICByZWFsPGxvd2VyID0gMD4gc2NhbGVfdHZjbDsgICAgIC8vIFByaW9yIFNjYWxlIHBhcmFtZXRlciBmb3IgQ0wKICByZWFsPGxvd2VyID0gMD4gc2NhbGVfdHZ2YzsgICAgIC8vIFByaW9yIFNjYWxlIHBhcmFtZXRlciBmb3IgVkMKICByZWFsPGxvd2VyID0gMD4gc2NhbGVfdHZxOyAgICAgIC8vIFByaW9yIFNjYWxlIHBhcmFtZXRlciBmb3IgUQogIHJlYWw8bG93ZXIgPSAwPiBzY2FsZV90dnZwOyAgICAgLy8gUHJpb3IgU2NhbGUgcGFyYW1ldGVyIGZvciBWUAogIAogIHJlYWw8bG93ZXIgPSAwPiBzY2FsZV9vbWVnYV9jbDsgLy8gUHJpb3Igc2NhbGUgcGFyYW1ldGVyIGZvciBvbWVnYV9jbAogIHJlYWw8bG93ZXIgPSAwPiBzY2FsZV9vbWVnYV92YzsgLy8gUHJpb3Igc2NhbGUgcGFyYW1ldGVyIGZvciBvbWVnYV92YwogIHJlYWw8bG93ZXIgPSAwPiBzY2FsZV9vbWVnYV9xOyAgLy8gUHJpb3Igc2NhbGUgcGFyYW1ldGVyIGZvciBvbWVnYV9xCiAgcmVhbDxsb3dlciA9IDA+IHNjYWxlX29tZWdhX3ZwOyAvLyBQcmlvciBzY2FsZSBwYXJhbWV0ZXIgZm9yIG9tZWdhX3ZwCiAgCiAgcmVhbDxsb3dlciA9IDA+IGxral9kZl9vbWVnYTsgICAvLyBQcmlvciBkZWdyZWVzIG9mIGZyZWVkb20gZm9yIG9tZWdhIGNvciBtYXQKICAKICByZWFsPGxvd2VyID0gMD4gc2NhbGVfc2lnbWFfcDsgIC8vIFByaW9yIFNjYWxlIHBhcmFtZXRlciBmb3IgcHJvcG9ydGlvbmFsIGVycm9yCiAgcmVhbDxsb3dlciA9IDA+IHNjYWxlX3NpZ21hX2E7ICAvLyBQcmlvciBTY2FsZSBwYXJhbWV0ZXIgZm9yIGFkZGl0aXZlIGVycm9yCiAgCiAgcmVhbDxsb3dlciA9IDA+IGxral9kZl9zaWdtYTsgICAvLyBQcmlvciBkZWdyZWVzIG9mIGZyZWVkb20gZm9yIHNpZ21hIGNvciBtYXQKICAKICBpbnQ8bG93ZXIgPSAwLCB1cHBlciA9IDE+IHByaW9yX29ubHk7IC8vIFdhbnQgdG8gc2ltdWxhdGUgZnJvbSB0aGUgcHJpb3I/CiAgCn0KdHJhbnNmb3JtZWQgZGF0YXsgCiAgCiAgaW50IGdyYWluc2l6ZSA9IDE7CiAgCiAgdmVjdG9yPGxvd2VyID0gMD5bbl9vYnNdIGR2X29icyA9IGR2W2lfb2JzXTsKICBhcnJheVtuX29ic10gaW50IGR2X29ic19pZCA9IElEW2lfb2JzXTsKICAKICB2ZWN0b3Jbbl9vYnNdIGxsb3Ffb2JzID0gbGxvcVtpX29ic107CiAgYXJyYXlbbl9vYnNdIGludCBibG9xX29icyA9IGJsb3FbaV9vYnNdOwogIAogIGludCBuX3JhbmRvbSA9IDQ7ICAgICAgICAgICAgICAgICAgICAvLyBOdW1iZXIgb2YgcmFuZG9tIGVmZmVjdHMKICBpbnQgbl9jbXQgPSAyOyAgICAgICAgICAgICAgICAgICAgICAgLy8gTnVtYmVyIG9mIHN0YXRlcyBpbiB0aGUgT0RFcwogIAogIGFycmF5W25fcmFuZG9tXSByZWFsIHNjYWxlX29tZWdhID0ge3NjYWxlX29tZWdhX2NsLCBzY2FsZV9vbWVnYV92YywgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2NhbGVfb21lZ2FfcSwgc2NhbGVfb21lZ2FfdnB9OyAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICBhcnJheVsyXSByZWFsIHNjYWxlX3NpZ21hID0ge3NjYWxlX3NpZ21hX3AsIHNjYWxlX3NpZ21hX2F9OyAKICAKICBhcnJheVtuX3N1YmplY3RzXSBpbnQgc2VxX3N1YmogPSBzZXF1ZW5jZSgxLCBuX3N1YmplY3RzKTsgLy8gcmVkdWNlX3N1bSBvdmVyIHN1YmplY3RzCiAgCiAgYXJyYXlbbl9jbXRdIHJlYWwgYmlvYXYgPSByZXBfYXJyYXkoMS4wLCBuX2NtdCk7IC8vIEhhcmRjb2RpbmcsIGJ1dCBjb3VsZCBiZSBkYXRhIG9yIGEgcGFyYW1ldGVyIGluIGFub3RoZXIgc2l0dWF0aW9uCiAgYXJyYXlbbl9jbXRdIHJlYWwgdGxhZyA9IHJlcF9hcnJheSgwLjAsIG5fY210KTsKICAKfQpwYXJhbWV0ZXJzeyAKICAKICByZWFsPGxvd2VyID0gMD4gVFZDTDsgICAgICAgCiAgcmVhbDxsb3dlciA9IDA+IFRWVkM7IAogIHJlYWw8bG93ZXIgPSAwPiBUVlE7ICAgICAgIAogIHJlYWw8bG93ZXIgPSAwPiBUVlZQOwogIAogIHZlY3Rvcjxsb3dlciA9IDA+W25fcmFuZG9tXSBvbWVnYTsKICBjaG9sZXNreV9mYWN0b3JfY29ycltuX3JhbmRvbV0gTDsKICAKICB2ZWN0b3I8bG93ZXIgPSAwPlsyXSBzaWdtYTsKICBjaG9sZXNreV9mYWN0b3JfY29yclsyXSBMX1NpZ21hOwogIAogIG1hdHJpeFtuX3JhbmRvbSwgbl9zdWJqZWN0c10gWjsKICAKfQp0cmFuc2Zvcm1lZCBwYXJhbWV0ZXJzewogIAogIHZlY3RvcltuX3N1YmplY3RzXSBldGFfY2w7CiAgdmVjdG9yW25fc3ViamVjdHNdIGV0YV92YzsKICB2ZWN0b3Jbbl9zdWJqZWN0c10gZXRhX3E7CiAgdmVjdG9yW25fc3ViamVjdHNdIGV0YV92cDsKICB2ZWN0b3Jbbl9zdWJqZWN0c10gQ0w7CiAgdmVjdG9yW25fc3ViamVjdHNdIFZDOwogIHZlY3RvcltuX3N1YmplY3RzXSBROwogIHZlY3RvcltuX3N1YmplY3RzXSBWUDsKICAKICByZWFsPGxvd2VyID0gMD4gc2lnbWFfcCA9IHNpZ21hWzFdOwogIHJlYWw8bG93ZXIgPSAwPiBzaWdtYV9hID0gc2lnbWFbMl07CiAgCiAgcmVhbDxsb3dlciA9IDA+IHNpZ21hX3NxX3AgPSBzcXVhcmUoc2lnbWFfcCk7CiAgcmVhbDxsb3dlciA9IDA+IHNpZ21hX3NxX2EgPSBzcXVhcmUoc2lnbWFfYSk7CiAgCiAgcmVhbCBjb3JfcF9hOwogIHJlYWwgc2lnbWFfcF9hOwoKICB7CiAgCiAgICByb3dfdmVjdG9yW25fcmFuZG9tXSB0eXBpY2FsX3ZhbHVlcyA9IHRvX3Jvd192ZWN0b3Ioe1RWQ0wsIFRWVkMsIFRWUSwgVFZWUH0pOwoKICAgIG1hdHJpeFtuX3N1YmplY3RzLCBuX3JhbmRvbV0gZXRhID0gZGlhZ19wcmVfbXVsdGlwbHkob21lZ2EsIEwgKiBaKSc7CgogICAgbWF0cml4W25fc3ViamVjdHMsIG5fcmFuZG9tXSB0aGV0YSA9CiAgICAgICAgICAgICAgICAgICAgICAgICAgKHJlcF9tYXRyaXgodHlwaWNhbF92YWx1ZXMsIG5fc3ViamVjdHMpIC4qIGV4cChldGEpKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgIG1hdHJpeFsyLCAyXSBSX1NpZ21hID0gbXVsdGlwbHlfbG93ZXJfdHJpX3NlbGZfdHJhbnNwb3NlKExfU2lnbWEpOwogICAgbWF0cml4WzIsIDJdIFNpZ21hID0gcXVhZF9mb3JtX2RpYWcoUl9TaWdtYSwgc2lnbWEpOwogICAgCiAgICBldGFfY2wgPSBjb2woZXRhLCAxKTsKICAgIGV0YV92YyA9IGNvbChldGEsIDIpOwogICAgZXRhX3EgPSBjb2woZXRhLCAzKTsKICAgIGV0YV92cCA9IGNvbChldGEsIDQpOwogICAgQ0wgPSBjb2wodGhldGEsIDEpOwogICAgVkMgPSBjb2wodGhldGEsIDIpOwogICAgUSA9IGNvbCh0aGV0YSwgMyk7CiAgICBWUCA9IGNvbCh0aGV0YSwgNCk7CiAgICAKICAgIGNvcl9wX2EgPSBSX1NpZ21hWzEsIDJdOwogICAgc2lnbWFfcF9hID0gU2lnbWFbMSwgMl07CiAgCiAgfQogIAp9Cm1vZGVseyAKICAKICAvLyBQcmlvcnMKICBUVkNMIH4gbG9nbm9ybWFsKGxvZyhsb2NhdGlvbl90dmNsKSwgc2NhbGVfdHZjbCk7CiAgVFZWQyB+IGxvZ25vcm1hbChsb2cobG9jYXRpb25fdHZ2YyksIHNjYWxlX3R2dmMpOwogIFRWUSB+IGxvZ25vcm1hbChsb2cobG9jYXRpb25fdHZxKSwgc2NhbGVfdHZxKTsKICBUVlZQIH4gbG9nbm9ybWFsKGxvZyhsb2NhdGlvbl90dnZwKSwgc2NhbGVfdHZ2cCk7CgogIG9tZWdhIH4gbm9ybWFsKDAsIHNjYWxlX29tZWdhKTsKICBMIH4gbGtqX2NvcnJfY2hvbGVza3kobGtqX2RmX29tZWdhKTsKICAKICBzaWdtYSB+IG5vcm1hbCgwLCBzY2FsZV9zaWdtYSk7CiAgTF9TaWdtYSB+IGxral9jb3JyX2Nob2xlc2t5KGxral9kZl9zaWdtYSk7CiAgCiAgdG9fdmVjdG9yKFopIH4gc3RkX25vcm1hbCgpOwogIAogIC8vIExpa2VsaWhvb2QKICBpZihwcmlvcl9vbmx5ID09IDApewogICAgdGFyZ2V0ICs9IHJlZHVjZV9zdW0ocGFydGlhbF9zdW1fbHVwbWYsIHNlcV9zdWJqLCBncmFpbnNpemUsCiAgICAgICAgICAgICAgICAgICAgICAgICBkdl9vYnMsIGR2X29ic19pZCwgaV9vYnMsCiAgICAgICAgICAgICAgICAgICAgICAgICBhbXQsIGNtdCwgZXZpZCwgdGltZSwgCiAgICAgICAgICAgICAgICAgICAgICAgICByYXRlLCBpaSwgYWRkbCwgc3MsIHN1Ympfc3RhcnQsIHN1YmpfZW5kLCAKICAgICAgICAgICAgICAgICAgICAgICAgIENMLCBWQywgUSwgVlAsCiAgICAgICAgICAgICAgICAgICAgICAgICBzaWdtYV9zcV9wLCBzaWdtYV9zcV9hLCBzaWdtYV9wX2EsIAogICAgICAgICAgICAgICAgICAgICAgICAgbGxvcSwgYmxvcSwKICAgICAgICAgICAgICAgICAgICAgICAgIG5fcmFuZG9tLCBuX3N1YmplY3RzLCBuX3RvdGFsLAogICAgICAgICAgICAgICAgICAgICAgICAgYmlvYXYsIHRsYWcsIG5fY210KTsKICB9Cn0KZ2VuZXJhdGVkIHF1YW50aXRpZXN7CiAgCiAgcmVhbDxsb3dlciA9IDA+IG9tZWdhX2NsID0gb21lZ2FbMV07CiAgcmVhbDxsb3dlciA9IDA+IG9tZWdhX3ZjID0gb21lZ2FbMl07CiAgcmVhbDxsb3dlciA9IDA+IG9tZWdhX3EgPSBvbWVnYVszXTsKICByZWFsPGxvd2VyID0gMD4gb21lZ2FfdnAgPSBvbWVnYVs0XTsKCiAgcmVhbDxsb3dlciA9IDA+IG9tZWdhX3NxX2NsID0gc3F1YXJlKG9tZWdhX2NsKTsKICByZWFsPGxvd2VyID0gMD4gb21lZ2Ffc3FfdmMgPSBzcXVhcmUob21lZ2FfdmMpOwogIHJlYWw8bG93ZXIgPSAwPiBvbWVnYV9zcV9xID0gc3F1YXJlKG9tZWdhX3EpOwogIHJlYWw8bG93ZXIgPSAwPiBvbWVnYV9zcV92cCA9IHNxdWFyZShvbWVnYV92cCk7CgogIHJlYWwgY29yX2NsX3ZjOwogIHJlYWwgY29yX2NsX3E7CiAgcmVhbCBjb3JfY2xfdnA7CiAgcmVhbCBjb3JfdmNfcTsKICByZWFsIGNvcl92Y192cDsKICByZWFsIGNvcl9xX3ZwOwogIHJlYWwgb21lZ2FfY2xfdmM7CiAgcmVhbCBvbWVnYV9jbF9xOwogIHJlYWwgb21lZ2FfY2xfdnA7CiAgcmVhbCBvbWVnYV92Y19xOwogIHJlYWwgb21lZ2FfdmNfdnA7CiAgcmVhbCBvbWVnYV9xX3ZwOwoKICB2ZWN0b3Jbbl9vYnNdIGlwcmVkOwogIHZlY3RvcltuX29ic10gcHJlZDsKICB2ZWN0b3Jbbl9vYnNdIGR2X3BwYzsKICB2ZWN0b3Jbbl9vYnNdIGxvZ19saWs7CiAgdmVjdG9yW25fb2JzXSByZXM7CiAgdmVjdG9yW25fb2JzXSB3cmVzOwogIHZlY3RvcltuX29ic10gaXJlczsKICB2ZWN0b3Jbbl9vYnNdIGl3cmVzOwogCiAgewoKICAgIG1hdHJpeFtuX3JhbmRvbSwgbl9yYW5kb21dIFIgPSBtdWx0aXBseV9sb3dlcl90cmlfc2VsZl90cmFuc3Bvc2UoTCk7CiAgICBtYXRyaXhbbl9yYW5kb20sIG5fcmFuZG9tXSBPbWVnYSA9IHF1YWRfZm9ybV9kaWFnKFIsIG9tZWdhKTsKCiAgICB2ZWN0b3Jbbl90b3RhbF0gZHZfcHJlZDsKICAgIG1hdHJpeFtuX3RvdGFsLCBuX2NtdF0geF9wcmVkOwogICAgdmVjdG9yW25fdG90YWxdIGR2X2lwcmVkOwogICAgbWF0cml4W25fdG90YWwsIG5fY210XSB4X2lwcmVkOwoKICAgIGNvcl9jbF92YyA9IFJbMSwgMl07CiAgICBjb3JfY2xfcSA9IFJbMSwgM107CiAgICBjb3JfY2xfdnAgPSBSWzEsIDRdOwogICAgY29yX3ZjX3EgPSBSWzIsIDNdOwogICAgY29yX3ZjX3ZwID0gUlsyLCA0XTsKICAgIGNvcl9xX3ZwID0gUlszLCA0XTsKICAgIAogICAgb21lZ2FfY2xfdmMgPSBPbWVnYVsxLCAyXTsKICAgIG9tZWdhX2NsX3EgPSBPbWVnYVsxLCAzXTsKICAgIG9tZWdhX2NsX3ZwID0gT21lZ2FbMSwgNF07CiAgICBvbWVnYV92Y19xID0gT21lZ2FbMiwgM107CiAgICBvbWVnYV92Y192cCA9IE9tZWdhWzIsIDRdOwogICAgb21lZ2FfcV92cCA9IE9tZWdhWzMsIDRdOwoKICAgIGZvcihqIGluIDE6bl9zdWJqZWN0cyl7CiAgICAgICAgCiAgICAgIHJlYWwga2UgPSBDTFtqXS9WQ1tqXTsKICAgICAgcmVhbCBrX2NwID0gUVtqXS9WQ1tqXTsKICAgICAgcmVhbCBrX3BjID0gUVtqXS9WUFtqXTsKICAgICAgICAKICAgICAgcmVhbCB0dmtlID0gVFZDTC9UVlZDOwogICAgICByZWFsIHR2a19jcCA9IFRWUS9UVlZDOwogICAgICByZWFsIHR2a19wYyA9IFRWUS9UVlZQOwogICAgICAgIAogICAgICBtYXRyaXhbbl9jbXQsIG5fY210XSBLID0gcmVwX21hdHJpeCgwLCBuX2NtdCwgbl9jbXQpOwogICAgICBtYXRyaXhbbl9jbXQsIG5fY210XSBLX3R2ID0gcmVwX21hdHJpeCgwLCBuX2NtdCwgbl9jbXQpOwogICAgICBLWzEsIDFdID0gLShrZSArIGtfY3ApOwogICAgICBLWzEsIDJdID0ga19wYzsKICAgICAgS1syLCAxXSA9IGtfY3A7CiAgICAgIEtbMiwgMl0gPSAta19wYzsKICAgICAgCiAgICAgIHhfaXByZWRbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXSwgXSA9CiAgICAgICAgcG14X3NvbHZlX2xpbm9kZSh0aW1lW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgYW10W3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgcmF0ZVtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIGlpW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgZXZpZFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIGNtdFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIGFkZGxbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICBzc1tzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIEssIGJpb2F2LCB0bGFnKSc7CiAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICBLX3R2WzEsIDFdID0gLSh0dmtlICsgdHZrX2NwKTsKICAgICAgS190dlsxLCAyXSA9IHR2a19wYzsKICAgICAgS190dlsyLCAxXSA9IHR2a19jcDsKICAgICAgS190dlsyLCAyXSA9IC10dmtfcGM7CgogICAgICB4X3ByZWRbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXSxdID0KICAgICAgICBwbXhfc29sdmVfbGlub2RlKHRpbWVbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICBhbXRbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICByYXRlW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgaWlbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICBldmlkW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgY210W3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgYWRkbFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIHNzW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgS190diwgYmlvYXYsIHRsYWcpJzsKICAgICAgCiAgICAgIGR2X2lwcmVkW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dID0KICAgICAgICB4X2lwcmVkW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal0sIDFdIC4vIFZDW2pdOwogICAgICAKICAgICAgZHZfcHJlZFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSA9CiAgICAgICAgeF9wcmVkW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal0sIDFdIC4vIFRWVkM7CiAgICAgIAogICAgfQoKICAgIHByZWQgPSBkdl9wcmVkW2lfb2JzXTsKICAgIGlwcmVkID0gZHZfaXByZWRbaV9vYnNdOwoKICB9CgogIHJlcyA9IGR2X29icyAtIHByZWQ7CiAgaXJlcyA9IGR2X29icyAtIGlwcmVkOwoKICBmb3IoaSBpbiAxOm5fb2JzKXsKICAgIHJlYWwgaXByZWRfdG1wID0gaXByZWRbaV07CiAgICByZWFsIHNpZ21hX3RtcCA9IHNxcnQoc3F1YXJlKGlwcmVkX3RtcCkgKiBzaWdtYV9zcV9wICsgc2lnbWFfc3FfYSArIAogICAgICAgICAgICAgICAgICAgICAgICAgIDIqaXByZWRfdG1wKnNpZ21hX3BfYSk7CiAgICBkdl9wcGNbaV0gPSBub3JtYWxfbGJfcm5nKGlwcmVkX3RtcCwgc2lnbWFfdG1wLCAwLjApOwogICAgaWYoYmxvcV9vYnNbaV0gPT0gMSl7CiAgICAgIC8vIGxvZ19saWtbaV0gPSBsb2cobm9ybWFsX2NkZihsbG9xX29ic1tpXSB8IGlwcmVkX3RtcCwgc2lnbWFfdG1wKSAtCiAgICAgIC8vICAgICAgICAgICAgICAgICAgbm9ybWFsX2NkZigwLjAgfCBpcHJlZF90bXAsIHNpZ21hX3RtcCkpIC0KICAgICAgLy8gICAgICAgICAgICAgIG5vcm1hbF9sY2NkZigwLjAgfCBpcHJlZF90bXAsIHNpZ21hX3RtcCk7CiAgICAgIGxvZ19saWtbaV0gPSBsb2dfZGlmZl9leHAobm9ybWFsX2xjZGYobGxvcV9vYnNbaV0gfCBpcHJlZF90bXAsIHNpZ21hX3RtcCksCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbm9ybWFsX2xjZGYoMC4wIHwgaXByZWRfdG1wLCBzaWdtYV90bXApKSAtCiAgICAgICAgICAgICAgICAgICBub3JtYWxfbGNjZGYoMC4wIHwgaXByZWRfdG1wLCBzaWdtYV90bXApOwogICAgfWVsc2V7CiAgICAgIGxvZ19saWtbaV0gPSBub3JtYWxfbHBkZihkdl9vYnNbaV0gfCBpcHJlZF90bXAsIHNpZ21hX3RtcCkgLQogICAgICAgICAgICAgICAgICAgbm9ybWFsX2xjY2RmKDAuMCB8IGlwcmVkX3RtcCwgc2lnbWFfdG1wKTsKICAgIH0KICAgIHdyZXNbaV0gPSByZXNbaV0vc2lnbWFfdG1wOwogICAgaXdyZXNbaV0gPSBpcmVzW2ldL3NpZ21hX3RtcDsKICB9CiAgCn0KCg==').then(res => res.blob()).then(blob => {
@@ -1350,8 +1554,8 @@ generated quantities{
 </div>
 </div>
 </section>
-<section id="lognormal-error" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Lognormal Error</h1>
+<section id="lognormal-error-1" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="lognormal-error-1"><span class="header-section-number">3.3</span> Lognormal Error</h2>
 <div class="cell">
 <div class="cell-output-display">
 <a onclick="fetch('data:application/octet-stream;base64,Ly8gSVYgaW5mdXNpb24KLy8gVHdvLWNvbXBhcnRtZW50IFBLIE1vZGVsCi8vIElJViBvbiBDTCwgVkMsIFEsIGFuZCBWUCAoZnVsbCBjb3ZhcmlhbmNlIG1hdHJpeCkKLy8gZXhwb25lbnRpYWwgZXJyb3IgLSBEViA9IElQUkVEKmV4cChlcHMpCi8vIE1hdHJpeC1leHBvbmVudGlhbCBzb2x1dGlvbiB1c2luZyBUb3JzdGVuICh0aGUgbWF0cml4LWV4cG9uZW50aWFsIHNlZW1zIHRvIGJlCi8vICAgZmFzdGVyIHRoYW4gdGhlIGFuYWx5dGljYWwgc29sdXRpb24gZm9yIHRoaXMgbW9kZWwpCi8vIEltcGxlbWVudHMgdGhyZWFkaW5nIGZvciB3aXRoaW4tY2hhaW4gcGFyYWxsZWxpemF0aW9uIAovLyBEZWFscyB3aXRoIEJMT1EgdmFsdWVzIGJ5IHRoZSBNMyBtZXRob2QgKE0zIGFuZCBNNCBhcmUgZXF1aXZhbGVudCB3aXRoIHRoaXMKLy8gICBlcnJvciBtb2RlbCkKCmZ1bmN0aW9uc3sKICAKICBhcnJheVtdIGludCBzZXF1ZW5jZShpbnQgc3RhcnQsIGludCBlbmQpIHsgCiAgICBhcnJheVtlbmQgLSBzdGFydCArIDFdIGludCBzZXE7CiAgICBmb3IgKG4gaW4gMTpudW1fZWxlbWVudHMoc2VxKSkgewogICAgICBzZXFbbl0gPSBuICsgc3RhcnQgLSAxOwogICAgfQogICAgcmV0dXJuIHNlcTsgCiAgfSAKICAKICBpbnQgbnVtX2JldHdlZW4oaW50IGxiLCBpbnQgdWIsIGFycmF5W10gaW50IHkpewogICAgCiAgICBpbnQgbiA9IDA7CiAgICBmb3IoaSBpbiAxOm51bV9lbGVtZW50cyh5KSl7CiAgICAgIGlmKHlbaV0gPj0gbGIgJiYgeVtpXSA8PSB1YikKICAgICAgICBuID0gbiArIDE7CiAgICB9CiAgICByZXR1cm4gbjsKICAgIAogIH0KICAKICBhcnJheVtdIGludCBmaW5kX2JldHdlZW4oaW50IGxiLCBpbnQgdWIsIGFycmF5W10gaW50IHkpIHsKICAgIC8vIHZlY3RvcltudW1fYmV0d2VlbihsYiwgdWIsIHkpXSByZXN1bHQ7CiAgICBhcnJheVtudW1fYmV0d2VlbihsYiwgdWIsIHkpXSBpbnQgcmVzdWx0OwogICAgaW50IG4gPSAxOwogICAgZm9yIChpIGluIDE6bnVtX2VsZW1lbnRzKHkpKSB7CiAgICAgIGlmICh5W2ldID49IGxiICYmIHlbaV0gPD0gdWIpIHsKICAgICAgICByZXN1bHRbbl0gPSB5W2ldOwogICAgICAgIG4gPSBuICsgMTsKICAgICAgfQogICAgfQogICAgcmV0dXJuIHJlc3VsdDsKICB9CiAgCiAgdmVjdG9yIGZpbmRfYmV0d2Vlbl92ZWMoaW50IGxiLCBpbnQgdWIsIGFycmF5W10gaW50IGlkeCwgdmVjdG9yIHkpIHsKICAgIAogICAgdmVjdG9yW251bV9iZXR3ZWVuKGxiLCB1YiwgaWR4KV0gcmVzdWx0OwogICAgaW50IG4gPSAxOwogICAgaWYobnVtX2VsZW1lbnRzKGlkeCkgIT0gbnVtX2VsZW1lbnRzKHkpKSByZWplY3QoImlsbGVnYWwgaW5wdXQiKTsKICAgIGZvciAoaSBpbiAxOnJvd3MoeSkpIHsKICAgICAgaWYgKGlkeFtpXSA+PSBsYiAmJiBpZHhbaV0gPD0gdWIpIHsKICAgICAgICByZXN1bHRbbl0gPSB5W2ldOwogICAgICAgIG4gPSBuICsgMTsKICAgICAgfQogICAgfQogICAgcmV0dXJuIHJlc3VsdDsKICB9CiAgCiAgcmVhbCBwYXJ0aWFsX3N1bV9scG1mKGFycmF5W10gaW50IHNlcV9zdWJqLCBpbnQgc3RhcnQsIGludCBlbmQsCiAgICAgICAgICAgICAgICAgICAgICAgIHZlY3RvciBkdl9vYnMsIGFycmF5W10gaW50IGR2X29ic19pZCwgYXJyYXlbXSBpbnQgaV9vYnMsCiAgICAgICAgICAgICAgICAgICAgICAgIGFycmF5W10gcmVhbCBhbXQsIGFycmF5W10gaW50IGNtdCwgYXJyYXlbXSBpbnQgZXZpZCwgCiAgICAgICAgICAgICAgICAgICAgICAgIGFycmF5W10gcmVhbCB0aW1lLCBhcnJheVtdIHJlYWwgcmF0ZSwgYXJyYXlbXSByZWFsIGlpLCAKICAgICAgICAgICAgICAgICAgICAgICAgYXJyYXlbXSBpbnQgYWRkbCwgYXJyYXlbXSBpbnQgc3MsCiAgICAgICAgICAgICAgICAgICAgICAgIGFycmF5W10gaW50IHN1Ympfc3RhcnQsIGFycmF5W10gaW50IHN1YmpfZW5kLCAKICAgICAgICAgICAgICAgICAgICAgICAgdmVjdG9yIENMLCB2ZWN0b3IgVkMsIHZlY3RvciBRLCB2ZWN0b3IgVlAsIAogICAgICAgICAgICAgICAgICAgICAgICByZWFsIHNpZ21hLCAKICAgICAgICAgICAgICAgICAgICAgICAgdmVjdG9yIGxsb3EsIGFycmF5W10gaW50IGJsb3EsCiAgICAgICAgICAgICAgICAgICAgICAgIGludCBuX3JhbmRvbSwgaW50IG5fc3ViamVjdHMsIGludCBuX3RvdGFsLAogICAgICAgICAgICAgICAgICAgICAgICBhcnJheVtdIHJlYWwgYmlvYXYsIGFycmF5W10gcmVhbCB0bGFnLCBpbnQgbl9jbXQpewogICAgCiAgICByZWFsIHB0YXJnZXQgPSAwOwogICAgCiAgICBpbnQgTiA9IGVuZCAtIHN0YXJ0ICsgMTsgICAgLy8gbnVtYmVyIG9mIHN1YmplY3RzIGluIHRoaXMgc2xpY2UgIAogICAgdmVjdG9yW25fdG90YWxdIGR2X2lwcmVkOyAgIAogICAgbWF0cml4W25fdG90YWwsIG5fY210XSB4X2lwcmVkOwogICAgCiAgICBpbnQgbl9vYnNfc2xpY2UgPSBudW1fYmV0d2VlbihzdWJqX3N0YXJ0W3N0YXJ0XSwgc3Vial9lbmRbZW5kXSwgaV9vYnMpOwogICAgYXJyYXlbbl9vYnNfc2xpY2VdIGludCBpX29ic19zbGljZSA9IGZpbmRfYmV0d2VlbihzdWJqX3N0YXJ0W3N0YXJ0XSwgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN1YmpfZW5kW2VuZF0sIGlfb2JzKTsKICAgIAogICAgdmVjdG9yW25fb2JzX3NsaWNlXSBkdl9vYnNfc2xpY2UgPSBmaW5kX2JldHdlZW5fdmVjKHN0YXJ0LCBlbmQsIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGR2X29ic19pZCwgZHZfb2JzKTsKICAgIAogICAgdmVjdG9yW25fb2JzX3NsaWNlXSBpcHJlZF9zbGljZTsKICAgIAogICAgdmVjdG9yW25fb2JzX3NsaWNlXSBsbG9xX3NsaWNlID0gbGxvcVtpX29ic19zbGljZV07CiAgICBhcnJheVtuX29ic19zbGljZV0gaW50IGJsb3Ffc2xpY2UgPSBibG9xW2lfb2JzX3NsaWNlXTsKICAgIAogICAgCiAgICBmb3IobiBpbiAxOk4peyAgICAgICAgICAgIC8vIGxvb3Agb3ZlciBzdWJqZWN0cyBpbiB0aGlzIHNsaWNlCiAgICAgIAogICAgICBpbnQgaiA9IG4gKyBzdGFydCAtIDE7IC8vIGogaXMgdGhlIElEIG9mIHRoZSBjdXJyZW50IHN1YmplY3QKICAgICAgCiAgICAgIHJlYWwga2UgPSBDTFtqXS9WQ1tqXTsKICAgICAgcmVhbCBrX2NwID0gUVtqXS9WQ1tqXTsKICAgICAgcmVhbCBrX3BjID0gUVtqXS9WUFtqXTsKICAgICAgCiAgICAgIG1hdHJpeFtuX2NtdCwgbl9jbXRdIEsgPSByZXBfbWF0cml4KDAsIG5fY210LCBuX2NtdCk7CiAgICAgIEtbMSwgMV0gPSAtKGtlICsga19jcCk7CiAgICAgIEtbMSwgMl0gPSBrX3BjOwogICAgICBLWzIsIDFdID0ga19jcDsKICAgICAgS1syLCAyXSA9IC1rX3BjOwogICAgICAKICAgICAgeF9pcHJlZFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdLCBdID0KICAgICAgICBwbXhfc29sdmVfbGlub2RlKHRpbWVbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICBhbXRbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICByYXRlW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgaWlbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICBldmlkW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgY210W3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgYWRkbFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIHNzW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgSywgYmlvYXYsIHRsYWcpJzsKICAgICAgICAgICAgICAgICAgICAgIAogICAgICBkdl9pcHJlZFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSA9IAogICAgICAgIHhfaXByZWRbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXSwgMV0gLi8gVkNbal07CiAgICAKICAgIH0KICAKICAgIGlwcmVkX3NsaWNlID0gZHZfaXByZWRbaV9vYnNfc2xpY2VdOwogICAgCiAgICBmb3IoaSBpbiAxOm5fb2JzX3NsaWNlKXsKICAgICAgaWYoYmxvcV9zbGljZVtpXSA9PSAxKXsKICAgICAgICBwdGFyZ2V0ICs9IGxvZ25vcm1hbF9sY2RmKGxsb3Ffc2xpY2VbaV0gfCBsb2coaXByZWRfc2xpY2VbaV0pLCBzaWdtYSk7CiAgICAgIH1lbHNlewogICAgICAgIHB0YXJnZXQgKz0gbG9nbm9ybWFsX2xwZGYoZHZfb2JzX3NsaWNlW2ldIHwgbG9nKGlwcmVkX3NsaWNlW2ldKSwgc2lnbWEpOwogICAgICB9CiAgICB9ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgIHJldHVybiBwdGFyZ2V0OwogICAgICAgICAgICAgICAgICAgICAgICAgICAKICB9CiAgCn0KZGF0YXsKICAKICBpbnQgbl9zdWJqZWN0czsKICBpbnQgbl90b3RhbDsKICBpbnQgbl9vYnM7CiAgYXJyYXlbbl9vYnNdIGludCBpX29iczsKICBhcnJheVtuX3RvdGFsXSBpbnQgSUQ7CiAgYXJyYXlbbl90b3RhbF0gcmVhbCBhbXQ7CiAgYXJyYXlbbl90b3RhbF0gaW50IGNtdDsKICBhcnJheVtuX3RvdGFsXSBpbnQgZXZpZDsKICBhcnJheVtuX3RvdGFsXSByZWFsIHJhdGU7CiAgYXJyYXlbbl90b3RhbF0gcmVhbCBpaTsKICBhcnJheVtuX3RvdGFsXSBpbnQgYWRkbDsKICBhcnJheVtuX3RvdGFsXSBpbnQgc3M7CiAgYXJyYXlbbl90b3RhbF0gcmVhbCB0aW1lOwogIHZlY3Rvcjxsb3dlciA9IDA+W25fdG90YWxdIGR2OwogIGFycmF5W25fc3ViamVjdHNdIGludCBzdWJqX3N0YXJ0OwogIGFycmF5W25fc3ViamVjdHNdIGludCBzdWJqX2VuZDsKICB2ZWN0b3Jbbl90b3RhbF0gbGxvcTsKICBhcnJheVtuX3RvdGFsXSBpbnQgYmxvcTsKICAKICByZWFsPGxvd2VyID0gMD4gbG9jYXRpb25fdHZjbDsgIC8vIFByaW9yIExvY2F0aW9uIHBhcmFtZXRlciBmb3IgQ0wKICByZWFsPGxvd2VyID0gMD4gbG9jYXRpb25fdHZ2YzsgIC8vIFByaW9yIExvY2F0aW9uIHBhcmFtZXRlciBmb3IgVkMKICByZWFsPGxvd2VyID0gMD4gbG9jYXRpb25fdHZxOyAgIC8vIFByaW9yIExvY2F0aW9uIHBhcmFtZXRlciBmb3IgUQogIHJlYWw8bG93ZXIgPSAwPiBsb2NhdGlvbl90dnZwOyAgLy8gUHJpb3IgTG9jYXRpb24gcGFyYW1ldGVyIGZvciBWUAogIAogIHJlYWw8bG93ZXIgPSAwPiBzY2FsZV90dmNsOyAgICAgLy8gUHJpb3IgU2NhbGUgcGFyYW1ldGVyIGZvciBDTAogIHJlYWw8bG93ZXIgPSAwPiBzY2FsZV90dnZjOyAgICAgLy8gUHJpb3IgU2NhbGUgcGFyYW1ldGVyIGZvciBWQwogIHJlYWw8bG93ZXIgPSAwPiBzY2FsZV90dnE7ICAgICAgLy8gUHJpb3IgU2NhbGUgcGFyYW1ldGVyIGZvciBRCiAgcmVhbDxsb3dlciA9IDA+IHNjYWxlX3R2dnA7ICAgICAvLyBQcmlvciBTY2FsZSBwYXJhbWV0ZXIgZm9yIFZQCiAgCiAgcmVhbDxsb3dlciA9IDA+IHNjYWxlX29tZWdhX2NsOyAvLyBQcmlvciBzY2FsZSBwYXJhbWV0ZXIgZm9yIG9tZWdhX2NsCiAgcmVhbDxsb3dlciA9IDA+IHNjYWxlX29tZWdhX3ZjOyAvLyBQcmlvciBzY2FsZSBwYXJhbWV0ZXIgZm9yIG9tZWdhX3ZjCiAgcmVhbDxsb3dlciA9IDA+IHNjYWxlX29tZWdhX3E7ICAvLyBQcmlvciBzY2FsZSBwYXJhbWV0ZXIgZm9yIG9tZWdhX3EKICByZWFsPGxvd2VyID0gMD4gc2NhbGVfb21lZ2FfdnA7IC8vIFByaW9yIHNjYWxlIHBhcmFtZXRlciBmb3Igb21lZ2FfdnAKICAKICByZWFsPGxvd2VyID0gMD4gbGtqX2RmX29tZWdhOyAgIC8vIFByaW9yIGRlZ3JlZXMgb2YgZnJlZWRvbSBmb3Igb21lZ2EgY29yIG1hdAogIAogIHJlYWw8bG93ZXIgPSAwPiBzY2FsZV9zaWdtYTsgICAgLy8gUHJpb3IgU2NhbGUgcGFyYW1ldGVyIGZvciBleHBvbmVudGlhbCBlcnJvcgogIAogIGludDxsb3dlciA9IDAsIHVwcGVyID0gMT4gcHJpb3Jfb25seTsgLy8gV2FudCB0byBzaW11bGF0ZSBmcm9tIHRoZSBwcmlvcj8KICAKfQp0cmFuc2Zvcm1lZCBkYXRheyAKICAKICBpbnQgZ3JhaW5zaXplID0gMTsKICAKICB2ZWN0b3I8bG93ZXIgPSAwPltuX29ic10gZHZfb2JzID0gZHZbaV9vYnNdOwogIGFycmF5W25fb2JzXSBpbnQgZHZfb2JzX2lkID0gSURbaV9vYnNdOwogIAogIHZlY3RvcltuX29ic10gbGxvcV9vYnMgPSBsbG9xW2lfb2JzXTsKICBhcnJheVtuX29ic10gaW50IGJsb3Ffb2JzID0gYmxvcVtpX29ic107CiAgCiAgaW50IG5fcmFuZG9tID0gNDsgICAgICAgICAgICAgICAgICAgIC8vIE51bWJlciBvZiByYW5kb20gZWZmZWN0cwogIGludCBuX2NtdCA9IDI7ICAgICAgICAgICAgICAgICAgICAgICAvLyBOdW1iZXIgb2Ygc3RhdGVzIGluIHRoZSBPREVzCiAgCiAgYXJyYXlbbl9yYW5kb21dIHJlYWwgc2NhbGVfb21lZ2EgPSB7c2NhbGVfb21lZ2FfY2wsIHNjYWxlX29tZWdhX3ZjLCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzY2FsZV9vbWVnYV9xLCBzY2FsZV9vbWVnYV92cH07IAogIAogIGFycmF5W25fc3ViamVjdHNdIGludCBzZXFfc3ViaiA9IHNlcXVlbmNlKDEsIG5fc3ViamVjdHMpOyAvLyByZWR1Y2Vfc3VtIG92ZXIgc3ViamVjdHMKICAKICBhcnJheVtuX2NtdF0gcmVhbCBiaW9hdiA9IHJlcF9hcnJheSgxLjAsIG5fY210KTsgLy8gSGFyZGNvZGluZywgYnV0IGNvdWxkIGJlIGRhdGEgb3IgYSBwYXJhbWV0ZXIgaW4gYW5vdGhlciBzaXR1YXRpb24KICBhcnJheVtuX2NtdF0gcmVhbCB0bGFnID0gcmVwX2FycmF5KDAuMCwgbl9jbXQpOwogIAp9CnBhcmFtZXRlcnN7IAogIAogIHJlYWw8bG93ZXIgPSAwPiBUVkNMOyAgICAgICAKICByZWFsPGxvd2VyID0gMD4gVFZWQzsgCiAgcmVhbDxsb3dlciA9IDA+IFRWUTsgICAgICAgCiAgcmVhbDxsb3dlciA9IDA+IFRWVlA7CiAgCiAgdmVjdG9yPGxvd2VyID0gMD5bbl9yYW5kb21dIG9tZWdhOwogIGNob2xlc2t5X2ZhY3Rvcl9jb3JyW25fcmFuZG9tXSBMOwogIAogIHJlYWw8bG93ZXIgPSAwPiBzaWdtYTsKICAKICBtYXRyaXhbbl9yYW5kb20sIG5fc3ViamVjdHNdIFo7CiAgCn0KdHJhbnNmb3JtZWQgcGFyYW1ldGVyc3sKICAKICB2ZWN0b3Jbbl9zdWJqZWN0c10gZXRhX2NsOwogIHZlY3RvcltuX3N1YmplY3RzXSBldGFfdmM7CiAgdmVjdG9yW25fc3ViamVjdHNdIGV0YV9xOwogIHZlY3RvcltuX3N1YmplY3RzXSBldGFfdnA7CiAgdmVjdG9yW25fc3ViamVjdHNdIENMOwogIHZlY3RvcltuX3N1YmplY3RzXSBWQzsKICB2ZWN0b3Jbbl9zdWJqZWN0c10gUTsKICB2ZWN0b3Jbbl9zdWJqZWN0c10gVlA7CgogIHsKICAKICAgIHJvd192ZWN0b3Jbbl9yYW5kb21dIHR5cGljYWxfdmFsdWVzID0gdG9fcm93X3ZlY3Rvcih7VFZDTCwgVFZWQywgVFZRLCBUVlZQfSk7CgogICAgbWF0cml4W25fc3ViamVjdHMsIG5fcmFuZG9tXSBldGEgPSBkaWFnX3ByZV9tdWx0aXBseShvbWVnYSwgTCAqIFopJzsKCiAgICBtYXRyaXhbbl9zdWJqZWN0cywgbl9yYW5kb21dIHRoZXRhID0KICAgICAgKHJlcF9tYXRyaXgodHlwaWNhbF92YWx1ZXMsIG5fc3ViamVjdHMpIC4qIGV4cChldGEpKTsKCiAgICBldGFfY2wgPSBjb2woZXRhLCAxKTsKICAgIGV0YV92YyA9IGNvbChldGEsIDIpOwogICAgZXRhX3EgPSBjb2woZXRhLCAzKTsKICAgIGV0YV92cCA9IGNvbChldGEsIDQpOwogICAgQ0wgPSBjb2wodGhldGEsIDEpOwogICAgVkMgPSBjb2wodGhldGEsIDIpOwogICAgUSA9IGNvbCh0aGV0YSwgMyk7CiAgICBWUCA9IGNvbCh0aGV0YSwgNCk7CgogIH0KCn0KbW9kZWx7IAogIAogIC8vIFByaW9ycwogIFRWQ0wgfiBsb2dub3JtYWwobG9nKGxvY2F0aW9uX3R2Y2wpLCBzY2FsZV90dmNsKTsKICBUVlZDIH4gbG9nbm9ybWFsKGxvZyhsb2NhdGlvbl90dnZjKSwgc2NhbGVfdHZ2Yyk7CiAgVFZRIH4gbG9nbm9ybWFsKGxvZyhsb2NhdGlvbl90dnEpLCBzY2FsZV90dnEpOwogIFRWVlAgfiBsb2dub3JtYWwobG9nKGxvY2F0aW9uX3R2dnApLCBzY2FsZV90dnZwKTsKICAKICBvbWVnYSB+IG5vcm1hbCgwLCBzY2FsZV9vbWVnYSk7CiAgTCB+IGxral9jb3JyX2Nob2xlc2t5KGxral9kZl9vbWVnYSk7CiAgCiAgc2lnbWEgfiBub3JtYWwoMCwgc2NhbGVfc2lnbWEpOwogIAogIHRvX3ZlY3RvcihaKSB+IHN0ZF9ub3JtYWwoKTsKICAKICAvLyBMaWtlbGlob29kCiAgaWYocHJpb3Jfb25seSA9PSAwKXsKICAgIHRhcmdldCArPSByZWR1Y2Vfc3VtKHBhcnRpYWxfc3VtX2x1cG1mLCBzZXFfc3ViaiwgZ3JhaW5zaXplLAogICAgICAgICAgICAgICAgICAgICAgICAgZHZfb2JzLCBkdl9vYnNfaWQsIGlfb2JzLAogICAgICAgICAgICAgICAgICAgICAgICAgYW10LCBjbXQsIGV2aWQsIHRpbWUsIAogICAgICAgICAgICAgICAgICAgICAgICAgcmF0ZSwgaWksIGFkZGwsIHNzLCBzdWJqX3N0YXJ0LCBzdWJqX2VuZCwgCiAgICAgICAgICAgICAgICAgICAgICAgICBDTCwgVkMsIFEsIFZQLAogICAgICAgICAgICAgICAgICAgICAgICAgc2lnbWEsCiAgICAgICAgICAgICAgICAgICAgICAgICBsbG9xLCBibG9xLAogICAgICAgICAgICAgICAgICAgICAgICAgbl9yYW5kb20sIG5fc3ViamVjdHMsIG5fdG90YWwsCiAgICAgICAgICAgICAgICAgICAgICAgICBiaW9hdiwgdGxhZywgbl9jbXQpOwogIH0KfQpnZW5lcmF0ZWQgcXVhbnRpdGllc3sKICAKICByZWFsPGxvd2VyID0gMD4gc2lnbWFfc3EgPSBzcXVhcmUoc2lnbWEpOwogIAogIHJlYWw8bG93ZXIgPSAwPiBvbWVnYV9jbCA9IG9tZWdhWzFdOwogIHJlYWw8bG93ZXIgPSAwPiBvbWVnYV92YyA9IG9tZWdhWzJdOwogIHJlYWw8bG93ZXIgPSAwPiBvbWVnYV9xID0gb21lZ2FbM107CiAgcmVhbDxsb3dlciA9IDA+IG9tZWdhX3ZwID0gb21lZ2FbNF07CiAgCiAgcmVhbDxsb3dlciA9IDA+IG9tZWdhX3NxX2NsID0gc3F1YXJlKG9tZWdhX2NsKTsKICByZWFsPGxvd2VyID0gMD4gb21lZ2Ffc3FfdmMgPSBzcXVhcmUob21lZ2FfdmMpOwogIHJlYWw8bG93ZXIgPSAwPiBvbWVnYV9zcV9xID0gc3F1YXJlKG9tZWdhX3EpOwogIHJlYWw8bG93ZXIgPSAwPiBvbWVnYV9zcV92cCA9IHNxdWFyZShvbWVnYV92cCk7CiAgCiAgcmVhbCBjb3JfY2xfdmM7CiAgcmVhbCBjb3JfY2xfcTsKICByZWFsIGNvcl9jbF92cDsKICByZWFsIGNvcl92Y19xOwogIHJlYWwgY29yX3ZjX3ZwOwogIHJlYWwgY29yX3FfdnA7CiAgcmVhbCBvbWVnYV9jbF92YzsKICByZWFsIG9tZWdhX2NsX3E7CiAgcmVhbCBvbWVnYV9jbF92cDsKICByZWFsIG9tZWdhX3ZjX3E7CiAgcmVhbCBvbWVnYV92Y192cDsKICByZWFsIG9tZWdhX3FfdnA7CiAgCiAgdmVjdG9yW25fb2JzXSBpcHJlZDsKICB2ZWN0b3Jbbl9vYnNdIHByZWQ7CiAgdmVjdG9yW25fb2JzXSBkdl9wcGM7CiAgdmVjdG9yW25fb2JzXSBsb2dfbGlrOwogIHZlY3RvcltuX29ic10gcmVzOwogIHZlY3RvcltuX29ic10gd3JlczsKICB2ZWN0b3Jbbl9vYnNdIGlyZXM7CiAgdmVjdG9yW25fb2JzXSBpd3JlczsKICAKICB7CiAgICAKICAgIG1hdHJpeFtuX3JhbmRvbSwgbl9yYW5kb21dIFIgPSBtdWx0aXBseV9sb3dlcl90cmlfc2VsZl90cmFuc3Bvc2UoTCk7CiAgICBtYXRyaXhbbl9yYW5kb20sIG5fcmFuZG9tXSBPbWVnYSA9IHF1YWRfZm9ybV9kaWFnKFIsIG9tZWdhKTsKICAgIAogICAgdmVjdG9yW25fdG90YWxdIGR2X3ByZWQ7CiAgICBtYXRyaXhbbl90b3RhbCwgbl9jbXRdIHhfcHJlZDsKICAgIHZlY3RvcltuX3RvdGFsXSBkdl9pcHJlZDsKICAgIG1hdHJpeFtuX3RvdGFsLCBuX2NtdF0geF9pcHJlZDsKICAgIAogICAgY29yX2NsX3ZjID0gUlsxLCAyXTsKICAgIGNvcl9jbF9xID0gUlsxLCAzXTsKICAgIGNvcl9jbF92cCA9IFJbMSwgNF07CiAgICBjb3JfdmNfcSA9IFJbMiwgM107CiAgICBjb3JfdmNfdnAgPSBSWzIsIDRdOwogICAgY29yX3FfdnAgPSBSWzMsIDRdOwogICAgCiAgICBvbWVnYV9jbF92YyA9IE9tZWdhWzEsIDJdOwogICAgb21lZ2FfY2xfcSA9IE9tZWdhWzEsIDNdOwogICAgb21lZ2FfY2xfdnAgPSBPbWVnYVsxLCA0XTsKICAgIG9tZWdhX3ZjX3EgPSBPbWVnYVsyLCAzXTsKICAgIG9tZWdhX3ZjX3ZwID0gT21lZ2FbMiwgNF07CiAgICBvbWVnYV9xX3ZwID0gT21lZ2FbMywgNF07CiAgICAKICAgIGZvcihqIGluIDE6bl9zdWJqZWN0cyl7CiAgICAgIAogICAgICByZWFsIGtlID0gQ0xbal0vVkNbal07CiAgICAgIHJlYWwga19jcCA9IFFbal0vVkNbal07CiAgICAgIHJlYWwga19wYyA9IFFbal0vVlBbal07CiAgICAgIAogICAgICByZWFsIHR2a2UgPSBUVkNML1RWVkM7CiAgICAgIHJlYWwgdHZrX2NwID0gVFZRL1RWVkM7CiAgICAgIHJlYWwgdHZrX3BjID0gVFZRL1RWVlA7CiAgICAgIAogICAgICBtYXRyaXhbbl9jbXQsIG5fY210XSBLID0gcmVwX21hdHJpeCgwLCBuX2NtdCwgbl9jbXQpOwogICAgICBtYXRyaXhbbl9jbXQsIG5fY210XSBLX3R2ID0gcmVwX21hdHJpeCgwLCBuX2NtdCwgbl9jbXQpOwogICAgICBLWzEsIDFdID0gLShrZSArIGtfY3ApOwogICAgICBLWzEsIDJdID0ga19wYzsKICAgICAgS1syLCAxXSA9IGtfY3A7CiAgICAgIEtbMiwgMl0gPSAta19wYzsKICAgICAgCiAgICAgIHhfaXByZWRbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXSwgXSA9CiAgICAgICAgcG14X3NvbHZlX2xpbm9kZSh0aW1lW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgYW10W3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgcmF0ZVtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIGlpW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgZXZpZFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIGNtdFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIGFkZGxbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICBzc1tzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIEssIGJpb2F2LCB0bGFnKSc7CiAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICBLX3R2WzEsIDFdID0gLSh0dmtlICsgdHZrX2NwKTsKICAgICAgS190dlsxLCAyXSA9IHR2a19wYzsKICAgICAgS190dlsyLCAxXSA9IHR2a19jcDsKICAgICAgS190dlsyLCAyXSA9IC10dmtfcGM7CgogICAgICB4X3ByZWRbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXSxdID0KICAgICAgICBwbXhfc29sdmVfbGlub2RlKHRpbWVbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICBhbXRbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICByYXRlW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgaWlbc3Vial9zdGFydFtqXTpzdWJqX2VuZFtqXV0sCiAgICAgICAgICAgICAgICAgICAgICAgICBldmlkW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgY210W3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgYWRkbFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSwKICAgICAgICAgICAgICAgICAgICAgICAgIHNzW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dLAogICAgICAgICAgICAgICAgICAgICAgICAgS190diwgYmlvYXYsIHRsYWcpJzsKICAgICAgCiAgICAgIGR2X2lwcmVkW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal1dID0KICAgICAgICB4X2lwcmVkW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal0sIDFdIC4vIFZDW2pdOwogICAgICAKICAgICAgZHZfcHJlZFtzdWJqX3N0YXJ0W2pdOnN1YmpfZW5kW2pdXSA9CiAgICAgICAgeF9wcmVkW3N1Ympfc3RhcnRbal06c3Vial9lbmRbal0sIDFdIC4vIFRWVkM7CiAgICAgIAogICAgfQogICAgCiAgICBwcmVkID0gZHZfcHJlZFtpX29ic107CiAgICBpcHJlZCA9IGR2X2lwcmVkW2lfb2JzXTsKICAgIAogIH0KICAKICByZXMgPSBsb2coZHZfb2JzKSAtIGxvZyhwcmVkKTsKICBpcmVzID0gbG9nKGR2X29icykgLSBsb2coaXByZWQpOwoKICBmb3IoaSBpbiAxOm5fb2JzKXsKICAgIHJlYWwgbG9nX2lwcmVkX3RtcCA9IGxvZyhpcHJlZFtpXSk7CiAgICBkdl9wcGNbaV0gPSBsb2dub3JtYWxfcm5nKGxvZ19pcHJlZF90bXAsIHNpZ21hKTsKICAgIGlmKGJsb3Ffb2JzW2ldID09IDEpewogICAgICBsb2dfbGlrW2ldID0gbG9nbm9ybWFsX2xjZGYobGxvcV9vYnNbaV0gfCBsb2dfaXByZWRfdG1wLCBzaWdtYSk7CiAgICB9ZWxzZXsKICAgICAgbG9nX2xpa1tpXSA9IGxvZ25vcm1hbF9scGRmKGR2X29ic1tpXSB8IGxvZ19pcHJlZF90bXAsIHNpZ21hKTsKICAgIH0KICAgIHdyZXNbaV0gPSByZXNbaV0vc2lnbWE7CiAgICBpd3Jlc1tpXSA9IGlyZXNbaV0vc2lnbWE7CiAgfQogIAp9Cgo=').then(res => res.blob()).then(blob => {
@@ -1787,8 +1991,20 @@ generated quantities{
 <!-- -->
 
 </section>
+</section>
 
-</main> <!-- /main -->
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>These parameters are the macro-parameterization of this model - clearance, central compartment volume, inter-compartmental clearance, and peripheral compartment volume, respectively. I have chosen to use <span class="math inline">\(V_c\)</span> and <span class="math inline">\(V_p\)</span> for <strong>c</strong>entral compartment volume and <strong>p</strong>eripheral compartment volume rather than <span class="math inline">\(V_1\)</span> and <span class="math inline">\(V_2\)</span> or <span class="math inline">\(V_2\)</span> and <span class="math inline">\(V_3\)</span> to reduce any confusion about the numbering (since <span class="math inline">\(V_2\)</span> is the central compartment in ADVAN4 but the peripheral compartment in ADVAN3 in NONMEM)<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>For this model, the matrix-exponential is faster than the analytical solution with Torsten, so I’ve written the Stan models to use the linear ODE solution. Therefore, since this is purely IV, I’ve written the ODEs with two compartments. If you want to use the analytical solution, you would write the ODEs as <span id="eq-2cmt-macro-genode-with-depot"><span class="math display">\[\begin{align}
+\frac{dA_d}{dt} &amp;= -K_a*A_d \notag \\
+\frac{dA_c}{dt} &amp;= K_a*A_d - \left(\frac{CL}{V_c} + \frac{Q}{V_c}\right)A_C + \frac{Q}{V_p}A_p + rate_{in} \notag \\
+\frac{dA_p}{dt} &amp;= \frac{Q}{V_c}A_c - \frac{Q}{V_p}A_p \\
+\end{align} \tag{2}\]</span></span> You’ll notice that this is written as if there is first-order absorption. This is to emphasize that the central compartment is the second compartment in Torsten’s setup, and you would have to make sure <span class="math inline">\(CMT = 2\)</span> for the dosing and observation records. Since there is no absorption, we just leave it out of our model and set it to 0 when using Torsten’s analytical solver.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -2115,107 +2331,369 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="fu"># Proportional Error</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>Here, we write down the PK model for a two-compartment model with IV infusion </span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>and linear elimination. We also write down the statistical model for multiple </span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>error models. The Stan models are free to download using the corresponding </span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>download buttons. </span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="fu"># PK Model</span></span>
 <span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>downloadthis<span class="sc">::</span><span class="fu">download_file</span>(</span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_prop.stan"</span>),</span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_name =</span> <span class="st">"iv_2cmt_prop"</span>,</span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_label =</span> <span class="st">"Download 2-cmt IV with proportional error"</span>,</span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_type =</span> <span class="st">"default"</span>,</span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">has_icon =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">icon =</span> <span class="st">"fa fa-save"</span>,</span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">self_contained =</span> <span class="cn">FALSE</span></span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>::::{.scrolling_700}</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>The data-generating model is </span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>$$C_{ij} = f(\mathbf{\theta}_i, t_{ij}) + error$$</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>where $error$ can be</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="ss">*  </span>additive: $C_{ij} = f(\mathbf{\theta}_i, t_{ij}) + \epsilon_{a_{ij}}$</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="ss">*  </span>proportional: $C_{ij} = f(\mathbf{\theta}_i, t_{ij})*\left( 1 + \epsilon_{p_{ij}} \right)$</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="ss">*  </span>proportional-plus-additive: $C_{ij} = f(\mathbf{\theta}_i, t_{ij})*\left( 1 + \epsilon_{p_{ij}} \right) + \epsilon_{a_{ij}}$</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="ss">*  </span>lognormal: $C_{ij} = f(\mathbf{\theta}_i, t_{ij})*e^{\epsilon_{ij}}$</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>where $\mathbf{\theta}_i = \left[CL_i, \, V_{c_i}, \, Q_i, \,V_{p_i}\right]^\top$ </span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>is a vector containing the individual parameters for individual $i$<span class="ot">[^poppk-4]</span>, </span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>$f(\cdot, \cdot)$ is the two-compartment model mean function seen <span class="co">[</span><span class="ot">here</span><span class="co">](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/PFIM3.2.2/PFIM_PKPD_library.pdf?root=pkpd)</span>, and $\epsilon_p, \epsilon_a,$ and $\epsilon$ are normally distributed. The</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>corresponding system of ODEs is:</span>
 <span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>:::{.cell-output}</span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="ot">[^poppk-4]: </span>These parameters are the macro-parameterization of this model - </span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>clearance, central compartment volume, inter-compartmental clearance, and </span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>peripheral compartment volume, respectively. I have chosen to use $V_c$ and </span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>$V_p$ for **c**entral compartment volume and **p**eripheral compartment volume </span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>rather than $V_1$ and $V_2$ or $V_2$ and $V_3$ to reduce any confusion about the</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>numbering (since $V_2$ is the central compartment in ADVAN4 but the peripheral </span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>compartment in ADVAN3 in NONMEM)</span>
 <span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="fu">readLines</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_prop.stan"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>()</span>
-<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>$$\begin{align}</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>\frac{dA_c}{dt} &amp;= -\left(\frac{CL}{V_c} + \frac{Q}{V_c}\right)A_C + \frac{Q}{V_p}A_p + rate_{in} \notag <span class="sc">\\</span></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>\frac{dA_p}{dt} &amp;= \frac{Q}{V_c}A_c - \frac{Q}{V_p}A_p <span class="sc">\\</span></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>\end{align}$$ {#eq-2cmt-macro-genode-no-depot}</span>
 <span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>and then $C = \frac{A_c}{V_c}$<span class="ot">[^poppk-5]</span>.</span>
 <span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>::::</span>
-<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a><span class="fu"># Proportional-Plus-Additive Error</span></span>
-<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>downloadthis<span class="sc">::</span><span class="fu">download_file</span>(</span>
-<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_ppa.stan"</span>),</span>
-<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_name =</span> <span class="st">"iv_2cmt_ppa"</span>,</span>
-<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_label =</span> <span class="st">"Download 2-cmt IV with proportional-plus-additive error"</span>,</span>
-<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_type =</span> <span class="st">"default"</span>,</span>
-<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>  <span class="at">has_icon =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>  <span class="at">icon =</span> <span class="st">"fa fa-save"</span>,</span>
-<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>  <span class="at">self_contained =</span> <span class="cn">FALSE</span></span>
-<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a>::::{.scrolling_700}</span>
-<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>:::{.cell-output}</span>
-<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
-<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a><span class="fu">readLines</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_ppa.stan"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>()</span>
-<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a>::::</span>
-<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a><span class="fu"># Lognormal Error</span></span>
-<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>downloadthis<span class="sc">::</span><span class="fu">download_file</span>(</span>
-<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_exp.stan"</span>),</span>
-<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_name =</span> <span class="st">"iv_2cmt_exp"</span>,</span>
-<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_label =</span> <span class="st">"Download 2-cmt IV with lognormal error"</span>,</span>
-<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_type =</span> <span class="st">"default"</span>,</span>
-<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a>  <span class="at">has_icon =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a>  <span class="at">icon =</span> <span class="st">"fa fa-save"</span>,</span>
-<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a>  <span class="at">self_contained =</span> <span class="cn">FALSE</span></span>
-<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a>::::{.scrolling_700}</span>
-<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a>:::{.cell-output}</span>
-<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
-<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a><span class="fu">readLines</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_exp.stan"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>()</span>
-<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="ot">[^poppk-5]: </span>For this model, the matrix-exponential is faster than the </span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>analytical solution with Torsten, so I've written the Stan models to use the </span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>linear ODE solution. Therefore, since this is purely IV, I've written the ODEs</span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>with two compartments. If you want to use the analytical solution, you would </span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>write the ODEs as</span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>$$\begin{align}</span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>\frac{dA_d}{dt} &amp;= -K_a*A_d \notag <span class="sc">\\</span></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>\frac{dA_c}{dt} &amp;= K_a*A_d - \left(\frac{CL}{V_c} + \frac{Q}{V_c}\right)A_C + \frac{Q}{V_p}A_p + rate_{in} \notag <span class="sc">\\</span></span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>\frac{dA_p}{dt} &amp;= \frac{Q}{V_c}A_c - \frac{Q}{V_p}A_p <span class="sc">\\</span></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>\end{align}$$ {#eq-2cmt-macro-genode-with-depot}</span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>You'll notice that this is written as if there is first-order absorption. This </span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>is to emphasize that the central compartment is the second compartment in </span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>Torsten's setup, and you would have to make sure $CMT = 2$ for the dosing and </span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>observation records. Since there is no absorption, we just leave it out of our </span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>model and set it to 0 when using Torsten's analytical solver.</span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a><span class="fu"># Statistical Model</span></span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>I'll model the *correlation matrix* $R_{\Omega}$ and *standard deviations* </span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>($\omega_p$) of the random effects rather than the covariance matrix $\Omega$ </span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a>that is the more traditional method. </span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>\Omega &amp;=</span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a>\omega^2_{CL} &amp; \omega_{CL, V_c} &amp; \omega_{CL, Q} &amp; \omega_{CL, V_p} <span class="sc">\\</span></span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a>\omega_{CL, V_c} &amp; \omega^2_{V_c} &amp; \omega_{V_c, Q} &amp; \omega_{V_c, V_p} <span class="sc">\\</span></span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a>\omega_{CL, Q} &amp; \omega_{V_c, Q} &amp; \omega^2_{Q} &amp; \omega_{Q, V_p} <span class="sc">\\</span></span>
+<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a>\omega_{CL, V_p} &amp; \omega_{V_c, V_p} &amp; \omega_{Q, V_p} &amp; \omega^2_{V_p} <span class="sc">\\</span></span>
+<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} <span class="sc">\\</span></span>
+<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a>&amp;= \begin{pmatrix}</span>
+<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a>\omega_{CL} &amp; 0 &amp; 0 &amp; 0 <span class="sc">\\</span></span>
+<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a>0 &amp; \omega_{V_c} &amp; 0 &amp; 0 <span class="sc">\\</span></span>
+<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a>0 &amp; 0 &amp; \omega_{Q} &amp; 0 <span class="sc">\\</span></span>
+<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a>0 &amp; 0 &amp; 0 &amp; \omega_{V_p} <span class="sc">\\</span></span>
+<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} \mathbf{R_{\Omega}}</span>
+<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a>\omega_{CL} &amp; 0 &amp; 0 &amp; 0 <span class="sc">\\</span></span>
+<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a>0 &amp; \omega_{V_c} &amp; 0 &amp; 0 <span class="sc">\\</span></span>
+<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a>0 &amp; 0 &amp; \omega_{Q} &amp; 0 <span class="sc">\\</span></span>
+<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a>0 &amp; 0 &amp; 0 &amp; \omega_{V_p} <span class="sc">\\</span></span>
+<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} <span class="sc">\\</span></span>
+<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a>&amp;= \begin{pmatrix}</span>
+<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a>\omega_{CL} &amp; 0 &amp; 0 &amp; 0 <span class="sc">\\</span></span>
+<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a>0 &amp; \omega_{V_c} &amp; 0 &amp; 0 <span class="sc">\\</span></span>
+<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a>0 &amp; 0 &amp; \omega_{Q} &amp; 0 <span class="sc">\\</span></span>
+<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a>0 &amp; 0 &amp; 0 &amp; \omega_{V_p} <span class="sc">\\</span></span>
+<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>\end{pmatrix}</span>
+<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a>1 &amp; \rho_{CL, V_c} &amp; \rho_{CL, Q} &amp; \rho_{CL, V_p} <span class="sc">\\</span></span>
+<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a>\rho_{CL, V_c} &amp; 1 &amp; \rho_{V_c, Q} &amp; \rho_{V_c, V_p} <span class="sc">\\</span></span>
+<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a>\rho_{CL, Q} &amp; \rho_{V_c, Q} &amp; 1 &amp; \rho_{Q, V_p} <span class="sc">\\</span></span>
+<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a>\rho_{CL, V_p} &amp; \rho_{V_c, V_p} &amp; \rho_{Q, V_p} &amp; 1 <span class="sc">\\</span></span>
+<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a>\end{pmatrix}</span>
+<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a>\omega_{CL} &amp; 0 &amp; 0 &amp; 0 <span class="sc">\\</span></span>
+<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a>0 &amp; \omega_{V_c} &amp; 0 &amp; 0 <span class="sc">\\</span></span>
+<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a>0 &amp; 0 &amp; \omega_{Q} &amp; 0 <span class="sc">\\</span></span>
+<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a>0 &amp; 0 &amp; 0 &amp; \omega_{V_p} <span class="sc">\\</span></span>
+<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a>\end{pmatrix}</span>
+<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a>\end{align} </span>
+<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a>When the random effects are modeled this way, we get all of the same information</span>
+<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a>as if they were modeled with a full covariance matrix, *i.e.*, we can transform</span>
+<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a>the standard deviations and correlation matrix into the covariance matrix if we </span>
+<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a>want. In addition, standard deviations and correlations are more interpretable</span>
+<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a>than variances and covariances. It's also much easier to set a prior </span>
+<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a>distribution on the standard deviations and the correlation matrix with an </span>
+<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">LKJ</span><span class="co">](https://en.wikipedia.org/wiki/Lewandowski-Kurowicka-Joe_distribution)</span> </span>
+<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a>distribution than it is to set a prior on a covariance matrix with an </span>
+<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">inverse-Wishart</span><span class="co">](https://en.wikipedia.org/wiki/Inverse-Wishart_distribution)</span></span>
+<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a>distribution.</span>
+<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-140"><a href="#cb4-140" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-141"><a href="#cb4-141" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-141"><a href="#cb4-141" aria-hidden="true" tabindex="-1"></a>The full statistical model is </span>
 <span id="cb4-142"><a href="#cb4-142" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-143"><a href="#cb4-143" aria-hidden="true" tabindex="-1"></a>::::</span>
+<span id="cb4-143"><a href="#cb4-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-144"><a href="#cb4-144" aria-hidden="true" tabindex="-1"></a>::: panel-tabset</span>
+<span id="cb4-145"><a href="#cb4-145" aria-hidden="true" tabindex="-1"></a><span class="fu">## Proportional Error Model</span></span>
+<span id="cb4-146"><a href="#cb4-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-147"><a href="#cb4-147" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
+<span id="cb4-148"><a href="#cb4-148" aria-hidden="true" tabindex="-1"></a>C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \mathbf{\Sigma}</span>
+<span id="cb4-149"><a href="#cb4-149" aria-hidden="true" tabindex="-1"></a>&amp;\sim Normal\left( f(\mathbf{\theta}_i, t_{ij}), \; \sigma_{ij} \right)</span>
+<span id="cb4-150"><a href="#cb4-150" aria-hidden="true" tabindex="-1"></a>I(C_{ij} &gt; 0) \notag <span class="sc">\\</span></span>
+<span id="cb4-151"><a href="#cb4-151" aria-hidden="true" tabindex="-1"></a>\mathbf{\eta}_i \; | \; \Omega &amp;\sim Normal\left(</span>
+<span id="cb4-152"><a href="#cb4-152" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-153"><a href="#cb4-153" aria-hidden="true" tabindex="-1"></a>0 <span class="sc">\\</span> 0 <span class="sc">\\</span> 0 <span class="sc">\\</span> 0 <span class="sc">\\</span></span>
+<span id="cb4-154"><a href="#cb4-154" aria-hidden="true" tabindex="-1"></a>\end{pmatrix}</span>
+<span id="cb4-155"><a href="#cb4-155" aria-hidden="true" tabindex="-1"></a>, \; \Omega\right) \notag <span class="sc">\\</span></span>
+<span id="cb4-156"><a href="#cb4-156" aria-hidden="true" tabindex="-1"></a>TVCL &amp;\sim Lognormal\left(log\left(location_{TVCL}\right), scale_{TVCL}\right) \notag <span class="sc">\\</span></span>
+<span id="cb4-157"><a href="#cb4-157" aria-hidden="true" tabindex="-1"></a>TVVC &amp;\sim Lognormal\left(log\left(location_{TVVC}\right), scale_{TVVC}\right) \notag <span class="sc">\\</span></span>
+<span id="cb4-158"><a href="#cb4-158" aria-hidden="true" tabindex="-1"></a>TVQ &amp;\sim Lognormal\left(log\left(location_{TVQ}\right), scale_{TVQ}\right) \notag <span class="sc">\\</span></span>
+<span id="cb4-159"><a href="#cb4-159" aria-hidden="true" tabindex="-1"></a>TVVP &amp;\sim Lognormal\left(log\left(location_{TVVP}\right), scale_{TVVP}\right) \notag <span class="sc">\\</span></span>
+<span id="cb4-160"><a href="#cb4-160" aria-hidden="true" tabindex="-1"></a>\omega_{CL} &amp;\sim Half-Normal(0, scale_{\omega_{CL}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-161"><a href="#cb4-161" aria-hidden="true" tabindex="-1"></a>\omega_{V_c} &amp;\sim Half-Normal(0, scale_{\omega_{V_c}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-162"><a href="#cb4-162" aria-hidden="true" tabindex="-1"></a>\omega_{Q} &amp;\sim Half-Normal(0, scale_{\omega_{Q}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-163"><a href="#cb4-163" aria-hidden="true" tabindex="-1"></a>\omega_{V_p} &amp;\sim Half-Normal(0, scale_{\omega_{V_p}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-164"><a href="#cb4-164" aria-hidden="true" tabindex="-1"></a>R_{\Omega} &amp;\sim LKJ(df_{R_{\Omega}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-165"><a href="#cb4-165" aria-hidden="true" tabindex="-1"></a>\sigma_p &amp;\sim Half-Normal(0, scale_{\sigma_p}) <span class="sc">\\</span></span>
+<span id="cb4-166"><a href="#cb4-166" aria-hidden="true" tabindex="-1"></a>\end{align}</span>
+<span id="cb4-167"><a href="#cb4-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-168"><a href="#cb4-168" aria-hidden="true" tabindex="-1"></a>where </span>
+<span id="cb4-169"><a href="#cb4-169" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
+<span id="cb4-170"><a href="#cb4-170" aria-hidden="true" tabindex="-1"></a>\mathbf{TV} &amp;=</span>
+<span id="cb4-171"><a href="#cb4-171" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-172"><a href="#cb4-172" aria-hidden="true" tabindex="-1"></a>TVCL <span class="sc">\\</span> TVVC <span class="sc">\\</span> TVQ <span class="sc">\\</span> TVVP <span class="sc">\\</span></span>
+<span id="cb4-173"><a href="#cb4-173" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} <span class="sc">\\</span></span>
+<span id="cb4-174"><a href="#cb4-174" aria-hidden="true" tabindex="-1"></a>\mathbf{\theta}_i &amp;=</span>
+<span id="cb4-175"><a href="#cb4-175" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-176"><a href="#cb4-176" aria-hidden="true" tabindex="-1"></a>CL_i <span class="sc">\\</span> V_{c_i} <span class="sc">\\</span> Q_i <span class="sc">\\</span> V_{p_i} <span class="sc">\\</span></span>
+<span id="cb4-177"><a href="#cb4-177" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} =</span>
+<span id="cb4-178"><a href="#cb4-178" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-179"><a href="#cb4-179" aria-hidden="true" tabindex="-1"></a>TVCL \times e^{\eta_{CL_i}} <span class="sc">\\</span> TVVC \times e^{\eta_{V_{c_i}}} <span class="sc">\\</span> TVQ \times e^{\eta_{Q_i}} <span class="sc">\\</span> TVVP \times e^{\eta_{V_{p_i}}} <span class="sc">\\</span></span>
+<span id="cb4-180"><a href="#cb4-180" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} <span class="sc">\\</span></span>
+<span id="cb4-181"><a href="#cb4-181" aria-hidden="true" tabindex="-1"></a>\mathbf{\eta}_i &amp;=</span>
+<span id="cb4-182"><a href="#cb4-182" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-183"><a href="#cb4-183" aria-hidden="true" tabindex="-1"></a>\eta_{CL_i} <span class="sc">\\</span> \eta_{V_{c_i}} <span class="sc">\\</span> \eta_{Q_i} <span class="sc">\\</span> \eta_{V_{p_i}} <span class="sc">\\</span></span>
+<span id="cb4-184"><a href="#cb4-184" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} <span class="sc">\\</span></span>
+<span id="cb4-185"><a href="#cb4-185" aria-hidden="true" tabindex="-1"></a>\sigma_{ij} &amp;= f(\mathbf{\theta}_i, t_{ij})\sigma^2_p  <span class="sc">\\</span></span>
+<span id="cb4-186"><a href="#cb4-186" aria-hidden="true" tabindex="-1"></a>\end{align}</span>
+<span id="cb4-187"><a href="#cb4-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-188"><a href="#cb4-188" aria-hidden="true" tabindex="-1"></a>Note: The indicator for $C_{ij} | \ldots$ indicates that we are truncating the </span>
+<span id="cb4-189"><a href="#cb4-189" aria-hidden="true" tabindex="-1"></a>distribution of the observed concentrations to be greater than 0.</span>
+<span id="cb4-190"><a href="#cb4-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-191"><a href="#cb4-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-192"><a href="#cb4-192" aria-hidden="true" tabindex="-1"></a><span class="fu">## Proportional-plus-Additive Error Model</span></span>
+<span id="cb4-193"><a href="#cb4-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-194"><a href="#cb4-194" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
+<span id="cb4-195"><a href="#cb4-195" aria-hidden="true" tabindex="-1"></a>C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \mathbf{\Sigma}</span>
+<span id="cb4-196"><a href="#cb4-196" aria-hidden="true" tabindex="-1"></a>&amp;\sim Normal\left( f(\mathbf{\theta}_i, t_{ij}), \; \sigma_{ij} \right)</span>
+<span id="cb4-197"><a href="#cb4-197" aria-hidden="true" tabindex="-1"></a>I(C_{ij} &gt; 0) \notag <span class="sc">\\</span></span>
+<span id="cb4-198"><a href="#cb4-198" aria-hidden="true" tabindex="-1"></a>\mathbf{\eta}_i \; | \; \Omega &amp;\sim Normal\left(</span>
+<span id="cb4-199"><a href="#cb4-199" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-200"><a href="#cb4-200" aria-hidden="true" tabindex="-1"></a>0 <span class="sc">\\</span> 0 <span class="sc">\\</span> 0 <span class="sc">\\</span> 0 <span class="sc">\\</span></span>
+<span id="cb4-201"><a href="#cb4-201" aria-hidden="true" tabindex="-1"></a>\end{pmatrix}</span>
+<span id="cb4-202"><a href="#cb4-202" aria-hidden="true" tabindex="-1"></a>, \; \Omega\right) \notag <span class="sc">\\</span></span>
+<span id="cb4-203"><a href="#cb4-203" aria-hidden="true" tabindex="-1"></a>TVCL &amp;\sim Lognormal\left(log\left(location_{TVCL}\right), scale_{TVCL}\right) \notag <span class="sc">\\</span></span>
+<span id="cb4-204"><a href="#cb4-204" aria-hidden="true" tabindex="-1"></a>TVVC &amp;\sim Lognormal\left(log\left(location_{TVVC}\right), scale_{TVVC}\right) \notag <span class="sc">\\</span></span>
+<span id="cb4-205"><a href="#cb4-205" aria-hidden="true" tabindex="-1"></a>TVQ &amp;\sim Lognormal\left(log\left(location_{TVQ}\right), scale_{TVQ}\right) \notag <span class="sc">\\</span></span>
+<span id="cb4-206"><a href="#cb4-206" aria-hidden="true" tabindex="-1"></a>TVVP &amp;\sim Lognormal\left(log\left(location_{TVVP}\right), scale_{TVVP}\right) \notag <span class="sc">\\</span></span>
+<span id="cb4-207"><a href="#cb4-207" aria-hidden="true" tabindex="-1"></a>\omega_{CL} &amp;\sim Half-Normal(0, scale_{\omega_{CL}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-208"><a href="#cb4-208" aria-hidden="true" tabindex="-1"></a>\omega_{V_c} &amp;\sim Half-Normal(0, scale_{\omega_{V_c}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-209"><a href="#cb4-209" aria-hidden="true" tabindex="-1"></a>\omega_{Q} &amp;\sim Half-Normal(0, scale_{\omega_{Q}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-210"><a href="#cb4-210" aria-hidden="true" tabindex="-1"></a>\omega_{V_p} &amp;\sim Half-Normal(0, scale_{\omega_{V_p}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-211"><a href="#cb4-211" aria-hidden="true" tabindex="-1"></a>R_{\Omega} &amp;\sim LKJ(df_{R_{\Omega}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-212"><a href="#cb4-212" aria-hidden="true" tabindex="-1"></a>\sigma_p &amp;\sim Half-Normal(0, scale_{\sigma_p}) <span class="sc">\\</span></span>
+<span id="cb4-213"><a href="#cb4-213" aria-hidden="true" tabindex="-1"></a>\sigma_a &amp;\sim Half-Normal(0, scale_{\sigma_a}) <span class="sc">\\</span></span>
+<span id="cb4-214"><a href="#cb4-214" aria-hidden="true" tabindex="-1"></a>R_{\Sigma} &amp;\sim LKJ(df_{R_{\Sigma}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-215"><a href="#cb4-215" aria-hidden="true" tabindex="-1"></a>\end{align}</span>
+<span id="cb4-216"><a href="#cb4-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-217"><a href="#cb4-217" aria-hidden="true" tabindex="-1"></a>where </span>
+<span id="cb4-218"><a href="#cb4-218" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
+<span id="cb4-219"><a href="#cb4-219" aria-hidden="true" tabindex="-1"></a>\mathbf{TV} &amp;=</span>
+<span id="cb4-220"><a href="#cb4-220" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-221"><a href="#cb4-221" aria-hidden="true" tabindex="-1"></a>TVCL <span class="sc">\\</span> TVVC <span class="sc">\\</span> TVQ <span class="sc">\\</span> TVVP <span class="sc">\\</span></span>
+<span id="cb4-222"><a href="#cb4-222" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} <span class="sc">\\</span></span>
+<span id="cb4-223"><a href="#cb4-223" aria-hidden="true" tabindex="-1"></a>\mathbf{\theta}_i &amp;=</span>
+<span id="cb4-224"><a href="#cb4-224" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-225"><a href="#cb4-225" aria-hidden="true" tabindex="-1"></a>CL_i <span class="sc">\\</span> V_{c_i} <span class="sc">\\</span> Q_i <span class="sc">\\</span> V_{p_i} <span class="sc">\\</span></span>
+<span id="cb4-226"><a href="#cb4-226" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} =</span>
+<span id="cb4-227"><a href="#cb4-227" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-228"><a href="#cb4-228" aria-hidden="true" tabindex="-1"></a>TVCL \times e^{\eta_{CL_i}} <span class="sc">\\</span> TVVC \times e^{\eta_{V_{c_i}}} <span class="sc">\\</span> TVQ \times e^{\eta_{Q_i}} <span class="sc">\\</span> TVVP \times e^{\eta_{V_{p_i}}} <span class="sc">\\</span></span>
+<span id="cb4-229"><a href="#cb4-229" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} <span class="sc">\\</span></span>
+<span id="cb4-230"><a href="#cb4-230" aria-hidden="true" tabindex="-1"></a>\mathbf{\eta}_i &amp;=</span>
+<span id="cb4-231"><a href="#cb4-231" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-232"><a href="#cb4-232" aria-hidden="true" tabindex="-1"></a>\eta_{CL_i} <span class="sc">\\</span> \eta_{V_{c_i}} <span class="sc">\\</span> \eta_{Q_i} <span class="sc">\\</span> \eta_{V_{p_i}} <span class="sc">\\</span></span>
+<span id="cb4-233"><a href="#cb4-233" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} <span class="sc">\\</span></span>
+<span id="cb4-234"><a href="#cb4-234" aria-hidden="true" tabindex="-1"></a>\mathbf{\Sigma} &amp;=</span>
+<span id="cb4-235"><a href="#cb4-235" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-236"><a href="#cb4-236" aria-hidden="true" tabindex="-1"></a>\sigma^2_{p} &amp; \rho_{p,a}\sigma_{p}\sigma_{a} <span class="sc">\\</span></span>
+<span id="cb4-237"><a href="#cb4-237" aria-hidden="true" tabindex="-1"></a>\rho_{p,a}\sigma_{p}\sigma_{a} &amp; \sigma^2_{z} <span class="sc">\\</span></span>
+<span id="cb4-238"><a href="#cb4-238" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} <span class="sc">\\</span></span>
+<span id="cb4-239"><a href="#cb4-239" aria-hidden="true" tabindex="-1"></a>\sigma_{ij} &amp;= \sqrt{f(\mathbf{\theta}_i, t_{ij})^2\sigma^2_p + \sigma^2_a + 2f(\mathbf{\theta}_i, t_{ij})\rho_{p,a}\sigma_{p}\sigma_{a}} <span class="sc">\\</span></span>
+<span id="cb4-240"><a href="#cb4-240" aria-hidden="true" tabindex="-1"></a>\end{align}</span>
+<span id="cb4-241"><a href="#cb4-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-242"><a href="#cb4-242" aria-hidden="true" tabindex="-1"></a>Note: The indicator for $C_{ij} | \ldots$ indicates that we are truncating the </span>
+<span id="cb4-243"><a href="#cb4-243" aria-hidden="true" tabindex="-1"></a>distribution of the observed concentrations to be greater than 0.</span>
+<span id="cb4-244"><a href="#cb4-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-245"><a href="#cb4-245" aria-hidden="true" tabindex="-1"></a><span class="fu">## Lognormal Error</span></span>
+<span id="cb4-246"><a href="#cb4-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-247"><a href="#cb4-247" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
+<span id="cb4-248"><a href="#cb4-248" aria-hidden="true" tabindex="-1"></a>C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \mathbf{\Sigma}</span>
+<span id="cb4-249"><a href="#cb4-249" aria-hidden="true" tabindex="-1"></a>&amp;\sim Lognormal\left( log\left(f(\mathbf{\theta}_i, t_{ij})\right), \; \sigma \right)</span>
+<span id="cb4-250"><a href="#cb4-250" aria-hidden="true" tabindex="-1"></a>\notag <span class="sc">\\</span></span>
+<span id="cb4-251"><a href="#cb4-251" aria-hidden="true" tabindex="-1"></a>\mathbf{\eta}_i \; | \; \Omega &amp;\sim Normal\left(</span>
+<span id="cb4-252"><a href="#cb4-252" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-253"><a href="#cb4-253" aria-hidden="true" tabindex="-1"></a>0 <span class="sc">\\</span> 0 <span class="sc">\\</span> 0 <span class="sc">\\</span> 0 <span class="sc">\\</span></span>
+<span id="cb4-254"><a href="#cb4-254" aria-hidden="true" tabindex="-1"></a>\end{pmatrix}</span>
+<span id="cb4-255"><a href="#cb4-255" aria-hidden="true" tabindex="-1"></a>, \; \Omega\right) \notag <span class="sc">\\</span></span>
+<span id="cb4-256"><a href="#cb4-256" aria-hidden="true" tabindex="-1"></a>TVCL &amp;\sim Lognormal\left(log\left(location_{TVCL}\right), scale_{TVCL}\right) \notag <span class="sc">\\</span></span>
+<span id="cb4-257"><a href="#cb4-257" aria-hidden="true" tabindex="-1"></a>TVVC &amp;\sim Lognormal\left(log\left(location_{TVVC}\right), scale_{TVVC}\right) \notag <span class="sc">\\</span></span>
+<span id="cb4-258"><a href="#cb4-258" aria-hidden="true" tabindex="-1"></a>TVQ &amp;\sim Lognormal\left(log\left(location_{TVQ}\right), scale_{TVQ}\right) \notag <span class="sc">\\</span></span>
+<span id="cb4-259"><a href="#cb4-259" aria-hidden="true" tabindex="-1"></a>TVVP &amp;\sim Lognormal\left(log\left(location_{TVVP}\right), scale_{TVVP}\right) \notag <span class="sc">\\</span></span>
+<span id="cb4-260"><a href="#cb4-260" aria-hidden="true" tabindex="-1"></a>\omega_{CL} &amp;\sim Half-Normal(0, scale_{\omega_{CL}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-261"><a href="#cb4-261" aria-hidden="true" tabindex="-1"></a>\omega_{V_c} &amp;\sim Half-Normal(0, scale_{\omega_{V_c}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-262"><a href="#cb4-262" aria-hidden="true" tabindex="-1"></a>\omega_{Q} &amp;\sim Half-Normal(0, scale_{\omega_{Q}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-263"><a href="#cb4-263" aria-hidden="true" tabindex="-1"></a>\omega_{V_p} &amp;\sim Half-Normal(0, scale_{\omega_{V_p}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-264"><a href="#cb4-264" aria-hidden="true" tabindex="-1"></a>R_{\Omega} &amp;\sim LKJ(df_{R_{\Omega}}) \notag <span class="sc">\\</span></span>
+<span id="cb4-265"><a href="#cb4-265" aria-hidden="true" tabindex="-1"></a>\sigma &amp;\sim Half-Normal(0, scale_{\sigma}) <span class="sc">\\</span></span>
+<span id="cb4-266"><a href="#cb4-266" aria-hidden="true" tabindex="-1"></a>\end{align}</span>
+<span id="cb4-267"><a href="#cb4-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-268"><a href="#cb4-268" aria-hidden="true" tabindex="-1"></a>where </span>
+<span id="cb4-269"><a href="#cb4-269" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
+<span id="cb4-270"><a href="#cb4-270" aria-hidden="true" tabindex="-1"></a>\mathbf{TV} &amp;=</span>
+<span id="cb4-271"><a href="#cb4-271" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-272"><a href="#cb4-272" aria-hidden="true" tabindex="-1"></a>TVCL <span class="sc">\\</span> TVVC <span class="sc">\\</span> TVQ <span class="sc">\\</span> TVVP <span class="sc">\\</span></span>
+<span id="cb4-273"><a href="#cb4-273" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} <span class="sc">\\</span></span>
+<span id="cb4-274"><a href="#cb4-274" aria-hidden="true" tabindex="-1"></a>\mathbf{\theta}_i &amp;=</span>
+<span id="cb4-275"><a href="#cb4-275" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-276"><a href="#cb4-276" aria-hidden="true" tabindex="-1"></a>CL_i <span class="sc">\\</span> V_{c_i} <span class="sc">\\</span> Q_i <span class="sc">\\</span> V_{p_i} <span class="sc">\\</span></span>
+<span id="cb4-277"><a href="#cb4-277" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} =</span>
+<span id="cb4-278"><a href="#cb4-278" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-279"><a href="#cb4-279" aria-hidden="true" tabindex="-1"></a>TVCL \times e^{\eta_{CL_i}} <span class="sc">\\</span> TVVC \times e^{\eta_{V_{c_i}}} <span class="sc">\\</span> TVQ \times e^{\eta_{Q_i}} <span class="sc">\\</span> TVVP \times e^{\eta_{V_{p_i}}} <span class="sc">\\</span></span>
+<span id="cb4-280"><a href="#cb4-280" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} <span class="sc">\\</span></span>
+<span id="cb4-281"><a href="#cb4-281" aria-hidden="true" tabindex="-1"></a>\mathbf{\eta}_i &amp;=</span>
+<span id="cb4-282"><a href="#cb4-282" aria-hidden="true" tabindex="-1"></a>\begin{pmatrix}</span>
+<span id="cb4-283"><a href="#cb4-283" aria-hidden="true" tabindex="-1"></a>\eta_{CL_i} <span class="sc">\\</span> \eta_{V_{c_i}} <span class="sc">\\</span> \eta_{Q_i} <span class="sc">\\</span> \eta_{V_{p_i}} <span class="sc">\\</span></span>
+<span id="cb4-284"><a href="#cb4-284" aria-hidden="true" tabindex="-1"></a>\end{pmatrix} <span class="sc">\\</span></span>
+<span id="cb4-285"><a href="#cb4-285" aria-hidden="true" tabindex="-1"></a>\end{align}</span>
+<span id="cb4-286"><a href="#cb4-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-287"><a href="#cb4-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-288"><a href="#cb4-288" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-289"><a href="#cb4-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-290"><a href="#cb4-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-291"><a href="#cb4-291" aria-hidden="true" tabindex="-1"></a><span class="fu"># Stan Code</span></span>
+<span id="cb4-292"><a href="#cb4-292" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-293"><a href="#cb4-293" aria-hidden="true" tabindex="-1"></a><span class="fu">## Proportional Error</span></span>
+<span id="cb4-294"><a href="#cb4-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-297"><a href="#cb4-297" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-298"><a href="#cb4-298" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb4-299"><a href="#cb4-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-300"><a href="#cb4-300" aria-hidden="true" tabindex="-1"></a>downloadthis<span class="sc">::</span><span class="fu">download_file</span>(</span>
+<span id="cb4-301"><a href="#cb4-301" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_prop.stan"</span>),</span>
+<span id="cb4-302"><a href="#cb4-302" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_name =</span> <span class="st">"iv_2cmt_prop"</span>,</span>
+<span id="cb4-303"><a href="#cb4-303" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_label =</span> <span class="st">"Download 2-cmt IV with proportional error"</span>,</span>
+<span id="cb4-304"><a href="#cb4-304" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_type =</span> <span class="st">"default"</span>,</span>
+<span id="cb4-305"><a href="#cb4-305" aria-hidden="true" tabindex="-1"></a>  <span class="at">has_icon =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb4-306"><a href="#cb4-306" aria-hidden="true" tabindex="-1"></a>  <span class="at">icon =</span> <span class="st">"fa fa-save"</span>,</span>
+<span id="cb4-307"><a href="#cb4-307" aria-hidden="true" tabindex="-1"></a>  <span class="at">self_contained =</span> <span class="cn">FALSE</span></span>
+<span id="cb4-308"><a href="#cb4-308" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-309"><a href="#cb4-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-310"><a href="#cb4-310" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-311"><a href="#cb4-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-312"><a href="#cb4-312" aria-hidden="true" tabindex="-1"></a>::::{.scrolling_700}</span>
+<span id="cb4-313"><a href="#cb4-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-314"><a href="#cb4-314" aria-hidden="true" tabindex="-1"></a>:::{.cell-output}</span>
+<span id="cb4-315"><a href="#cb4-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-318"><a href="#cb4-318" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-319"><a href="#cb4-319" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb4-320"><a href="#cb4-320" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb4-321"><a href="#cb4-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-322"><a href="#cb4-322" aria-hidden="true" tabindex="-1"></a><span class="fu">readLines</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_prop.stan"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb4-323"><a href="#cb4-323" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>()</span>
+<span id="cb4-324"><a href="#cb4-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-325"><a href="#cb4-325" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-326"><a href="#cb4-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-327"><a href="#cb4-327" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-328"><a href="#cb4-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-329"><a href="#cb4-329" aria-hidden="true" tabindex="-1"></a>::::</span>
+<span id="cb4-330"><a href="#cb4-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-331"><a href="#cb4-331" aria-hidden="true" tabindex="-1"></a><span class="fu">## Proportional-Plus-Additive Error</span></span>
+<span id="cb4-332"><a href="#cb4-332" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-335"><a href="#cb4-335" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-336"><a href="#cb4-336" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb4-337"><a href="#cb4-337" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-338"><a href="#cb4-338" aria-hidden="true" tabindex="-1"></a>downloadthis<span class="sc">::</span><span class="fu">download_file</span>(</span>
+<span id="cb4-339"><a href="#cb4-339" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_ppa.stan"</span>),</span>
+<span id="cb4-340"><a href="#cb4-340" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_name =</span> <span class="st">"iv_2cmt_ppa"</span>,</span>
+<span id="cb4-341"><a href="#cb4-341" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_label =</span> <span class="st">"Download 2-cmt IV with proportional-plus-additive error"</span>,</span>
+<span id="cb4-342"><a href="#cb4-342" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_type =</span> <span class="st">"default"</span>,</span>
+<span id="cb4-343"><a href="#cb4-343" aria-hidden="true" tabindex="-1"></a>  <span class="at">has_icon =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb4-344"><a href="#cb4-344" aria-hidden="true" tabindex="-1"></a>  <span class="at">icon =</span> <span class="st">"fa fa-save"</span>,</span>
+<span id="cb4-345"><a href="#cb4-345" aria-hidden="true" tabindex="-1"></a>  <span class="at">self_contained =</span> <span class="cn">FALSE</span></span>
+<span id="cb4-346"><a href="#cb4-346" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-347"><a href="#cb4-347" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-348"><a href="#cb4-348" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-349"><a href="#cb4-349" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-350"><a href="#cb4-350" aria-hidden="true" tabindex="-1"></a>::::{.scrolling_700}</span>
+<span id="cb4-351"><a href="#cb4-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-352"><a href="#cb4-352" aria-hidden="true" tabindex="-1"></a>:::{.cell-output}</span>
+<span id="cb4-353"><a href="#cb4-353" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-356"><a href="#cb4-356" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-357"><a href="#cb4-357" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb4-358"><a href="#cb4-358" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb4-359"><a href="#cb4-359" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-360"><a href="#cb4-360" aria-hidden="true" tabindex="-1"></a><span class="fu">readLines</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_ppa.stan"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb4-361"><a href="#cb4-361" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>()</span>
+<span id="cb4-362"><a href="#cb4-362" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-363"><a href="#cb4-363" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-364"><a href="#cb4-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-365"><a href="#cb4-365" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-366"><a href="#cb4-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-367"><a href="#cb4-367" aria-hidden="true" tabindex="-1"></a>::::</span>
+<span id="cb4-368"><a href="#cb4-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-369"><a href="#cb4-369" aria-hidden="true" tabindex="-1"></a><span class="fu">## Lognormal Error</span></span>
+<span id="cb4-370"><a href="#cb4-370" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-373"><a href="#cb4-373" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-374"><a href="#cb4-374" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb4-375"><a href="#cb4-375" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-376"><a href="#cb4-376" aria-hidden="true" tabindex="-1"></a>downloadthis<span class="sc">::</span><span class="fu">download_file</span>(</span>
+<span id="cb4-377"><a href="#cb4-377" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_exp.stan"</span>),</span>
+<span id="cb4-378"><a href="#cb4-378" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_name =</span> <span class="st">"iv_2cmt_exp"</span>,</span>
+<span id="cb4-379"><a href="#cb4-379" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_label =</span> <span class="st">"Download 2-cmt IV with lognormal error"</span>,</span>
+<span id="cb4-380"><a href="#cb4-380" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_type =</span> <span class="st">"default"</span>,</span>
+<span id="cb4-381"><a href="#cb4-381" aria-hidden="true" tabindex="-1"></a>  <span class="at">has_icon =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb4-382"><a href="#cb4-382" aria-hidden="true" tabindex="-1"></a>  <span class="at">icon =</span> <span class="st">"fa fa-save"</span>,</span>
+<span id="cb4-383"><a href="#cb4-383" aria-hidden="true" tabindex="-1"></a>  <span class="at">self_contained =</span> <span class="cn">FALSE</span></span>
+<span id="cb4-384"><a href="#cb4-384" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-385"><a href="#cb4-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-386"><a href="#cb4-386" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-387"><a href="#cb4-387" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-388"><a href="#cb4-388" aria-hidden="true" tabindex="-1"></a>::::{.scrolling_700}</span>
+<span id="cb4-389"><a href="#cb4-389" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-390"><a href="#cb4-390" aria-hidden="true" tabindex="-1"></a>:::{.cell-output}</span>
+<span id="cb4-391"><a href="#cb4-391" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-394"><a href="#cb4-394" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-395"><a href="#cb4-395" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb4-396"><a href="#cb4-396" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb4-397"><a href="#cb4-397" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-398"><a href="#cb4-398" aria-hidden="true" tabindex="-1"></a><span class="fu">readLines</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_exp.stan"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb4-399"><a href="#cb4-399" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>()</span>
+<span id="cb4-400"><a href="#cb4-400" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-401"><a href="#cb4-401" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-402"><a href="#cb4-402" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-403"><a href="#cb4-403" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-404"><a href="#cb4-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-405"><a href="#cb4-405" aria-hidden="true" tabindex="-1"></a>::::</span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

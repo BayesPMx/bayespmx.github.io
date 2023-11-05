@@ -2,102 +2,102 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://bayespmx.github.io/contact.html</loc>
-    <lastmod>2023-11-04T18:26:02.908Z</lastmod>
+    <lastmod>2023-11-04T18:34:02.968Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/code/models/stan/iv_2cmt_linear.html</loc>
-    <lastmod>2023-11-04T18:26:04.325Z</lastmod>
+    <lastmod>2023-11-05T15:32:19.816Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/code/models/stan/StanModel2.html</loc>
-    <lastmod>2023-11-04T18:26:04.612Z</lastmod>
+    <lastmod>2023-11-04T18:34:04.810Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/code/models/nonmem/NMModel1.html</loc>
-    <lastmod>2023-11-04T18:26:04.916Z</lastmod>
+    <lastmod>2023-11-04T18:34:05.113Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/code/models/nonmem/NMModel2.html</loc>
-    <lastmod>2023-11-04T18:26:05.231Z</lastmod>
+    <lastmod>2023-11-04T18:34:05.389Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/code/scripts/Simulation-Based-Diagnostics.html</loc>
-    <lastmod>2023-11-04T18:26:05.507Z</lastmod>
+    <lastmod>2023-11-04T18:34:05.666Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/code/scripts/Simulations.html</loc>
-    <lastmod>2023-11-04T18:26:05.800Z</lastmod>
+    <lastmod>2023-11-04T18:34:05.968Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/code/scripts/Model-Diagnostics.html</loc>
-    <lastmod>2023-11-04T18:26:06.086Z</lastmod>
+    <lastmod>2023-11-04T18:34:06.239Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/code/simData/mrgsolveModel2.html</loc>
-    <lastmod>2023-11-04T18:26:06.366Z</lastmod>
+    <lastmod>2023-11-04T18:34:06.523Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/code/simData/mrgsolveModel1.html</loc>
-    <lastmod>2023-11-04T18:26:06.649Z</lastmod>
+    <lastmod>2023-11-04T18:34:06.803Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/index.html</loc>
-    <lastmod>2023-11-04T18:26:06.988Z</lastmod>
+    <lastmod>2023-11-05T13:54:48.164Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Introduction-to-Stan.html</loc>
-    <lastmod>2023-11-04T18:26:09.256Z</lastmod>
+    <lastmod>2023-11-04T18:34:09.276Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Posterior-Predictive-Check.html</loc>
-    <lastmod>2023-11-04T18:26:09.555Z</lastmod>
+    <lastmod>2023-11-04T18:34:09.561Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Prior-Predictive-Check.html</loc>
-    <lastmod>2023-11-04T18:26:09.845Z</lastmod>
+    <lastmod>2023-11-04T18:34:09.873Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Matrix-Exponentiation.html</loc>
-    <lastmod>2023-11-04T18:26:10.136Z</lastmod>
+    <lastmod>2023-11-04T18:34:10.160Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Threading-for-Within-Chain-Parallelization.html</loc>
-    <lastmod>2023-11-04T18:26:12.453Z</lastmod>
+    <lastmod>2023-11-04T18:34:12.459Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Extracting-Individual-Posteriors-in-NONMEM.html</loc>
-    <lastmod>2023-11-04T18:26:12.759Z</lastmod>
+    <lastmod>2023-11-04T18:34:12.758Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Introduction-to-Bayesian-Inference.html</loc>
-    <lastmod>2023-11-04T18:26:21.543Z</lastmod>
+    <lastmod>2023-11-04T18:34:21.524Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Model-Diagnostics.html</loc>
-    <lastmod>2023-11-04T18:26:21.846Z</lastmod>
+    <lastmod>2023-11-04T18:34:21.811Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Priors.html</loc>
-    <lastmod>2023-11-04T18:26:22.143Z</lastmod>
+    <lastmod>2023-11-04T18:34:22.100Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Incorporating-Covariates.html</loc>
-    <lastmod>2023-11-04T18:26:22.431Z</lastmod>
+    <lastmod>2023-11-04T18:34:22.381Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Simulations-Setup.html</loc>
-    <lastmod>2023-11-04T18:26:22.692Z</lastmod>
+    <lastmod>2023-11-04T18:34:22.660Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Bayesian-Estimation-Methods-in-NONMEM.html</loc>
-    <lastmod>2023-11-04T18:26:22.991Z</lastmod>
+    <lastmod>2023-11-04T18:34:22.939Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/contributors.html</loc>
-    <lastmod>2023-11-04T18:26:23.303Z</lastmod>
+    <lastmod>2023-11-04T18:34:23.262Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/references.html</loc>
-    <lastmod>2023-11-04T18:26:23.597Z</lastmod>
+    <lastmod>2023-11-04T18:34:23.537Z</lastmod>
   </url>
 </urlset>
