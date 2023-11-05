@@ -114,7 +114,7 @@ functions{
 ```
 
 -   Example 2: Function to generate a random number from a normal distribution
-that is truncated below at 0:
+that is truncated below at ```lb``` (often this is 0):
 
 ```{stan, output.var="function_normal_lb_rng"}
 #| label: function-normal-lb-rng
