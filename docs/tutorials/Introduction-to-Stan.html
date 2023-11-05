@@ -459,7 +459,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
-<li>Example 2: Function to generate a random number from a normal distribution that is truncated below at 0:</li>
+<li>Example 2: Function to generate a random number from a normal distribution that is truncated below at <code>lb</code> (often this is 0):</li>
 </ul>
 <div class="cell" data-output.var="function_normal_lb_rng" data-hash="Introduction-to-Stan_cache/html/function-normal-lb-rng_031777d9063aa17453085fd75b8495e8">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode stan code-with-copy"><code class="sourceCode stan"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">functions</span>{</span>
@@ -1059,7 +1059,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Example 2: Function to generate a random number from a normal distribution</span>
-<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a>that is truncated below at 0:</span>
+<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a>that is truncated below at <span class="in">```lb```</span> (often this is 0):</span>
 <span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a><span class="in">```{stan, output.var="function_normal_lb_rng"}</span></span>
 <span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a><span class="in">#| label: function-normal-lb-rng</span></span>
