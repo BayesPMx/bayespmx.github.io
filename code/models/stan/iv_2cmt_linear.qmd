@@ -145,7 +145,7 @@ The full statistical model is
 ## Proportional Error Model
 
 \begin{align}
-C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \mathbf{\Sigma}
+C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \sigma_p
 &\sim Normal\left( f(\mathbf{\theta}_i, t_{ij}), \; \sigma_{ij} \right)
 I(C_{ij} > 0) \notag \\
 \mathbf{\eta}_i \; | \; \Omega &\sim Normal\left(
@@ -245,7 +245,7 @@ distribution of the observed concentrations to be greater than 0.
 ## Lognormal Error
 
 \begin{align}
-C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \mathbf{\Sigma}
+C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \sigma
 &\sim Lognormal\left( log\left(f(\mathbf{\theta}_i, t_{ij})\right), \; \sigma \right)
 \notag \\
 \mathbf{\eta}_i \; | \; \Omega &\sim Normal\left(
