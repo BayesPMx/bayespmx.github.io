@@ -487,7 +487,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <p><span class="math display">\[\begin{align}
-C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \mathbf{\Sigma}
+C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \sigma_p
 &amp;\sim Normal\left( f(\mathbf{\theta}_i, t_{ij}), \; \sigma_{ij} \right)
 I(C_{ij} &gt; 0) \notag \\
 \mathbf{\eta}_i \; | \; \Omega &amp;\sim Normal\left(
@@ -576,7 +576,7 @@ TVCL \times e^{\eta_{CL_i}} \\ TVVC \times e^{\eta_{V_{c_i}}} \\ TVQ \times e^{\
 </div>
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
 <p><span class="math display">\[\begin{align}
-C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \mathbf{\Sigma}
+C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \sigma
 &amp;\sim Lognormal\left( log\left(f(\mathbf{\theta}_i, t_{ij})\right), \; \sigma \right)
 \notag \\
 \mathbf{\eta}_i \; | \; \Omega &amp;\sim Normal\left(
@@ -2448,7 +2448,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb4-145"><a href="#cb4-145" aria-hidden="true" tabindex="-1"></a><span class="fu">## Proportional Error Model</span></span>
 <span id="cb4-146"><a href="#cb4-146" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-147"><a href="#cb4-147" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
-<span id="cb4-148"><a href="#cb4-148" aria-hidden="true" tabindex="-1"></a>C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \mathbf{\Sigma}</span>
+<span id="cb4-148"><a href="#cb4-148" aria-hidden="true" tabindex="-1"></a>C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \sigma_p</span>
 <span id="cb4-149"><a href="#cb4-149" aria-hidden="true" tabindex="-1"></a>&amp;\sim Normal\left( f(\mathbf{\theta}_i, t_{ij}), \; \sigma_{ij} \right)</span>
 <span id="cb4-150"><a href="#cb4-150" aria-hidden="true" tabindex="-1"></a>I(C_{ij} &gt; 0) \notag <span class="sc">\\</span></span>
 <span id="cb4-151"><a href="#cb4-151" aria-hidden="true" tabindex="-1"></a>\mathbf{\eta}_i \; | \; \Omega &amp;\sim Normal\left(</span>
@@ -2548,7 +2548,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb4-245"><a href="#cb4-245" aria-hidden="true" tabindex="-1"></a><span class="fu">## Lognormal Error</span></span>
 <span id="cb4-246"><a href="#cb4-246" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-247"><a href="#cb4-247" aria-hidden="true" tabindex="-1"></a>\begin{align}</span>
-<span id="cb4-248"><a href="#cb4-248" aria-hidden="true" tabindex="-1"></a>C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \mathbf{\Sigma}</span>
+<span id="cb4-248"><a href="#cb4-248" aria-hidden="true" tabindex="-1"></a>C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \sigma</span>
 <span id="cb4-249"><a href="#cb4-249" aria-hidden="true" tabindex="-1"></a>&amp;\sim Lognormal\left( log\left(f(\mathbf{\theta}_i, t_{ij})\right), \; \sigma \right)</span>
 <span id="cb4-250"><a href="#cb4-250" aria-hidden="true" tabindex="-1"></a>\notag <span class="sc">\\</span></span>
 <span id="cb4-251"><a href="#cb4-251" aria-hidden="true" tabindex="-1"></a>\mathbf{\eta}_i \; | \; \Omega &amp;\sim Normal\left(</span>
