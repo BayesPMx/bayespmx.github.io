@@ -373,7 +373,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#pk-model" id="toc-pk-model" class="nav-link active" data-scroll-target="#pk-model"><span class="header-section-number">1</span> PK Model</a></li>
-  <li><a href="#statistical-model" id="toc-statistical-model" class="nav-link" data-scroll-target="#statistical-model"><span class="header-section-number">2</span> Statistical Model</a></li>
+  <li><a href="#sec-statistical-model" id="toc-sec-statistical-model" class="nav-link" data-scroll-target="#sec-statistical-model"><span class="header-section-number">2</span> Statistical Model</a></li>
   <li><a href="#stan-code" id="toc-stan-code" class="nav-link" data-scroll-target="#stan-code"><span class="header-section-number">3</span> Stan Code</a>
   <ul>
   <li><a href="#proportional-error" id="toc-proportional-error" class="nav-link" data-scroll-target="#proportional-error"><span class="header-section-number">3.1</span> Proportional Error</a></li>
@@ -438,7 +438,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 \end{align} \tag{1}\]</span></span></p>
 <p>and then <span class="math inline">\(C = \frac{A_c}{V_c}\)</span><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
 </section>
-<section id="statistical-model" class="level1" data-number="2">
+<section id="sec-statistical-model" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Statistical Model</h1>
 <p>I’ll model the <em>correlation matrix</em> <span class="math inline">\(R_{\Omega}\)</span> and <em>standard deviations</em> (<span class="math inline">\(\omega_p\)</span>) of the random effects rather than the covariance matrix <span class="math inline">\(\Omega\)</span> that is the more traditional method.</p>
 <p><span class="math display">\[\begin{align}
@@ -636,6 +636,8 @@ TVCL \times e^{\eta_{CL_i}} \\ TVVC \times e^{\eta_{V_{c_i}}} \\ TVQ \times e^{\
 </div>
 </div>
 <div class="scrolling_700">
+<div class="columns">
+<div class="column" style="width:50%;">
 <div class="cell-output">
 <div class="cell">
 <div class="cell-output cell-output-stdout">
@@ -1070,6 +1072,15 @@ generated quantities{
   
 }</code></pre>
 </div>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<p>Create a sequence of integers from <code>start</code> to <code>end</code>, similarly to doing in R <code>seq(start, to, by = 1)</code>, where <code>start</code> and <code>end</code> are integers.</p>
+<p>Find the number of elements of the integer array <span class="math inline">\(y\)</span> such that <span class="math inline">\(lb \leq y \leq ub\)</span>, similarly to doing in R <code>sum(y &gt;= 4 &amp; y &lt;= 6)</code> or <code>sum(dplyr::between(y, 4, 6))</code>.</p>
+<p>Find the elements of the integer array <span class="math inline">\(y\)</span> such that <span class="math inline">\(lb \leq y \leq ub\)</span>, similarly to doing in R <code>y[y &gt;= 4 &amp; y &lt;= 6]</code>.</p>
+<p>Find the elements of the vector <span class="math inline">\(y\)</span> whose index is <span class="math inline">\(\geq lb\)</span> and whose index is <span class="math inline">\(\leq ub\)</span>, similarly to doing in R <code>y[idx &gt;= 4 &amp; idx &lt;= 6]</code></p>
+<p>Generate a random number from a normal distribution that is truncated below at <code>lb</code> (often this is 0).</p>
+<p>in <a href="#sec-statistical-model">Section&nbsp;2</a></p>
 </div>
 </div>
 </div>
@@ -2383,7 +2394,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>observation records. Since there is no absorption, we just leave it out of our </span>
 <span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>model and set it to 0 when using Torsten's analytical solver.</span>
 <span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a><span class="fu"># Statistical Model</span></span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a><span class="fu"># Statistical Model {#sec-statistical-model}</span></span>
 <span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>I'll model the *correlation matrix* $R_{\Omega}$ and *standard deviations* </span>
 <span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>($\omega_p$) of the random effects rather than the covariance matrix $\Omega$ </span>
@@ -2612,88 +2623,117 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb4-311"><a href="#cb4-311" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-312"><a href="#cb4-312" aria-hidden="true" tabindex="-1"></a>::::{.scrolling_700}</span>
 <span id="cb4-313"><a href="#cb4-313" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-314"><a href="#cb4-314" aria-hidden="true" tabindex="-1"></a>:::{.cell-output}</span>
+<span id="cb4-314"><a href="#cb4-314" aria-hidden="true" tabindex="-1"></a>::: {.columns}</span>
 <span id="cb4-315"><a href="#cb4-315" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-318"><a href="#cb4-318" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-319"><a href="#cb4-319" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb4-320"><a href="#cb4-320" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
-<span id="cb4-321"><a href="#cb4-321" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-322"><a href="#cb4-322" aria-hidden="true" tabindex="-1"></a><span class="fu">readLines</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_prop.stan"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb4-323"><a href="#cb4-323" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>()</span>
-<span id="cb4-324"><a href="#cb4-324" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-325"><a href="#cb4-325" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-326"><a href="#cb4-326" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-327"><a href="#cb4-327" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-316"><a href="#cb4-316" aria-hidden="true" tabindex="-1"></a>::: {.column width="50%"}</span>
+<span id="cb4-317"><a href="#cb4-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-318"><a href="#cb4-318" aria-hidden="true" tabindex="-1"></a>:::{.cell-output}</span>
+<span id="cb4-319"><a href="#cb4-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-322"><a href="#cb4-322" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-323"><a href="#cb4-323" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb4-324"><a href="#cb4-324" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb4-325"><a href="#cb4-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-326"><a href="#cb4-326" aria-hidden="true" tabindex="-1"></a><span class="fu">readLines</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_prop.stan"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb4-327"><a href="#cb4-327" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>()</span>
 <span id="cb4-328"><a href="#cb4-328" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-329"><a href="#cb4-329" aria-hidden="true" tabindex="-1"></a>::::</span>
+<span id="cb4-329"><a href="#cb4-329" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb4-330"><a href="#cb4-330" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-331"><a href="#cb4-331" aria-hidden="true" tabindex="-1"></a><span class="fu">## Proportional-Plus-Additive Error</span></span>
+<span id="cb4-331"><a href="#cb4-331" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb4-332"><a href="#cb4-332" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-335"><a href="#cb4-335" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-336"><a href="#cb4-336" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb4-337"><a href="#cb4-337" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-338"><a href="#cb4-338" aria-hidden="true" tabindex="-1"></a>downloadthis<span class="sc">::</span><span class="fu">download_file</span>(</span>
-<span id="cb4-339"><a href="#cb4-339" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_ppa.stan"</span>),</span>
-<span id="cb4-340"><a href="#cb4-340" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_name =</span> <span class="st">"iv_2cmt_ppa"</span>,</span>
-<span id="cb4-341"><a href="#cb4-341" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_label =</span> <span class="st">"Download 2-cmt IV with proportional-plus-additive error"</span>,</span>
-<span id="cb4-342"><a href="#cb4-342" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_type =</span> <span class="st">"default"</span>,</span>
-<span id="cb4-343"><a href="#cb4-343" aria-hidden="true" tabindex="-1"></a>  <span class="at">has_icon =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb4-344"><a href="#cb4-344" aria-hidden="true" tabindex="-1"></a>  <span class="at">icon =</span> <span class="st">"fa fa-save"</span>,</span>
-<span id="cb4-345"><a href="#cb4-345" aria-hidden="true" tabindex="-1"></a>  <span class="at">self_contained =</span> <span class="cn">FALSE</span></span>
-<span id="cb4-346"><a href="#cb4-346" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-347"><a href="#cb4-347" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-348"><a href="#cb4-348" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-349"><a href="#cb4-349" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-350"><a href="#cb4-350" aria-hidden="true" tabindex="-1"></a>::::{.scrolling_700}</span>
+<span id="cb4-333"><a href="#cb4-333" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-334"><a href="#cb4-334" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-335"><a href="#cb4-335" aria-hidden="true" tabindex="-1"></a>::: {.column width="50%"}</span>
+<span id="cb4-336"><a href="#cb4-336" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-337"><a href="#cb4-337" aria-hidden="true" tabindex="-1"></a>Create a sequence of integers from ```start``` to ```end```, similarly to doing</span>
+<span id="cb4-338"><a href="#cb4-338" aria-hidden="true" tabindex="-1"></a>in R ```seq(start, to, by = 1)```, where ```start``` and ```end``` are integers. </span>
+<span id="cb4-339"><a href="#cb4-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-340"><a href="#cb4-340" aria-hidden="true" tabindex="-1"></a>Find the number of elements of the integer array $y$ such that </span>
+<span id="cb4-341"><a href="#cb4-341" aria-hidden="true" tabindex="-1"></a>$lb \leq y \leq ub$, similarly to doing in R ```sum(y &gt;= 4 &amp; y &lt;= 6)``` or ```sum(dplyr::between(y, 4, 6))```.</span>
+<span id="cb4-342"><a href="#cb4-342" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-343"><a href="#cb4-343" aria-hidden="true" tabindex="-1"></a>Find the elements of the integer array $y$ such that $lb \leq y \leq ub$, </span>
+<span id="cb4-344"><a href="#cb4-344" aria-hidden="true" tabindex="-1"></a>similarly to doing in R ```y<span class="co">[</span><span class="ot">y &gt;= 4 &amp; y &lt;= 6</span><span class="co">]</span>```.</span>
+<span id="cb4-345"><a href="#cb4-345" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-346"><a href="#cb4-346" aria-hidden="true" tabindex="-1"></a>Find the elements of the vector $y$ whose index is $\geq lb$ and whose index is </span>
+<span id="cb4-347"><a href="#cb4-347" aria-hidden="true" tabindex="-1"></a>$\leq ub$, similarly to doing in R ```y<span class="co">[</span><span class="ot">idx &gt;= 4 &amp; idx &lt;= 6</span><span class="co">]</span>```</span>
+<span id="cb4-348"><a href="#cb4-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-349"><a href="#cb4-349" aria-hidden="true" tabindex="-1"></a>Generate a random number from a normal distribution that is truncated below at</span>
+<span id="cb4-350"><a href="#cb4-350" aria-hidden="true" tabindex="-1"></a><span class="in">```lb```</span> (often this is 0).</span>
 <span id="cb4-351"><a href="#cb4-351" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-352"><a href="#cb4-352" aria-hidden="true" tabindex="-1"></a>:::{.cell-output}</span>
+<span id="cb4-352"><a href="#cb4-352" aria-hidden="true" tabindex="-1"></a>in @sec-statistical-model</span>
 <span id="cb4-353"><a href="#cb4-353" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-356"><a href="#cb4-356" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-357"><a href="#cb4-357" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb4-358"><a href="#cb4-358" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb4-354"><a href="#cb4-354" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-355"><a href="#cb4-355" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-356"><a href="#cb4-356" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-357"><a href="#cb4-357" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-358"><a href="#cb4-358" aria-hidden="true" tabindex="-1"></a>::::</span>
 <span id="cb4-359"><a href="#cb4-359" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-360"><a href="#cb4-360" aria-hidden="true" tabindex="-1"></a><span class="fu">readLines</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_ppa.stan"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb4-361"><a href="#cb4-361" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>()</span>
-<span id="cb4-362"><a href="#cb4-362" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-363"><a href="#cb4-363" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-364"><a href="#cb4-364" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-365"><a href="#cb4-365" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-360"><a href="#cb4-360" aria-hidden="true" tabindex="-1"></a><span class="fu">## Proportional-Plus-Additive Error</span></span>
+<span id="cb4-361"><a href="#cb4-361" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-364"><a href="#cb4-364" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-365"><a href="#cb4-365" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
 <span id="cb4-366"><a href="#cb4-366" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-367"><a href="#cb4-367" aria-hidden="true" tabindex="-1"></a>::::</span>
-<span id="cb4-368"><a href="#cb4-368" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-369"><a href="#cb4-369" aria-hidden="true" tabindex="-1"></a><span class="fu">## Lognormal Error</span></span>
-<span id="cb4-370"><a href="#cb4-370" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-373"><a href="#cb4-373" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-374"><a href="#cb4-374" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb4-375"><a href="#cb4-375" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-376"><a href="#cb4-376" aria-hidden="true" tabindex="-1"></a>downloadthis<span class="sc">::</span><span class="fu">download_file</span>(</span>
-<span id="cb4-377"><a href="#cb4-377" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_exp.stan"</span>),</span>
-<span id="cb4-378"><a href="#cb4-378" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_name =</span> <span class="st">"iv_2cmt_exp"</span>,</span>
-<span id="cb4-379"><a href="#cb4-379" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_label =</span> <span class="st">"Download 2-cmt IV with lognormal error"</span>,</span>
-<span id="cb4-380"><a href="#cb4-380" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_type =</span> <span class="st">"default"</span>,</span>
-<span id="cb4-381"><a href="#cb4-381" aria-hidden="true" tabindex="-1"></a>  <span class="at">has_icon =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb4-382"><a href="#cb4-382" aria-hidden="true" tabindex="-1"></a>  <span class="at">icon =</span> <span class="st">"fa fa-save"</span>,</span>
-<span id="cb4-383"><a href="#cb4-383" aria-hidden="true" tabindex="-1"></a>  <span class="at">self_contained =</span> <span class="cn">FALSE</span></span>
-<span id="cb4-384"><a href="#cb4-384" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-385"><a href="#cb4-385" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-386"><a href="#cb4-386" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-387"><a href="#cb4-387" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-388"><a href="#cb4-388" aria-hidden="true" tabindex="-1"></a>::::{.scrolling_700}</span>
-<span id="cb4-389"><a href="#cb4-389" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-390"><a href="#cb4-390" aria-hidden="true" tabindex="-1"></a>:::{.cell-output}</span>
+<span id="cb4-367"><a href="#cb4-367" aria-hidden="true" tabindex="-1"></a>downloadthis<span class="sc">::</span><span class="fu">download_file</span>(</span>
+<span id="cb4-368"><a href="#cb4-368" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_ppa.stan"</span>),</span>
+<span id="cb4-369"><a href="#cb4-369" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_name =</span> <span class="st">"iv_2cmt_ppa"</span>,</span>
+<span id="cb4-370"><a href="#cb4-370" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_label =</span> <span class="st">"Download 2-cmt IV with proportional-plus-additive error"</span>,</span>
+<span id="cb4-371"><a href="#cb4-371" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_type =</span> <span class="st">"default"</span>,</span>
+<span id="cb4-372"><a href="#cb4-372" aria-hidden="true" tabindex="-1"></a>  <span class="at">has_icon =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb4-373"><a href="#cb4-373" aria-hidden="true" tabindex="-1"></a>  <span class="at">icon =</span> <span class="st">"fa fa-save"</span>,</span>
+<span id="cb4-374"><a href="#cb4-374" aria-hidden="true" tabindex="-1"></a>  <span class="at">self_contained =</span> <span class="cn">FALSE</span></span>
+<span id="cb4-375"><a href="#cb4-375" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-376"><a href="#cb4-376" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-377"><a href="#cb4-377" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-378"><a href="#cb4-378" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-379"><a href="#cb4-379" aria-hidden="true" tabindex="-1"></a>::::{.scrolling_700}</span>
+<span id="cb4-380"><a href="#cb4-380" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-381"><a href="#cb4-381" aria-hidden="true" tabindex="-1"></a>:::{.cell-output}</span>
+<span id="cb4-382"><a href="#cb4-382" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-385"><a href="#cb4-385" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-386"><a href="#cb4-386" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb4-387"><a href="#cb4-387" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb4-388"><a href="#cb4-388" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-389"><a href="#cb4-389" aria-hidden="true" tabindex="-1"></a><span class="fu">readLines</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_ppa.stan"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb4-390"><a href="#cb4-390" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>()</span>
 <span id="cb4-391"><a href="#cb4-391" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-394"><a href="#cb4-394" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-395"><a href="#cb4-395" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb4-396"><a href="#cb4-396" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb4-392"><a href="#cb4-392" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-393"><a href="#cb4-393" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-394"><a href="#cb4-394" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-395"><a href="#cb4-395" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-396"><a href="#cb4-396" aria-hidden="true" tabindex="-1"></a>::::</span>
 <span id="cb4-397"><a href="#cb4-397" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-398"><a href="#cb4-398" aria-hidden="true" tabindex="-1"></a><span class="fu">readLines</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_exp.stan"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb4-399"><a href="#cb4-399" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>()</span>
-<span id="cb4-400"><a href="#cb4-400" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-401"><a href="#cb4-401" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-402"><a href="#cb4-402" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-403"><a href="#cb4-403" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-398"><a href="#cb4-398" aria-hidden="true" tabindex="-1"></a><span class="fu">## Lognormal Error</span></span>
+<span id="cb4-399"><a href="#cb4-399" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-402"><a href="#cb4-402" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-403"><a href="#cb4-403" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
 <span id="cb4-404"><a href="#cb4-404" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-405"><a href="#cb4-405" aria-hidden="true" tabindex="-1"></a>::::</span>
+<span id="cb4-405"><a href="#cb4-405" aria-hidden="true" tabindex="-1"></a>downloadthis<span class="sc">::</span><span class="fu">download_file</span>(</span>
+<span id="cb4-406"><a href="#cb4-406" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_exp.stan"</span>),</span>
+<span id="cb4-407"><a href="#cb4-407" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_name =</span> <span class="st">"iv_2cmt_exp"</span>,</span>
+<span id="cb4-408"><a href="#cb4-408" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_label =</span> <span class="st">"Download 2-cmt IV with lognormal error"</span>,</span>
+<span id="cb4-409"><a href="#cb4-409" aria-hidden="true" tabindex="-1"></a>  <span class="at">button_type =</span> <span class="st">"default"</span>,</span>
+<span id="cb4-410"><a href="#cb4-410" aria-hidden="true" tabindex="-1"></a>  <span class="at">has_icon =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb4-411"><a href="#cb4-411" aria-hidden="true" tabindex="-1"></a>  <span class="at">icon =</span> <span class="st">"fa fa-save"</span>,</span>
+<span id="cb4-412"><a href="#cb4-412" aria-hidden="true" tabindex="-1"></a>  <span class="at">self_contained =</span> <span class="cn">FALSE</span></span>
+<span id="cb4-413"><a href="#cb4-413" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-414"><a href="#cb4-414" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-415"><a href="#cb4-415" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-416"><a href="#cb4-416" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-417"><a href="#cb4-417" aria-hidden="true" tabindex="-1"></a>::::{.scrolling_700}</span>
+<span id="cb4-418"><a href="#cb4-418" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-419"><a href="#cb4-419" aria-hidden="true" tabindex="-1"></a>:::{.cell-output}</span>
+<span id="cb4-420"><a href="#cb4-420" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-423"><a href="#cb4-423" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-424"><a href="#cb4-424" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb4-425"><a href="#cb4-425" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb4-426"><a href="#cb4-426" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-427"><a href="#cb4-427" aria-hidden="true" tabindex="-1"></a><span class="fu">readLines</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_2cmt_exp.stan"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb4-428"><a href="#cb4-428" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>()</span>
+<span id="cb4-429"><a href="#cb4-429" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-430"><a href="#cb4-430" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-431"><a href="#cb4-431" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-432"><a href="#cb4-432" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb4-433"><a href="#cb4-433" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-434"><a href="#cb4-434" aria-hidden="true" tabindex="-1"></a>::::</span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

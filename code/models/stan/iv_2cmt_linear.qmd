@@ -80,7 +80,7 @@ Torsten's setup, and you would have to make sure $CMT = 2$ for the dosing and
 observation records. Since there is no absorption, we just leave it out of our 
 model and set it to 0 when using Torsten's analytical solver.
 
-# Statistical Model
+# Statistical Model {#sec-statistical-model}
 
 I'll model the *correlation matrix* $R_{\Omega}$ and *standard deviations* 
 ($\omega_p$) of the random effects rather than the covariance matrix $\Omega$ 
@@ -309,6 +309,10 @@ downloadthis::download_file(
 
 ::::{.scrolling_700}
 
+::: {.columns}
+
+::: {.column width="50%"}
+
 :::{.cell-output}
 
 ```{r}
@@ -319,6 +323,31 @@ readLines(here::here("models/stan/iv_2cmt_prop.stan")) |>
   writeLines()
 
 ```
+
+:::
+
+:::
+
+::: {.column width="50%"}
+
+Create a sequence of integers from ```start``` to ```end```, similarly to doing
+in R ```seq(start, to, by = 1)```, where ```start``` and ```end``` are integers. 
+
+Find the number of elements of the integer array $y$ such that 
+$lb \leq y \leq ub$, similarly to doing in R ```sum(y >= 4 & y <= 6)``` or ```sum(dplyr::between(y, 4, 6))```.
+
+Find the elements of the integer array $y$ such that $lb \leq y \leq ub$, 
+similarly to doing in R ```y[y >= 4 & y <= 6]```.
+
+Find the elements of the vector $y$ whose index is $\geq lb$ and whose index is 
+$\leq ub$, similarly to doing in R ```y[idx >= 4 & idx <= 6]```
+
+Generate a random number from a normal distribution that is truncated below at
+```lb``` (often this is 0).
+
+in @sec-statistical-model
+
+:::
 
 :::
 

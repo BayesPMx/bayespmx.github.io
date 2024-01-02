@@ -6,7 +6,7 @@
   </url>
   <url>
     <loc>https://bayespmx.github.io/code/models/stan/iv_2cmt_linear.html</loc>
-    <lastmod>2023-11-05T21:12:32.904Z</lastmod>
+    <lastmod>2023-11-09T04:23:38.050Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/code/models/stan/StanModel2.html</loc>
@@ -42,11 +42,11 @@
   </url>
   <url>
     <loc>https://bayespmx.github.io/index.html</loc>
-    <lastmod>2023-11-05T21:12:35.631Z</lastmod>
+    <lastmod>2023-11-09T04:00:04.172Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Introduction-to-Stan.html</loc>
-    <lastmod>2023-11-05T21:12:37.816Z</lastmod>
+    <lastmod>2023-11-08T23:39:44.388Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Posterior-Predictive-Check.html</loc>
@@ -62,7 +62,7 @@
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Threading-for-Within-Chain-Parallelization.html</loc>
-    <lastmod>2023-11-05T21:12:40.940Z</lastmod>
+    <lastmod>2023-11-09T00:04:22.757Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Extracting-Individual-Posteriors-in-NONMEM.html</loc>
@@ -70,7 +70,7 @@
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Introduction-to-Bayesian-Inference.html</loc>
-    <lastmod>2023-11-05T21:12:49.764Z</lastmod>
+    <lastmod>2023-11-08T23:39:54.579Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Model-Diagnostics.html</loc>
@@ -78,7 +78,7 @@
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Priors.html</loc>
-    <lastmod>2023-11-05T21:12:50.341Z</lastmod>
+    <lastmod>2023-11-09T00:12:36.898Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Incorporating-Covariates.html</loc>
@@ -90,11 +90,11 @@
   </url>
   <url>
     <loc>https://bayespmx.github.io/tutorials/Bayesian-Estimation-Methods-in-NONMEM.html</loc>
-    <lastmod>2023-11-05T21:12:51.174Z</lastmod>
+    <lastmod>2023-11-08T23:39:50.109Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/contributors.html</loc>
-    <lastmod>2023-11-05T21:12:51.529Z</lastmod>
+    <lastmod>2023-11-09T04:33:35.525Z</lastmod>
   </url>
   <url>
     <loc>https://bayespmx.github.io/references.html</loc>
