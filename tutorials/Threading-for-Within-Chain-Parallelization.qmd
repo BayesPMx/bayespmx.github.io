@@ -126,12 +126,12 @@ within_iteration <- tibble(Main = rep("Iteration i", 6),
                            l3 = rep("Posterior Density", 6),
                            l4 = c("Likelihood", "Priors",
                                   rep("Likelihood", 3), "Priors"),
-                           l5 = c("Subject 1", NA_character_,
+                           l5 = c("Subject 1", "",
                                   str_c("Subject ", 1:2), "Subject 3...",
-                                  NA_character_),
-                           l6 = c("Subject 2", rep(NA_character_, 5)),
-                           l7 = c("Subject 3", rep(NA_character_, 5)),
-                           ellipsis = c("...", rep(NA_character_, 5)))
+                                  ""),
+                           l6 = c("Subject 2", rep("", 5)),
+                           l7 = c("Subject 3", rep("", 5)),
+                           ellipsis = c("...", rep("", 5)))
 collapsibleTree(within_iteration,
                 root = "Iteration i",
                 hierarchy = colnames(within_iteration)[-1],
@@ -354,7 +354,7 @@ model{
 #| echo: false
 
 model_no_threading <- 
-  cmdstan_model(here::here("models/stan/iv_1cmt_prop_no_threading.stan"))
+  cmdstan_model(here::here("models/stan/iv_1cmt_prop_no_threading.stan")) 
 
 ```
 
@@ -456,7 +456,7 @@ fit_completely_sequential <- suppressMessages(model_no_threading$sample(
 
 Here is the implementation of the above model in R with parallel chains:
 
-:::{.scrolling_500}
+:::{.scrolling_700}
 
 ```{r}
 #| label: fit-parallel-chains
@@ -793,7 +793,7 @@ fit_threaded <- suppressMessages(model_threaded$sample(
   chains = 4,
   parallel_chains = 4,
   # threads_per_chain = parallel::detectCores()/4,
-  threads_per_chain = 2,
+  threads_per_chain = 4,
   iter_warmup = 500,
   iter_sampling = 1000,
   adapt_delta = 0.8,
@@ -825,3 +825,29 @@ For example, if your machine has 32 cores, we recommend having 4 `chains`, 4
 available cores. Using more `threads_per_chain` than this won't be helpful in 
 reducing execution time, since the available cores are already in use.
 
+### Explanation for Stan Code Implementation of Within-Chain Parallelization
+
+```sequence()```, ```num_between()```, ```find_between()```, and
+```find_between_vec()``` are functions to help make sure correct observations
+are passed along with the subjects in a given slice.
+
+- ```sequence(start, end)``` creates a sequence of integers from ```start``` 
+to ```end``` where ```start``` and ```end``` are integers, similarly to doing in
+R ```seq(start, to, by = 1)```.
+- ```num_between(lb, ub, y)``` finds the number of elements of the integer 
+array $y$ such that $lb \leq y \leq ub$, similarly to doing in R 
+```sum(y >= lb & y <= ub)``` or ```sum(dplyr::between(y, lb, ub))```.
+- ```find_between(lb, ub, y)``` finds the elements of the integer array $y$ such
+that $lb \leq y \leq ub$, similarly to doing in R ```y[y >= lb & y <= ub]```.
+- ```find_between_vec(lb, ub, idx, y)``` finds the elements of the vector $y$ 
+whose index is $\geq lb$ and whose index is $\leq ub$, similarly to doing in R
+```y[idx >= lb & idx <= ub]```
+
+
+```partial_sum_lpmf()``` is the function that is input into ```reduce_sum()```.
+The output of this function is the log-likelihood for the subjects in a
+particular slice. For example, if we have 4 threads per chain and 12 subjects,
+the likelihood calculations might be sent in slices of 3 subjects to each of the
+4 threads. Then the output for this function would be the likelihood for the 3
+subjects in the slice. The ```reduce_sum()``` function then adds the results
+from each slice to get the full log-probability.

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.340">
+<meta name="generator" content="quarto-1.4.549">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -22,7 +22,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -63,7 +63,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../tutorials/Model-Diagnostics.html" rel="next">
+<link href="../tutorials/Handling-Censored-Data.html" rel="next">
 <link href="../tutorials/Prior-Predictive-Check.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -80,7 +80,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "start",
   "type": "textbox",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -89,17 +95,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
-<script src="../site_libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="../site_libs/htmlwidgets-1.6.1/htmlwidgets.js"></script>
 <script src="../site_libs/d3-4.10.2/d3.min.js"></script>
 <link href="../site_libs/collapsibleTree-0.1.6/collapsibleTree.css" rel="stylesheet">
-<script src="../site_libs/collapsibleTree-binding-0.1.7/collapsibleTree.js"></script>
+<script src="../site_libs/collapsibleTree-binding-0.1.8/collapsibleTree.js"></script>
 
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -110,13 +145,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/Introduction-to-Bayesian-Inference.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/Threading-for-Within-Chain-Parallelization.html">Threading for Within Chain Parallelization</a></li></ol></nav>
-      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-      </a>
-      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/Introduction-to-Bayesian-Inference.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/Threading-for-Within-Chain-Parallelization.html">Threading for Within Chain Parallelization</a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -125,8 +160,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
-    <div class="pt-lg-2 mt-2 text-center sidebar-header">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
       <a href="../index.html" class="sidebar-logo-link">
       <img src="../images/bayespmx_logo.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
       </a>
@@ -193,6 +228,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../tutorials/Threading-for-Within-Chain-Parallelization.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Threading for Within Chain Parallelization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../tutorials/Handling-Censored-Data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Handling Censored Data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -308,6 +349,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../code/models/stan/iv_1cmt_linear.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">One-Compartment IV Infusion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../code/models/stan/iv_2cmt_linear.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Two-Compartment IV Infusion</span></a>
   </div>
@@ -368,7 +415,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </ul>
     </div>
 </nav>
-<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -385,7 +432,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#completely-sequential-mcmc-1" id="toc-completely-sequential-mcmc-1" class="nav-link" data-scroll-target="#completely-sequential-mcmc-1"><span class="header-section-number">2.1</span> Completely Sequential MCMC</a></li>
   <li><a href="#mcmc-with-parallel-chains-1" id="toc-mcmc-with-parallel-chains-1" class="nav-link" data-scroll-target="#mcmc-with-parallel-chains-1"><span class="header-section-number">2.2</span> MCMC with Parallel Chains</a></li>
-  <li><a href="#mcmc-with-parallel-chains-and-within-chain-parallelization" id="toc-mcmc-with-parallel-chains-and-within-chain-parallelization" class="nav-link" data-scroll-target="#mcmc-with-parallel-chains-and-within-chain-parallelization"><span class="header-section-number">2.3</span> MCMC with Parallel Chains and Within-Chain Parallelization</a></li>
+  <li><a href="#mcmc-with-parallel-chains-and-within-chain-parallelization" id="toc-mcmc-with-parallel-chains-and-within-chain-parallelization" class="nav-link" data-scroll-target="#mcmc-with-parallel-chains-and-within-chain-parallelization"><span class="header-section-number">2.3</span> MCMC with Parallel Chains and Within-Chain Parallelization</a>
+  <ul>
+  <li><a href="#explanation-for-stan-code-implementation-of-within-chain-parallelization" id="toc-explanation-for-stan-code-implementation-of-within-chain-parallelization" class="nav-link" data-scroll-target="#explanation-for-stan-code-implementation-of-within-chain-parallelization"><span class="header-section-number">2.3.1</span> Explanation for Stan Code Implementation of Within-Chain Parallelization</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -393,7 +443,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../tutorials/Introduction-to-Bayesian-Inference.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../tutorials/Threading-for-Within-Chain-Parallelization.html">Threading for Within Chain Parallelization</a></li></ol></nav>
 <div class="quarto-title">
 <div class="quarto-title-block"><div><h1 class="title">Threading for Within Chain Parallelization</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
@@ -408,7 +458,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
   
 
+
 </header>
+
 
 <div class="cell">
 <style type="text/css">
@@ -424,7 +476,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 </div>
 <div class="cell">
-<details>
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(collapsibleTree)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># library(kableExtra)</span></span>
@@ -447,30 +499,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="completely-sequential-mcmc" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="completely-sequential-mcmc"><span class="header-section-number">1.1</span> Completely Sequential MCMC</h2>
 <p>Historically MCMC is performed in a completely sequential manner (this is an interactive tree. Click on it):</p>
-<div class="cell" data-hash="Threading-for-Within-Chain-Parallelization_cache/html/collapsible-tree-typical_be8bf67cdf28c3e3d7aea36dccec13aa">
+<div class="cell">
 <div class="cell-output-display">
-<div id="htmlwidget-ed8c40cbde96ea15a7d9" style="width:100%;height:464px;" class="collapsibleTree html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ed8c40cbde96ea15a7d9">{"x":{"data":{"name":"Typical MCMC","children":[{"name":"Chain 1, Iteration 1","children":[{"name":"Chain 1, Iteration 2","children":[{"name":"...","children":[{"name":"Chain 1, Iteration n","children":[{"name":"Chain 2, Iteration 1","children":[{"name":"Chain 2, Iteration 2","children":[{"name":"...","children":[{"name":"Chain 2, Iteration n","children":[{"name":"...","children":[{"name":"Chain m, Iteration 1","children":[{"name":"Chain m, Iteration 2","children":[{"name":"...","children":[{"name":"Chain m, Iteration n"}]}]}]}]}]}]}]}]}]}]}]}]}]},"options":{"hierarchy":["a1","a2","a3","a4","b1","b2","b3","b4","ellipsis","m1","m2","m3","m4"],"input":null,"attribute":"leafCount","linkLength":120,"fontSize":10,"tooltip":false,"collapsed":true,"zoomable":true,"margin":{"top":20,"bottom":20,"left":85,"right":125},"fill":"lightsteelblue"}},"evals":[],"jsHooks":[]}</script>
+<div class="collapsibleTree html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-a0e2317d5e270eb855ff" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-a0e2317d5e270eb855ff">{"x":{"data":{"name":"Typical MCMC","children":[{"name":"Chain 1, Iteration 1","children":[{"name":"Chain 1, Iteration 2","children":[{"name":"...","children":[{"name":"Chain 1, Iteration n","children":[{"name":"Chain 2, Iteration 1","children":[{"name":"Chain 2, Iteration 2","children":[{"name":"...","children":[{"name":"Chain 2, Iteration n","children":[{"name":"...","children":[{"name":"Chain m, Iteration 1","children":[{"name":"Chain m, Iteration 2","children":[{"name":"...","children":[{"name":"Chain m, Iteration n"}]}]}]}]}]}]}]}]}]}]}]}]}]},"options":{"hierarchy":["a1","a2","a3","a4","b1","b2","b3","b4","ellipsis","m1","m2","m3","m4"],"input":null,"attribute":"leafCount","linkLength":120,"fontSize":10,"tooltip":false,"collapsed":true,"zoomable":true,"margin":{"top":20,"bottom":20,"left":85,"right":125},"fill":"lightsteelblue"}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </section>
 <section id="mcmc-with-parallel-chains" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="mcmc-with-parallel-chains"><span class="header-section-number">1.2</span> MCMC with Parallel Chains</h2>
 <p>Stan (along with many other softwares<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>) can automatically sample the chains in parallel:</p>
-<div class="cell" data-hash="Threading-for-Within-Chain-Parallelization_cache/html/collapsible-tree-parallel_073ca188d9be3a9d965b7ed0e9261128">
+<div class="cell">
 <div class="cell-output-display">
-<div id="htmlwidget-7df4ff5e1ac6c6509376" style="width:100%;height:464px;" class="collapsibleTree html-widget"></div>
-<script type="application/json" data-for="htmlwidget-7df4ff5e1ac6c6509376">{"x":{"data":{"name":"Parallel MCMC","children":[{"name":"Chain 1","children":[{"name":"Iteration 1","children":[{"name":"Iteration 2","children":[{"name":"...","children":[{"name":"Iteration n"}]}]}]}]},{"name":"Chain 2","children":[{"name":"Iteration 1","children":[{"name":"Iteration 2","children":[{"name":"...","children":[{"name":"Iteration n"}]}]}]}]},{"name":"Chain 3","children":[{"name":"Iteration 1","children":[{"name":"Iteration 2","children":[{"name":"...","children":[{"name":"Iteration n"}]}]}]}]},{"name":"Chain 4","children":[{"name":"Iteration 1","children":[{"name":"Iteration 2","children":[{"name":"...","children":[{"name":"Iteration n"}]}]}]}]}]},"options":{"hierarchy":["Chain","a1","a2","a3","a4"],"input":null,"attribute":"leafCount","linkLength":null,"fontSize":10,"tooltip":false,"collapsed":true,"zoomable":true,"margin":{"top":20,"bottom":20,"left":90,"right":80},"fill":"lightsteelblue"}},"evals":[],"jsHooks":[]}</script>
+<div class="collapsibleTree html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-270d0fbdbf30dbdb97e0" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-270d0fbdbf30dbdb97e0">{"x":{"data":{"name":"Parallel MCMC","children":[{"name":"Chain 1","children":[{"name":"Iteration 1","children":[{"name":"Iteration 2","children":[{"name":"...","children":[{"name":"Iteration n"}]}]}]}]},{"name":"Chain 2","children":[{"name":"Iteration 1","children":[{"name":"Iteration 2","children":[{"name":"...","children":[{"name":"Iteration n"}]}]}]}]},{"name":"Chain 3","children":[{"name":"Iteration 1","children":[{"name":"Iteration 2","children":[{"name":"...","children":[{"name":"Iteration n"}]}]}]}]},{"name":"Chain 4","children":[{"name":"Iteration 1","children":[{"name":"Iteration 2","children":[{"name":"...","children":[{"name":"Iteration n"}]}]}]}]}]},"options":{"hierarchy":["Chain","a1","a2","a3","a4"],"input":null,"attribute":"leafCount","linkLength":null,"fontSize":10,"tooltip":false,"collapsed":true,"zoomable":true,"margin":{"top":20,"bottom":20,"left":90,"right":80},"fill":"lightsteelblue"}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </section>
 <section id="within-chain-parallelization" class="level2" data-number="1.3">
 <h2 data-number="1.3" class="anchored" data-anchor-id="within-chain-parallelization"><span class="header-section-number">1.3</span> Within-Chain Parallelization</h2>
 <p>Within each iteration, we calculate the posterior density (up to a constant): <span class="math display">\[ \pi(\mathbf{\theta \, | \, \mathbf{y}}) \propto \mathcal{L}(\mathbf{\theta \, | \, \mathbf{y}})\,p(\mathbf{\theta})\]</span> where <span class="math inline">\(\mathcal{L(\cdot\,|\,\cdot)}\)</span> is the likelihood and <span class="math inline">\(p(\cdot)\)</span> is the prior. For us, we generally have <span class="math inline">\(n_{subj}\)</span> independent subjects, and so we can calculate the likelihood for each individual separately from the others<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>. Typically, the likelihood for each subject is calculated sequentially, but Stan has <a href="https://mc-stan.org/docs/stan-users-guide/parallelization.html">multiple methods</a> for parallelization. The <code>reduce_sum</code> function implemented in most of the Stan models on this website<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> uses <a href="https://en.wikipedia.org/wiki/Multithreading_(computer_architecture)">multi-threading</a> that allows the individual likelihoods to be calculated in parallel rather than sequentially:</p>
-<div class="cell" data-hash="Threading-for-Within-Chain-Parallelization_cache/html/collapsible-tree-within-iteration_573b733e1b6647348c7f08cbb6fa8a8a">
+<div class="cell">
 <div class="cell-output-display">
-<div id="htmlwidget-fd680a5ec9c4ab3a81c6" style="width:100%;height:464px;" class="collapsibleTree html-widget"></div>
-<script type="application/json" data-for="htmlwidget-fd680a5ec9c4ab3a81c6">{"x":{"data":{"name":"Iteration i","children":[{"name":"Standard MCMC","children":[{"name":"Posterior Density","children":[{"name":"Likelihood","children":[{"name":"Subject 1","children":[{"name":"Subject 2","children":[{"name":"Subject 3","children":[{"name":"..."}]}]}]}]},{"name":"Priors"}]}]},{"name":"Within-Chain Parallelization","children":[{"name":"Posterior Density","children":[{"name":"Likelihood","children":[{"name":"Subject 1"},{"name":"Subject 2"},{"name":"Subject 3..."}]},{"name":"Priors"}]}]}]},"options":{"hierarchy":["l2","l3","l4","l5","l6","l7","ellipsis"],"input":null,"attribute":"leafCount","linkLength":100,"fontSize":10,"tooltip":false,"collapsed":true,"zoomable":true,"margin":{"top":20,"bottom":20,"left":80,"right":40},"fill":"lightsteelblue"}},"evals":[],"jsHooks":[]}</script>
+<div class="collapsibleTree html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-f319c463f1ccd471bb0b" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-f319c463f1ccd471bb0b">{"x":{"data":{"name":"Iteration i","children":[{"name":"Standard MCMC","children":[{"name":"Posterior Density","children":[{"name":"Likelihood","children":[{"name":"Subject 1","children":[{"name":"Subject 2","children":[{"name":"Subject 3","children":[{"name":"..."}]}]}]}]},{"name":"Priors"}]}]},{"name":"Within-Chain Parallelization","children":[{"name":"Posterior Density","children":[{"name":"Likelihood","children":[{"name":"Subject 1"},{"name":"Subject 2"},{"name":"Subject 3..."}]},{"name":"Priors"}]}]}]},"options":{"hierarchy":["l2","l3","l4","l5","l6","l7","ellipsis"],"input":null,"attribute":"leafCount","linkLength":100,"fontSize":10,"tooltip":false,"collapsed":true,"zoomable":true,"margin":{"top":20,"bottom":20,"left":80,"right":40},"fill":"lightsteelblue"}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <p>This within-chain parallelization can lead to substantial speed-ups in computation time<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>.</p>
@@ -654,7 +706,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="2.1" class="anchored" data-anchor-id="completely-sequential-mcmc-1"><span class="header-section-number">2.1</span> Completely Sequential MCMC</h2>
 <p>Here is the implementation of the above model in R with completely sequential sampling:</p>
 <div class="scrolling_500">
-<div class="cell" data-hash="Threading-for-Within-Chain-Parallelization_cache/html/fit-completely-sequential_8b36156a44e1e96d68c2de78160c91ac">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>nonmem_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data/iv_1cmt_prop.csv"</span>),</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">na =</span> <span class="st">"."</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">show_col_types =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
@@ -735,14 +787,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-stdout">
 <pre><code>Running MCMC with 4 sequential chains...
 
-Chain 1 finished in 92.7 seconds.
-Chain 2 finished in 94.6 seconds.
-Chain 3 finished in 93.5 seconds.
-Chain 4 finished in 96.0 seconds.
+Chain 1 finished in 71.2 seconds.
+Chain 2 finished in 72.5 seconds.
+Chain 3 finished in 64.8 seconds.
+Chain 4 finished in 69.0 seconds.
 
 All 4 chains finished successfully.
-Mean chain execution time: 94.2 seconds.
-Total execution time: 377.2 seconds.</code></pre>
+Mean chain execution time: 69.4 seconds.
+Total execution time: 277.9 seconds.</code></pre>
 </div>
 </div>
 </div>
@@ -750,41 +802,41 @@ Total execution time: 377.2 seconds.</code></pre>
 <section id="mcmc-with-parallel-chains-1" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="mcmc-with-parallel-chains-1"><span class="header-section-number">2.2</span> MCMC with Parallel Chains</h2>
 <p>Here is the implementation of the above model in R with parallel chains:</p>
-<div class="scrolling_500">
-<div class="cell" data-hash="Threading-for-Within-Chain-Parallelization_cache/html/fit-parallel-chains_eaf5415a3b690b72f186c6adeb8fb3ff">
-<div class="sourceCode cell-code" id="annotated-cell-1"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a>fit_parallel_chains <span class="ot">&lt;-</span> <span class="fu">suppressMessages</span>(model_no_threading<span class="sc">$</span><span class="fu">sample</span>(</span>
-<span id="annotated-cell-1-2"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> stan_data,</span>
-<span id="annotated-cell-1-3"><a href="#annotated-cell-1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">112358</span>,</span>
-<span id="annotated-cell-1-4"><a href="#annotated-cell-1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1">1</button><span id="annotated-cell-1-5" class="code-annotation-target"><a href="#annotated-cell-1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">parallel_chains =</span> <span class="dv">4</span>,</span>
-<span id="annotated-cell-1-6"><a href="#annotated-cell-1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_warmup =</span> <span class="dv">500</span>,</span>
-<span id="annotated-cell-1-7"><a href="#annotated-cell-1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_sampling =</span> <span class="dv">1000</span>,</span>
-<span id="annotated-cell-1-8"><a href="#annotated-cell-1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">adapt_delta =</span> <span class="fl">0.8</span>,</span>
-<span id="annotated-cell-1-9"><a href="#annotated-cell-1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">refresh =</span> <span class="dv">0</span>,</span>
-<span id="annotated-cell-1-10"><a href="#annotated-cell-1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_treedepth =</span> <span class="dv">10</span>,</span>
-<span id="annotated-cell-1-11"><a href="#annotated-cell-1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">init =</span> <span class="cf">function</span>() <span class="fu">list</span>(<span class="at">TVCL =</span> <span class="fu">rlnorm</span>(<span class="dv">1</span>, <span class="fu">log</span>(<span class="fl">0.25</span>), <span class="fl">0.3</span>),</span>
-<span id="annotated-cell-1-12"><a href="#annotated-cell-1-12" aria-hidden="true" tabindex="-1"></a>                         <span class="at">TVVC =</span> <span class="fu">rlnorm</span>(<span class="dv">1</span>, <span class="fu">log</span>(<span class="dv">3</span>), <span class="fl">0.3</span>),</span>
-<span id="annotated-cell-1-13"><a href="#annotated-cell-1-13" aria-hidden="true" tabindex="-1"></a>                         <span class="at">omega =</span> <span class="fu">rlnorm</span>(<span class="dv">2</span>, <span class="fu">log</span>(<span class="fl">0.3</span>), <span class="fl">0.3</span>),</span>
-<span id="annotated-cell-1-14"><a href="#annotated-cell-1-14" aria-hidden="true" tabindex="-1"></a>                         <span class="at">sigma_p =</span> <span class="fu">rlnorm</span>(<span class="dv">1</span>, <span class="fu">log</span>(<span class="fl">0.2</span>), <span class="fl">0.3</span>))))</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="scrolling_700">
+<div class="cell">
+<div class="sourceCode cell-code" id="annotated-cell-5"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1" aria-hidden="true" tabindex="-1"></a>fit_parallel_chains <span class="ot">&lt;-</span> <span class="fu">suppressMessages</span>(model_no_threading<span class="sc">$</span><span class="fu">sample</span>(</span>
+<span id="annotated-cell-5-2"><a href="#annotated-cell-5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> stan_data,</span>
+<span id="annotated-cell-5-3"><a href="#annotated-cell-5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">112358</span>,</span>
+<span id="annotated-cell-5-4"><a href="#annotated-cell-5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1">1</button><span id="annotated-cell-5-5" class="code-annotation-target"><a href="#annotated-cell-5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">parallel_chains =</span> <span class="dv">4</span>,</span>
+<span id="annotated-cell-5-6"><a href="#annotated-cell-5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_warmup =</span> <span class="dv">500</span>,</span>
+<span id="annotated-cell-5-7"><a href="#annotated-cell-5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_sampling =</span> <span class="dv">1000</span>,</span>
+<span id="annotated-cell-5-8"><a href="#annotated-cell-5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">adapt_delta =</span> <span class="fl">0.8</span>,</span>
+<span id="annotated-cell-5-9"><a href="#annotated-cell-5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">refresh =</span> <span class="dv">0</span>,</span>
+<span id="annotated-cell-5-10"><a href="#annotated-cell-5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_treedepth =</span> <span class="dv">10</span>,</span>
+<span id="annotated-cell-5-11"><a href="#annotated-cell-5-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">init =</span> <span class="cf">function</span>() <span class="fu">list</span>(<span class="at">TVCL =</span> <span class="fu">rlnorm</span>(<span class="dv">1</span>, <span class="fu">log</span>(<span class="fl">0.25</span>), <span class="fl">0.3</span>),</span>
+<span id="annotated-cell-5-12"><a href="#annotated-cell-5-12" aria-hidden="true" tabindex="-1"></a>                         <span class="at">TVVC =</span> <span class="fu">rlnorm</span>(<span class="dv">1</span>, <span class="fu">log</span>(<span class="dv">3</span>), <span class="fl">0.3</span>),</span>
+<span id="annotated-cell-5-13"><a href="#annotated-cell-5-13" aria-hidden="true" tabindex="-1"></a>                         <span class="at">omega =</span> <span class="fu">rlnorm</span>(<span class="dv">2</span>, <span class="fu">log</span>(<span class="fl">0.3</span>), <span class="fl">0.3</span>),</span>
+<span id="annotated-cell-5-14"><a href="#annotated-cell-5-14" aria-hidden="true" tabindex="-1"></a>                         <span class="at">sigma_p =</span> <span class="fu">rlnorm</span>(<span class="dv">1</span>, <span class="fu">log</span>(<span class="fl">0.2</span>), <span class="fl">0.3</span>))))</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-annotation">
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
+<dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-annotation="1" data-code-lines="5" data-code-cell="annotated-cell-1">Notice <code>parallel_chains = 4</code>, where it was 1 before.</span>
+<span data-code-cell="annotated-cell-5" data-code-lines="5" data-code-annotation="1">Notice <code>parallel_chains = 4</code>, where it was 1 before.</span>
 </dd>
 </dl>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Running MCMC with 4 parallel chains...
 
-Chain 4 finished in 88.6 seconds.
-Chain 3 finished in 96.2 seconds.
-Chain 2 finished in 100.3 seconds.
-Chain 1 finished in 101.3 seconds.
+Chain 4 finished in 68.9 seconds.
+Chain 1 finished in 71.3 seconds.
+Chain 3 finished in 72.4 seconds.
+Chain 2 finished in 72.8 seconds.
 
 All 4 chains finished successfully.
-Mean chain execution time: 96.6 seconds.
-Total execution time: 101.4 seconds.</code></pre>
+Mean chain execution time: 71.4 seconds.
+Total execution time: 73.0 seconds.</code></pre>
 </div>
 </div>
 </div>
@@ -1062,14 +1114,14 @@ Total execution time: 101.4 seconds.</code></pre>
 </div>
 <p>Here is the implementation of this model in R with within-chain parallelization:</p>
 <div class="scrolling_700">
-<div class="cell" data-hash="Threading-for-Within-Chain-Parallelization_cache/html/fit-threading_dc7a838474d4df78abcf0ed9958b5774">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fit_threaded <span class="ot">&lt;-</span> <span class="fu">suppressMessages</span>(model_threaded<span class="sc">$</span><span class="fu">sample</span>(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> stan_data,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">112358</span>,</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">parallel_chains =</span> <span class="dv">4</span>,</span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># threads_per_chain = parallel::detectCores()/4,</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">threads_per_chain =</span> <span class="dv">2</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">threads_per_chain =</span> <span class="dv">4</span>,</span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_warmup =</span> <span class="dv">500</span>,</span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_sampling =</span> <span class="dv">1000</span>,</span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">adapt_delta =</span> <span class="fl">0.8</span>,</span>
@@ -1080,16 +1132,16 @@ Total execution time: 101.4 seconds.</code></pre>
 <span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                         <span class="at">omega =</span> <span class="fu">rlnorm</span>(<span class="dv">2</span>, <span class="fu">log</span>(<span class="fl">0.3</span>), <span class="fl">0.3</span>),</span>
 <span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>                         <span class="at">sigma_p =</span> <span class="fu">rlnorm</span>(<span class="dv">1</span>, <span class="fu">log</span>(<span class="fl">0.2</span>), <span class="fl">0.3</span>))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Running MCMC with 4 parallel chains, with 2 thread(s) per chain...
+<pre><code>Running MCMC with 4 parallel chains, with 4 thread(s) per chain...
 
-Chain 3 finished in 67.3 seconds.
-Chain 4 finished in 75.2 seconds.
-Chain 1 finished in 75.5 seconds.
-Chain 2 finished in 76.6 seconds.
+Chain 1 finished in 25.2 seconds.
+Chain 2 finished in 26.7 seconds.
+Chain 4 finished in 27.1 seconds.
+Chain 3 finished in 29.4 seconds.
 
 All 4 chains finished successfully.
-Mean chain execution time: 73.6 seconds.
-Total execution time: 76.8 seconds.</code></pre>
+Mean chain execution time: 27.1 seconds.
+Total execution time: 29.5 seconds.</code></pre>
 </div>
 </div>
 </div>
@@ -1102,10 +1154,21 @@ Total execution time: 76.8 seconds.</code></pre>
 <li><code>threads_per_chain</code> should be anywhere between 1 and <span class="math inline">\(\frac{parallel::detectCores()}{parallel\_chains}\)</span></li>
 </ol>
 <p>For example, if your machine has 32 cores, we recommend having 4 <code>chains</code>, 4 <code>parallel_chains</code>, and 8 <code>threads_per_chain</code>. This will make use of all the available cores. Using more <code>threads_per_chain</code> than this won’t be helpful in reducing execution time, since the available cores are already in use.</p>
+<section id="explanation-for-stan-code-implementation-of-within-chain-parallelization" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="explanation-for-stan-code-implementation-of-within-chain-parallelization"><span class="header-section-number">2.3.1</span> Explanation for Stan Code Implementation of Within-Chain Parallelization</h3>
+<p><code>sequence()</code>, <code>num_between()</code>, <code>find_between()</code>, and <code>find_between_vec()</code> are functions to help make sure correct observations are passed along with the subjects in a given slice.</p>
+<ul>
+<li><code>sequence(start, end)</code> creates a sequence of integers from <code>start</code> to <code>end</code> where <code>start</code> and <code>end</code> are integers, similarly to doing in R <code>seq(start, to, by = 1)</code>.</li>
+<li><code>num_between(lb, ub, y)</code> finds the number of elements of the integer array <span class="math inline">\(y\)</span> such that <span class="math inline">\(lb \leq y \leq ub\)</span>, similarly to doing in R <code>sum(y &gt;= lb &amp; y &lt;= ub)</code> or <code>sum(dplyr::between(y, lb, ub))</code>.</li>
+<li><code>find_between(lb, ub, y)</code> finds the elements of the integer array <span class="math inline">\(y\)</span> such that <span class="math inline">\(lb \leq y \leq ub\)</span>, similarly to doing in R <code>y[y &gt;= lb &amp; y &lt;= ub]</code>.</li>
+<li><code>find_between_vec(lb, ub, idx, y)</code> finds the elements of the vector <span class="math inline">\(y\)</span> whose index is <span class="math inline">\(\geq lb\)</span> and whose index is <span class="math inline">\(\leq ub\)</span>, similarly to doing in R <code>y[idx &gt;= lb &amp; idx &lt;= ub]</code></li>
+</ul>
+<p><code>partial_sum_lpmf()</code> is the function that is input into <code>reduce_sum()</code>. The output of this function is the log-likelihood for the subjects in a particular slice. For example, if we have 4 threads per chain and 12 subjects, the likelihood calculations might be sent in slices of 3 subjects to each of the 4 threads. Then the output for this function would be the likelihood for the 3 subjects in the slice. The <code>reduce_sum()</code> function then adds the results from each slice to get the full log-probability.</p>
 
 
 <!-- -->
 
+</section>
 </section>
 </section>
 
@@ -1256,10 +1319,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   if (showAllCode) {
     showAllCode.addEventListener("click", toggleCodeHandler(true));
   }
-  function tippyHover(el, contentFn) {
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -1269,8 +1331,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -1283,6 +1354,125 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -1326,6 +1516,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -1351,8 +1542,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
-      // Handle positioning of the toggle
-      window.addEventListener(
+        // Handle positioning of the toggle
+    window.addEventListener(
       "resize",
       throttle(() => {
         elRect = undefined;
@@ -1360,23 +1551,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
           selectCodeLines(selectedAnnoteEl);
         }
       }, 10)
-      );
-      function throttle(fn, ms) {
-      let throttle = false;
-      let timer;
-        return (...args) => {
-          if(!throttle) { // first call gets through
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
               fn.apply(this, args);
-              throttle = true;
-          } else { // all the others get throttled
-              if(timer) clearTimeout(timer); // cancel #2
-              timer = setTimeout(() => {
-                fn.apply(this, args);
-                timer = throttle = false;
-              }, ms);
-          }
-        };
-      }
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
       for (let i=0; i<annoteTargets.length; i++) {
         const annoteTarget = annoteTargets[i];
@@ -1421,7 +1612,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
               options: {
                 flipVariations: false, // true by default
                 allowedAutoPlacements: ['right'],
-                fallbackPlacements: ['right', 'top', 'top-start', 'top-end'],
+                fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
               },
             },
             {
@@ -1477,13 +1668,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../tutorials/Prior-Predictive-Check.html" class="pagination-link">
+      <a href="../tutorials/Prior-Predictive-Check.html" class="pagination-link  aria-label=" prior="" predictive="" check"="">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Prior Predictive Check</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../tutorials/Model-Diagnostics.html" class="pagination-link">
-        <span class="nav-page-text">Model Diagnostics</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../tutorials/Handling-Censored-Data.html" class="pagination-link" aria-label="Handling Censored Data">
+        <span class="nav-page-text">Handling Censored Data</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
@@ -1502,37 +1693,37 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="in">```{css, echo = FALSE}</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="op">.</span><span class="fu">scrolling_500</span> <span class="op">{</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  max<span class="op">-</span>height<span class="op">:</span> 500px<span class="op">;</span></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  overflow<span class="op">-</span>y<span class="op">:</span> auto<span class="op">;</span></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="in">.scrolling_500 {</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="in">  max-height: 500px;</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="in">  overflow-y: auto;</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
 <span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="op">.</span><span class="fu">scrolling_700</span> <span class="op">{</span></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  max<span class="op">-</span>height<span class="op">:</span> 700px<span class="op">;</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  overflow<span class="op">-</span>y<span class="op">:</span> auto<span class="op">;</span></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="in">.scrolling_700 {</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="in">  max-height: 700px;</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="in">  overflow-y: auto;</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
 <span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="in">```{r package-load}</span></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: package-load</span></span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: true</span></span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="in">#| label: package-load</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="in">#| include: true</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="in">#| warning: false</span></span>
 <span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(collapsibleTree)</span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="co"># library(kableExtra)</span></span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a><span class="co"># library(patchwork)</span></span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a><span class="co"># library(latex2exp)</span></span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a><span class="co"># library(bayesplot)</span></span>
-<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a><span class="co"># library(tidybayes)</span></span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a><span class="co"># library(loo)</span></span>
-<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a><span class="co"># library(posterior)</span></span>
-<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cmdstanr)</span>
-<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="in">library(collapsibleTree)</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="in"># library(kableExtra)</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a><span class="in"># library(patchwork)</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a><span class="in"># library(latex2exp)</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a><span class="in"># library(bayesplot)</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a><span class="in"># library(tidybayes)</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a><span class="in"># library(loo)</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a><span class="in"># library(posterior)</span></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a><span class="in">library(cmdstanr)</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidyverse)</span></span>
 <span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">16</span>, <span class="at">base_line_size =</span> <span class="dv">2</span>))</span>
-<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a><span class="fu">set_cmdstan_path</span>(<span class="st">"~/Torsten/cmdstan"</span>)</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a><span class="in">theme_set(theme_bw(base_size = 16, base_line_size = 2))</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a><span class="in">set_cmdstan_path("~/Torsten/cmdstan")</span></span>
 <span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a></span>
@@ -1555,25 +1746,25 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>interactive tree. Click on it):</span>
 <span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a><span class="in">```{r collapsible-tree-typical, cache=TRUE, echo=FALSE}</span></span>
-<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>typical_mcmc <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Main =</span> <span class="st">"MCMC"</span>,</span>
-<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>                       <span class="at">a1 =</span> <span class="st">"Chain 1, Iteration 1"</span>,</span>
-<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>                       <span class="at">a2 =</span> <span class="st">"Chain 1, Iteration 2"</span>,</span>
-<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>                       <span class="at">a3 =</span> <span class="st">"..."</span>,</span>
-<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>                       <span class="at">a4 =</span> <span class="st">"Chain 1, Iteration n"</span>,</span>
-<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>                       <span class="at">b1 =</span> <span class="st">"Chain 2, Iteration 1"</span>,</span>
-<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>                       <span class="at">b2 =</span> <span class="st">"Chain 2, Iteration 2"</span>,</span>
-<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>                       <span class="at">b3 =</span> <span class="st">"..."</span>,</span>
-<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>                       <span class="at">b4 =</span> <span class="st">"Chain 2, Iteration n"</span>,</span>
-<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>                       <span class="at">ellipsis =</span> <span class="st">"..."</span>,</span>
-<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>                       <span class="at">m1 =</span> <span class="st">"Chain m, Iteration 1"</span>,</span>
-<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>                       <span class="at">m2 =</span> <span class="st">"Chain m, Iteration 2"</span>,</span>
-<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>                       <span class="at">m3 =</span> <span class="st">"..."</span>,</span>
-<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>                       <span class="at">m4 =</span> <span class="st">"Chain m, Iteration n"</span>)</span>
-<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a><span class="fu">collapsibleTree</span>(typical_mcmc,</span>
-<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>                <span class="at">root =</span> <span class="st">"Typical MCMC"</span>,</span>
-<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a>                <span class="at">hierarchy =</span> <span class="fu">colnames</span>(typical_mcmc)[<span class="sc">-</span><span class="dv">1</span>],</span>
-<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapsed =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a>                <span class="at">linkLength =</span> <span class="dv">120</span>)</span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a><span class="in">typical_mcmc &lt;- tibble(Main = "MCMC",</span></span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a><span class="in">                       a1 = "Chain 1, Iteration 1",</span></span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a><span class="in">                       a2 = "Chain 1, Iteration 2",</span></span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a><span class="in">                       a3 = "...",</span></span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a><span class="in">                       a4 = "Chain 1, Iteration n",</span></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a><span class="in">                       b1 = "Chain 2, Iteration 1",</span></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a><span class="in">                       b2 = "Chain 2, Iteration 2",</span></span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a><span class="in">                       b3 = "...",</span></span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a><span class="in">                       b4 = "Chain 2, Iteration n",</span></span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a><span class="in">                       ellipsis = "...",</span></span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a><span class="in">                       m1 = "Chain m, Iteration 1",</span></span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a><span class="in">                       m2 = "Chain m, Iteration 2",</span></span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a><span class="in">                       m3 = "...",</span></span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a><span class="in">                       m4 = "Chain m, Iteration n")</span></span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a><span class="in">collapsibleTree(typical_mcmc,</span></span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a><span class="in">                root = "Typical MCMC",</span></span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a><span class="in">                hierarchy = colnames(typical_mcmc)[-1],</span></span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a><span class="in">                collapsed = TRUE,</span></span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a><span class="in">                linkLength = 120)</span></span>
 <span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a><span class="fu">## MCMC with Parallel Chains</span></span>
@@ -1583,16 +1774,16 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a>automatically sample the chains in parallel:</span>
 <span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a><span class="in">```{r collapsible-tree-parallel, cache=TRUE, echo=FALSE}</span></span>
-<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a>parallel_mcmc <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Main =</span> <span class="fu">rep</span>(<span class="st">"MCMC"</span>, <span class="dv">4</span>),</span>
-<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a>                        <span class="at">Chain =</span> <span class="fu">str_c</span>(<span class="st">"Chain "</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>),</span>
-<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a>                        <span class="at">a1 =</span> <span class="fu">rep</span>(<span class="st">"Iteration 1"</span>, <span class="dv">4</span>),</span>
-<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a>                        <span class="at">a2 =</span> <span class="fu">rep</span>(<span class="st">"Iteration 2"</span>, <span class="dv">4</span>),</span>
-<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a>                        <span class="at">a3 =</span> <span class="fu">rep</span>(<span class="st">"..."</span>, <span class="dv">4</span>),</span>
-<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a>                        <span class="at">a4 =</span> <span class="fu">rep</span>(<span class="st">"Iteration n"</span>, <span class="dv">4</span>))</span>
-<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a><span class="fu">collapsibleTree</span>(parallel_mcmc,</span>
-<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>                <span class="at">root =</span> <span class="st">"Parallel MCMC"</span>,</span>
-<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a>                <span class="at">hierarchy =</span> <span class="fu">colnames</span>(parallel_mcmc)[<span class="sc">-</span><span class="dv">1</span>],</span>
-<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapsed =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a><span class="in">parallel_mcmc &lt;- tibble(Main = rep("MCMC", 4),</span></span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a><span class="in">                        Chain = str_c("Chain ", 1:4),</span></span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a><span class="in">                        a1 = rep("Iteration 1", 4),</span></span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a><span class="in">                        a2 = rep("Iteration 2", 4),</span></span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a><span class="in">                        a3 = rep("...", 4),</span></span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a><span class="in">                        a4 = rep("Iteration n", 4))</span></span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a><span class="in">collapsibleTree(parallel_mcmc,</span></span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a><span class="in">                root = "Parallel MCMC",</span></span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a><span class="in">                hierarchy = colnames(parallel_mcmc)[-1],</span></span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a><span class="in">                collapsed = TRUE)</span></span>
 <span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a><span class="fu">## Within-Chain Parallelization</span></span>
@@ -1609,23 +1800,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a>sequentially:</span>
 <span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a><span class="in">```{r collapsible-tree-within-iteration, cache=TRUE, echo=FALSE}</span></span>
-<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a>within_iteration <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Main =</span> <span class="fu">rep</span>(<span class="st">"Iteration i"</span>, <span class="dv">6</span>),</span>
-<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a>                           <span class="at">l2 =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">"Standard MCMC"</span>, <span class="dv">2</span>),</span>
-<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">rep</span>(<span class="st">"Within-Chain Parallelization"</span>, <span class="dv">4</span>)),</span>
-<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a>                           <span class="at">l3 =</span> <span class="fu">rep</span>(<span class="st">"Posterior Density"</span>, <span class="dv">6</span>),</span>
-<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a>                           <span class="at">l4 =</span> <span class="fu">c</span>(<span class="st">"Likelihood"</span>, <span class="st">"Priors"</span>,</span>
-<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">rep</span>(<span class="st">"Likelihood"</span>, <span class="dv">3</span>), <span class="st">"Priors"</span>),</span>
-<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a>                           <span class="at">l5 =</span> <span class="fu">c</span>(<span class="st">"Subject 1"</span>, <span class="cn">NA_character_</span>,</span>
-<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">str_c</span>(<span class="st">"Subject "</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>), <span class="st">"Subject 3..."</span>,</span>
-<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a>                                  <span class="cn">NA_character_</span>),</span>
-<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a>                           <span class="at">l6 =</span> <span class="fu">c</span>(<span class="st">"Subject 2"</span>, <span class="fu">rep</span>(<span class="cn">NA_character_</span>, <span class="dv">5</span>)),</span>
-<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a>                           <span class="at">l7 =</span> <span class="fu">c</span>(<span class="st">"Subject 3"</span>, <span class="fu">rep</span>(<span class="cn">NA_character_</span>, <span class="dv">5</span>)),</span>
-<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a>                           <span class="at">ellipsis =</span> <span class="fu">c</span>(<span class="st">"..."</span>, <span class="fu">rep</span>(<span class="cn">NA_character_</span>, <span class="dv">5</span>)))</span>
-<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a><span class="fu">collapsibleTree</span>(within_iteration,</span>
-<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a>                <span class="at">root =</span> <span class="st">"Iteration i"</span>,</span>
-<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a>                <span class="at">hierarchy =</span> <span class="fu">colnames</span>(within_iteration)[<span class="sc">-</span><span class="dv">1</span>],</span>
-<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapsed =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a>                <span class="at">linkLength =</span> <span class="dv">100</span>)</span>
+<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a><span class="in">within_iteration &lt;- tibble(Main = rep("Iteration i", 6),</span></span>
+<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a><span class="in">                           l2 = c(rep("Standard MCMC", 2),</span></span>
+<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a><span class="in">                                  rep("Within-Chain Parallelization", 4)),</span></span>
+<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a><span class="in">                           l3 = rep("Posterior Density", 6),</span></span>
+<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a><span class="in">                           l4 = c("Likelihood", "Priors",</span></span>
+<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a><span class="in">                                  rep("Likelihood", 3), "Priors"),</span></span>
+<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a><span class="in">                           l5 = c("Subject 1", "",</span></span>
+<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a><span class="in">                                  str_c("Subject ", 1:2), "Subject 3...",</span></span>
+<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a><span class="in">                                  ""),</span></span>
+<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a><span class="in">                           l6 = c("Subject 2", rep("", 5)),</span></span>
+<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a><span class="in">                           l7 = c("Subject 3", rep("", 5)),</span></span>
+<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a><span class="in">                           ellipsis = c("...", rep("", 5)))</span></span>
+<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a><span class="in">collapsibleTree(within_iteration,</span></span>
+<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a><span class="in">                root = "Iteration i",</span></span>
+<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a><span class="in">                hierarchy = colnames(within_iteration)[-1],</span></span>
+<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a><span class="in">                collapsed = TRUE,</span></span>
+<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a><span class="in">                linkLength = 100)</span></span>
 <span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a><span class="ot">[^parallel-1]: </span>In Stan we actually calculate the *log-*posterior density (up to </span>
@@ -1843,7 +2034,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb9-358"><a href="#cb9-358" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
 <span id="cb9-359"><a href="#cb9-359" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-360"><a href="#cb9-360" aria-hidden="true" tabindex="-1"></a>model_no_threading <span class="ot">&lt;-</span> </span>
-<span id="cb9-361"><a href="#cb9-361" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cmdstan_model</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_1cmt_prop_no_threading.stan"</span>))</span>
+<span id="cb9-361"><a href="#cb9-361" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cmdstan_model</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"models/stan/iv_1cmt_prop_no_threading.stan"</span>)) </span>
 <span id="cb9-362"><a href="#cb9-362" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-363"><a href="#cb9-363" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb9-364"><a href="#cb9-364" aria-hidden="true" tabindex="-1"></a></span>
@@ -1945,7 +2136,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb9-462"><a href="#cb9-462" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-463"><a href="#cb9-463" aria-hidden="true" tabindex="-1"></a>Here is the implementation of the above model in R with parallel chains:</span>
 <span id="cb9-464"><a href="#cb9-464" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-465"><a href="#cb9-465" aria-hidden="true" tabindex="-1"></a>:::{.scrolling_500}</span>
+<span id="cb9-465"><a href="#cb9-465" aria-hidden="true" tabindex="-1"></a>:::{.scrolling_700}</span>
 <span id="cb9-466"><a href="#cb9-466" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-469"><a href="#cb9-469" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb9-470"><a href="#cb9-470" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fit-parallel-chains</span></span>
@@ -2282,7 +2473,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb9-807"><a href="#cb9-807" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
 <span id="cb9-808"><a href="#cb9-808" aria-hidden="true" tabindex="-1"></a>  <span class="at">parallel_chains =</span> <span class="dv">4</span>,</span>
 <span id="cb9-809"><a href="#cb9-809" aria-hidden="true" tabindex="-1"></a>  <span class="co"># threads_per_chain = parallel::detectCores()/4,</span></span>
-<span id="cb9-810"><a href="#cb9-810" aria-hidden="true" tabindex="-1"></a>  <span class="at">threads_per_chain =</span> <span class="dv">2</span>,</span>
+<span id="cb9-810"><a href="#cb9-810" aria-hidden="true" tabindex="-1"></a>  <span class="at">threads_per_chain =</span> <span class="dv">4</span>,</span>
 <span id="cb9-811"><a href="#cb9-811" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_warmup =</span> <span class="dv">500</span>,</span>
 <span id="cb9-812"><a href="#cb9-812" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_sampling =</span> <span class="dv">1000</span>,</span>
 <span id="cb9-813"><a href="#cb9-813" aria-hidden="true" tabindex="-1"></a>  <span class="at">adapt_delta =</span> <span class="fl">0.8</span>,</span>
@@ -2313,6 +2504,33 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb9-838"><a href="#cb9-838" aria-hidden="true" tabindex="-1"></a><span class="in">`parallel_chains`</span>, and 8 <span class="in">`threads_per_chain`</span>. This will make use of all the </span>
 <span id="cb9-839"><a href="#cb9-839" aria-hidden="true" tabindex="-1"></a>available cores. Using more <span class="in">`threads_per_chain`</span> than this won't be helpful in </span>
 <span id="cb9-840"><a href="#cb9-840" aria-hidden="true" tabindex="-1"></a>reducing execution time, since the available cores are already in use.</span>
+<span id="cb9-841"><a href="#cb9-841" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-842"><a href="#cb9-842" aria-hidden="true" tabindex="-1"></a><span class="fu">### Explanation for Stan Code Implementation of Within-Chain Parallelization</span></span>
+<span id="cb9-843"><a href="#cb9-843" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-844"><a href="#cb9-844" aria-hidden="true" tabindex="-1"></a>```sequence()<span class="in">```, ```</span>num_between()<span class="in">```, ```</span>find_between()```, and</span>
+<span id="cb9-845"><a href="#cb9-845" aria-hidden="true" tabindex="-1"></a>```find_between_vec()``` are functions to help make sure correct observations</span>
+<span id="cb9-846"><a href="#cb9-846" aria-hidden="true" tabindex="-1"></a>are passed along with the subjects in a given slice.</span>
+<span id="cb9-847"><a href="#cb9-847" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-848"><a href="#cb9-848" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>```sequence(start, end)``` creates a sequence of integers from ```start``` </span>
+<span id="cb9-849"><a href="#cb9-849" aria-hidden="true" tabindex="-1"></a>to ```end``` where ```start``` and ```end``` are integers, similarly to doing in</span>
+<span id="cb9-850"><a href="#cb9-850" aria-hidden="true" tabindex="-1"></a>R ```seq(start, to, by = 1)```.</span>
+<span id="cb9-851"><a href="#cb9-851" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>```num_between(lb, ub, y)``` finds the number of elements of the integer </span>
+<span id="cb9-852"><a href="#cb9-852" aria-hidden="true" tabindex="-1"></a>array $y$ such that $lb \leq y \leq ub$, similarly to doing in R </span>
+<span id="cb9-853"><a href="#cb9-853" aria-hidden="true" tabindex="-1"></a>```sum(y &gt;= lb &amp; y &lt;= ub)``` or ```sum(dplyr::between(y, lb, ub))```.</span>
+<span id="cb9-854"><a href="#cb9-854" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>```find_between(lb, ub, y)``` finds the elements of the integer array $y$ such</span>
+<span id="cb9-855"><a href="#cb9-855" aria-hidden="true" tabindex="-1"></a>that $lb \leq y \leq ub$, similarly to doing in R ```y<span class="co">[</span><span class="ot">y &gt;= lb &amp; y &lt;= ub</span><span class="co">]</span>```.</span>
+<span id="cb9-856"><a href="#cb9-856" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>```find_between_vec(lb, ub, idx, y)``` finds the elements of the vector $y$ </span>
+<span id="cb9-857"><a href="#cb9-857" aria-hidden="true" tabindex="-1"></a>whose index is $\geq lb$ and whose index is $\leq ub$, similarly to doing in R</span>
+<span id="cb9-858"><a href="#cb9-858" aria-hidden="true" tabindex="-1"></a>```y<span class="co">[</span><span class="ot">idx &gt;= lb &amp; idx &lt;= ub</span><span class="co">]</span>```</span>
+<span id="cb9-859"><a href="#cb9-859" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-860"><a href="#cb9-860" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-861"><a href="#cb9-861" aria-hidden="true" tabindex="-1"></a>```partial_sum_lpmf()``` is the function that is input into ```reduce_sum()```.</span>
+<span id="cb9-862"><a href="#cb9-862" aria-hidden="true" tabindex="-1"></a>The output of this function is the log-likelihood for the subjects in a</span>
+<span id="cb9-863"><a href="#cb9-863" aria-hidden="true" tabindex="-1"></a>particular slice. For example, if we have 4 threads per chain and 12 subjects,</span>
+<span id="cb9-864"><a href="#cb9-864" aria-hidden="true" tabindex="-1"></a>the likelihood calculations might be sent in slices of 3 subjects to each of the</span>
+<span id="cb9-865"><a href="#cb9-865" aria-hidden="true" tabindex="-1"></a>4 threads. Then the output for this function would be the likelihood for the 3</span>
+<span id="cb9-866"><a href="#cb9-866" aria-hidden="true" tabindex="-1"></a>subjects in the slice. The ```reduce_sum()``` function then adds the results</span>
+<span id="cb9-867"><a href="#cb9-867" aria-hidden="true" tabindex="-1"></a>from each slice to get the full log-probability.</span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
@@ -2337,9 +2555,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     <div class="nav-footer-center">
       &nbsp;
     </div>
-    <div class="nav-footer-right">© GNU GPL v3.0</div>
+    <div class="nav-footer-right">
+<p>© GNU GPL v3.0</p>
+</div>
   </div>
 </footer>
+
 
 
 

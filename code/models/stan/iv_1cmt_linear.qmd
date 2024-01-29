@@ -1,0 +1,395 @@
+---
+title: "One-Compartment IV Infusion"
+format:
+  html:
+    code-fold: false  
+    code-summary: "Code"
+    code-tools: true
+    number-sections: true
+    toc-depth: 5
+editor_options: 
+  chunk_output_type: console
+---
+
+```{css, echo = FALSE}
+.scrolling_500 {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.scrolling_700 {
+  max-height: 700px;
+  overflow-y: auto;
+}
+
+.cell-output {
+  background-color: WhiteSmoke;
+  border-radius: 4px;
+}
+
+.gap-1cm { 
+	width: 100%; 
+	height: 1cm; 
+}
+
+.gap-2cm { 
+	width: 100%; 
+	height: 2cm; 
+}
+
+.gap-3cm { 
+	width: 100%; 
+	height: 3cm; 
+}
+
+.gap-3_5cm { 
+	width: 100%; 
+	height: 3.5cm; 
+}
+
+.gap-4cm { 
+	width: 100%; 
+	height: 4cm; 
+}
+
+.gap-8cm { 
+	width: 100%; 
+	height: 8cm; 
+}
+```
+
+Here, we write down the PK model for a one-compartment model with IV infusion 
+and linear elimination. We also write down the statistical model for multiple 
+error models. The Stan models are free to download using the corresponding 
+download buttons. 
+
+# PK Model
+
+The data-generating model is 
+$$C_{ij} = f(\mathbf{\theta}_i, t_{ij}) + error$$
+where $error$ can be
+
+*  additive: $C_{ij} = f(\mathbf{\theta}_i, t_{ij}) + \epsilon_{a_{ij}}$
+*  proportional: $C_{ij} = f(\mathbf{\theta}_i, t_{ij})*\left( 1 + \epsilon_{p_{ij}} \right)$
+*  proportional-plus-additive: $C_{ij} = f(\mathbf{\theta}_i, t_{ij})*\left( 1 + \epsilon_{p_{ij}} \right) + \epsilon_{a_{ij}}$
+*  lognormal: $C_{ij} = f(\mathbf{\theta}_i, t_{ij})*e^{\epsilon_{ij}}$
+
+where $\mathbf{\theta}_i = \left[CL_i, \, V_{c_i}\right]^\top$
+is a vector containing the individual parameters for individual $i$[^foo-1], 
+$f(\cdot, \cdot)$ is the one-compartment model mean function seen [here](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/PFIM3.2.2/PFIM_PKPD_library.pdf?root=pkpd), and $\epsilon_p, \epsilon_a,$ and $\epsilon$ are normally distributed. The
+corresponding system of ODEs is:
+
+[^foo-1]: These parameters are the macro-parameterization of this model - 
+clearance and central compartment volume, respectively. I have chosen to use 
+$V_c$ for **c**entral compartment volume rather than $V_1$ or simply $V$ to 
+reduce any confusion about the numbering or notation.
+
+$$\begin{align}
+\frac{dA_c}{dt} &= -\left(\frac{CL}{V_c}\right)A_C + rate_{in} \notag \\
+\end{align}$$ {#eq-1cmt-macro-genode-no-depot}
+
+and then $C = \frac{A_c}{V_c}$[^foo-2].
+
+[^foo-2]: For this model, the matrix-exponential is faster than the 
+analytical solution with Torsten, so I've written the Stan models to use the 
+linear ODE solution. Therefore, since this is purely IV, I've written the ODE
+with one compartment. If you want to use Torsten's analytical solution, you 
+would write the ODEs as
+$$\begin{align}
+\frac{dA_d}{dt} &= -K_a*A_d \notag \\
+\frac{dA_c}{dt} &= K_a*A_d - \left(\frac{CL}{V_c}\right)A_C + rate_{in} \notag \\
+\end{align}$$ {#eq-1cmt-macro-genode-with-depot}
+You'll notice that this is written as if there is first-order absorption. This 
+is to emphasize that the central compartment is the second compartment in 
+the setup for Torsten's analytical solver, and you would have to make sure 
+$CMT = 2$ for the dosing and observation records. Since there is no absorption, 
+we just leave it out of our model and set it to 0 when using Torsten's 
+analytical solver.
+
+# Statistical Model {#sec-statistical-model}
+
+I'll model the *correlation matrix* $R_{\Omega}$ and *standard deviations* 
+($\omega_p$) of the random effects rather than the covariance matrix $\Omega$ 
+that is the more traditional method. 
+
+\begin{align}
+\Omega &=
+\begin{pmatrix}
+\omega^2_{CL} & \omega_{CL, V_c} \\
+\omega_{CL, V_c} & \omega^2_{V_c}  \\
+\end{pmatrix} \\
+&= \begin{pmatrix}
+\omega_{CL} & 0 \\
+0 & \omega_{V_c} \\
+\end{pmatrix} \mathbf{R_{\Omega}}
+\begin{pmatrix}
+\omega_{CL} & 0 \\
+0 & \omega_{V_c} \\
+\end{pmatrix} \\
+&= \begin{pmatrix}
+\omega_{CL} & 0 \\
+0 & \omega_{V_c} \\
+\end{pmatrix}
+\begin{pmatrix}
+1 & \rho_{CL, V_c} \\
+\rho_{CL, V_c} & 1 \\
+\end{pmatrix}
+\begin{pmatrix}
+\omega_{CL} & 0 \\
+0 & \omega_{V_c} \\
+\end{pmatrix}
+\end{align} 
+
+When the random effects are modeled this way, we get all of the same information
+as if they were modeled with a full covariance matrix, *i.e.*, we can transform
+the standard deviations and correlation matrix into the covariance matrix if we 
+want. In addition, standard deviations and correlations are more interpretable
+than variances and covariances. It's also much easier to set a prior 
+distribution on the standard deviations and the correlation matrix with an 
+[LKJ](https://en.wikipedia.org/wiki/Lewandowski-Kurowicka-Joe_distribution) 
+distribution than it is to set a prior on a covariance matrix with an 
+[inverse-Wishart](https://en.wikipedia.org/wiki/Inverse-Wishart_distribution)
+distribution.
+
+
+The full statistical model is 
+
+
+::: panel-tabset
+## Proportional Error Model
+
+\begin{align}
+C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \sigma_p
+&\sim Normal\left( f(\mathbf{\theta}_i, t_{ij}), \; \sigma_{ij} \right)
+I(C_{ij} > 0) \notag \\
+\mathbf{\eta}_i \; | \; \Omega &\sim Normal\left(
+\begin{pmatrix}
+0 \\ 0 \\ 0 \\ 0 \\
+\end{pmatrix}
+, \; \Omega\right) \notag \\
+TVCL &\sim Lognormal\left(log\left(location_{TVCL}\right), scale_{TVCL}\right) \notag \\
+TVVC &\sim Lognormal\left(log\left(location_{TVVC}\right), scale_{TVVC}\right) \notag \\
+\omega_{CL} &\sim Half-Normal(0, scale_{\omega_{CL}}) \notag \\
+\omega_{V_c} &\sim Half-Normal(0, scale_{\omega_{V_c}}) \notag \\
+R_{\Omega} &\sim LKJ(df_{R_{\Omega}}) \notag \\
+\sigma_p &\sim Half-Normal(0, scale_{\sigma_p}) \\
+\end{align}
+
+where 
+\begin{align}
+\mathbf{TV} &=
+\begin{pmatrix}
+TVCL \\ TVVC \\
+\end{pmatrix} \\
+\mathbf{\theta}_i &=
+\begin{pmatrix}
+CL_i \\ V_{c_i} \\
+\end{pmatrix} =
+\begin{pmatrix}
+TVCL \times e^{\eta_{CL_i}} \\ TVVC \times e^{\eta_{V_{c_i}}} \\
+\end{pmatrix} \\
+\mathbf{\eta}_i &=
+\begin{pmatrix}
+\eta_{CL_i} \\ \eta_{V_{c_i}} \\
+\end{pmatrix} \\
+\sigma_{ij} &= f(\mathbf{\theta}_i, t_{ij})\sigma_p  \\
+\end{align}
+
+Note: The indicator for $C_{ij} | \ldots$ indicates that we are truncating the 
+distribution of the observed concentrations to be greater than 0.
+
+
+## Proportional-plus-Additive Error Model
+
+\begin{align}
+C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \mathbf{\Sigma}
+&\sim Normal\left( f(\mathbf{\theta}_i, t_{ij}), \; \sigma_{ij} \right)
+I(C_{ij} > 0) \notag \\
+\mathbf{\eta}_i \; | \; \Omega &\sim Normal\left(
+\begin{pmatrix}
+0 \\ 0 \\ 0 \\ 0 \\
+\end{pmatrix}
+, \; \Omega\right) \notag \\
+TVCL &\sim Lognormal\left(log\left(location_{TVCL}\right), scale_{TVCL}\right) \notag \\
+TVVC &\sim Lognormal\left(log\left(location_{TVVC}\right), scale_{TVVC}\right) \notag \\
+\omega_{CL} &\sim Half-Normal(0, scale_{\omega_{CL}}) \notag \\
+\omega_{V_c} &\sim Half-Normal(0, scale_{\omega_{V_c}}) \notag \\
+R_{\Omega} &\sim LKJ(df_{R_{\Omega}}) \notag \\
+\sigma_p &\sim Half-Normal(0, scale_{\sigma_p}) \\
+\sigma_a &\sim Half-Normal(0, scale_{\sigma_a}) \\
+R_{\Sigma} &\sim LKJ(df_{R_{\Sigma}}) \notag \\
+\end{align}
+
+where 
+\begin{align}
+\mathbf{TV} &=
+\begin{pmatrix}
+TVCL \\ TVVC \\
+\end{pmatrix} \\
+\mathbf{\theta}_i &=
+\begin{pmatrix}
+CL_i \\ V_{c_i} \\
+\end{pmatrix} =
+\begin{pmatrix}
+TVCL \times e^{\eta_{CL_i}} \\ TVVC \times e^{\eta_{V_{c_i}}} \\
+\end{pmatrix} \\
+\mathbf{\eta}_i &=
+\begin{pmatrix}
+\eta_{CL_i} \\ \eta_{V_{c_i}} \\
+\end{pmatrix} \\
+\mathbf{\Sigma} &=
+\begin{pmatrix}
+\sigma^2_{p} & \rho_{p,a}\sigma_{p}\sigma_{a} \\
+\rho_{p,a}\sigma_{p}\sigma_{a} & \sigma^2_{z} \\
+\end{pmatrix} \\
+\sigma_{ij} &= \sqrt{f(\mathbf{\theta}_i, t_{ij})^2\sigma^2_p + \sigma^2_a + 2f(\mathbf{\theta}_i, t_{ij})\rho_{p,a}\sigma_{p}\sigma_{a}} \\
+\end{align}
+
+Note: The indicator for $C_{ij} | \ldots$ indicates that we are truncating the 
+distribution of the observed concentrations to be greater than 0.
+
+## Lognormal Error
+
+\begin{align}
+C_{ij} \mid \mathbf{TV}, \; \mathbf{\eta}_i, \; \mathbf{\Omega}, \; \sigma
+&\sim Lognormal\left( log\left(f(\mathbf{\theta}_i, t_{ij})\right), \; \sigma \right)
+\notag \\
+\mathbf{\eta}_i \; | \; \Omega &\sim Normal\left(
+\begin{pmatrix}
+0 \\ 0 \\ 0 \\ 0 \\
+\end{pmatrix}
+, \; \Omega\right) \notag \\
+TVCL &\sim Lognormal\left(log\left(location_{TVCL}\right), scale_{TVCL}\right) \notag \\
+TVVC &\sim Lognormal\left(log\left(location_{TVVC}\right), scale_{TVVC}\right) \notag \\
+\omega_{CL} &\sim Half-Normal(0, scale_{\omega_{CL}}) \notag \\
+\omega_{V_c} &\sim Half-Normal(0, scale_{\omega_{V_c}}) \notag \\
+R_{\Omega} &\sim LKJ(df_{R_{\Omega}}) \notag \\
+\sigma &\sim Half-Normal(0, scale_{\sigma}) \\
+\end{align}
+
+where 
+\begin{align}
+\mathbf{TV} &=
+\begin{pmatrix}
+TVCL \\ TVVC \\ 
+\end{pmatrix} \\
+\mathbf{\theta}_i &=
+\begin{pmatrix}
+CL_i \\ V_{c_i} \\ 
+\end{pmatrix} =
+\begin{pmatrix}
+TVCL \times e^{\eta_{CL_i}} \\ TVVC \times e^{\eta_{V_{c_i}}} \\
+\end{pmatrix} \\
+\mathbf{\eta}_i &=
+\begin{pmatrix}
+\eta_{CL_i} \\ \eta_{V_{c_i}} \\
+\end{pmatrix} \\
+\end{align}
+
+
+:::
+
+
+# Stan Code
+
+## Proportional Error
+
+```{r}
+#| echo: false
+
+downloadthis::download_file(
+  path = here::here("models/stan/iv_1cmt_prop.stan"),
+  output_name = "iv_1cmt_prop",
+  button_label = "Download 1-cmt IV with proportional error",
+  button_type = "default",
+  has_icon = TRUE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+
+```
+
+::::{.scrolling_700}
+
+:::{.cell-output}
+
+```{r}
+#| echo: false
+#| output: true
+
+readLines(here::here("models/stan/iv_1cmt_prop.stan")) |>
+  writeLines()
+
+```
+
+:::
+
+::::
+
+## Proportional-Plus-Additive Error
+
+```{r}
+#| echo: false
+
+downloadthis::download_file(
+  path = here::here("models/stan/iv_1cmt_ppa.stan"),
+  output_name = "iv_1cmt_ppa",
+  button_label = "Download 1-cmt IV with proportional-plus-additive error",
+  button_type = "default",
+  has_icon = TRUE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+
+```
+
+::::{.scrolling_700}
+
+:::{.cell-output}
+
+```{r}
+#| echo: false
+#| output: true
+
+readLines(here::here("models/stan/iv_1cmt_ppa.stan")) |>
+  writeLines()
+
+```
+
+:::
+
+::::
+
+## Lognormal Error
+
+```{r}
+#| echo: false
+
+downloadthis::download_file(
+  path = here::here("models/stan/iv_1cmt_exp.stan"),
+  output_name = "iv_1cmt_exp",
+  button_label = "Download 1-cmt IV with lognormal error",
+  button_type = "default",
+  has_icon = TRUE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+
+```
+
+::::{.scrolling_700}
+
+:::{.cell-output}
+
+```{r}
+#| echo: false
+#| output: true
+
+readLines(here::here("models/stan/iv_1cmt_exp.stan")) |>
+  writeLines()
+
+```
+
+:::
+
+::::

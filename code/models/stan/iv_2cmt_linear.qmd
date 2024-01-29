@@ -26,6 +26,36 @@ editor_options:
   background-color: WhiteSmoke;
   border-radius: 4px;
 }
+
+.gap-1cm { 
+	width: 100%; 
+	height: 1cm; 
+}
+
+.gap-2cm { 
+	width: 100%; 
+	height: 2cm; 
+}
+
+.gap-3cm { 
+	width: 100%; 
+	height: 3cm; 
+}
+
+.gap-3_5cm { 
+	width: 100%; 
+	height: 3.5cm; 
+}
+
+.gap-4cm { 
+	width: 100%; 
+	height: 4cm; 
+}
+
+.gap-8cm { 
+	width: 100%; 
+	height: 8cm; 
+}
 ```
 
 Here, we write down the PK model for a two-compartment model with IV infusion 
@@ -67,8 +97,8 @@ and then $C = \frac{A_c}{V_c}$[^poppk-5].
 [^poppk-5]: For this model, the matrix-exponential is faster than the 
 analytical solution with Torsten, so I've written the Stan models to use the 
 linear ODE solution. Therefore, since this is purely IV, I've written the ODEs
-with two compartments. If you want to use the analytical solution, you would 
-write the ODEs as
+with two compartments. If you want to use Torsten's analytical solution, you 
+would write the ODEs as
 $$\begin{align}
 \frac{dA_d}{dt} &= -K_a*A_d \notag \\
 \frac{dA_c}{dt} &= K_a*A_d - \left(\frac{CL}{V_c} + \frac{Q}{V_c}\right)A_C + \frac{Q}{V_p}A_p + rate_{in} \notag \\
@@ -76,9 +106,10 @@ $$\begin{align}
 \end{align}$$ {#eq-2cmt-macro-genode-with-depot}
 You'll notice that this is written as if there is first-order absorption. This 
 is to emphasize that the central compartment is the second compartment in 
-Torsten's setup, and you would have to make sure $CMT = 2$ for the dosing and 
-observation records. Since there is no absorption, we just leave it out of our 
-model and set it to 0 when using Torsten's analytical solver.
+the setup for Torsten's analytical solver, and you would have to make sure 
+$CMT = 2$ for the dosing and observation records. Since there is no absorption, 
+we just leave it out of our model and set it to 0 when using Torsten's 
+analytical solver.
 
 # Statistical Model {#sec-statistical-model}
 
@@ -182,7 +213,7 @@ TVCL \times e^{\eta_{CL_i}} \\ TVVC \times e^{\eta_{V_{c_i}}} \\ TVQ \times e^{\
 \begin{pmatrix}
 \eta_{CL_i} \\ \eta_{V_{c_i}} \\ \eta_{Q_i} \\ \eta_{V_{p_i}} \\
 \end{pmatrix} \\
-\sigma_{ij} &= f(\mathbf{\theta}_i, t_{ij})\sigma^2_p  \\
+\sigma_{ij} &= f(\mathbf{\theta}_i, t_{ij})\sigma_p  \\
 \end{align}
 
 Note: The indicator for $C_{ij} | \ldots$ indicates that we are truncating the 
@@ -309,10 +340,6 @@ downloadthis::download_file(
 
 ::::{.scrolling_700}
 
-::: {.columns}
-
-::: {.column width="50%"}
-
 :::{.cell-output}
 
 ```{r}
@@ -323,31 +350,6 @@ readLines(here::here("models/stan/iv_2cmt_prop.stan")) |>
   writeLines()
 
 ```
-
-:::
-
-:::
-
-::: {.column width="50%"}
-
-Create a sequence of integers from ```start``` to ```end```, similarly to doing
-in R ```seq(start, to, by = 1)```, where ```start``` and ```end``` are integers. 
-
-Find the number of elements of the integer array $y$ such that 
-$lb \leq y \leq ub$, similarly to doing in R ```sum(y >= 4 & y <= 6)``` or ```sum(dplyr::between(y, 4, 6))```.
-
-Find the elements of the integer array $y$ such that $lb \leq y \leq ub$, 
-similarly to doing in R ```y[y >= 4 & y <= 6]```.
-
-Find the elements of the vector $y$ whose index is $\geq lb$ and whose index is 
-$\leq ub$, similarly to doing in R ```y[idx >= 4 & idx <= 6]```
-
-Generate a random number from a normal distribution that is truncated below at
-```lb``` (often this is 0).
-
-in @sec-statistical-model
-
-:::
 
 :::
 
