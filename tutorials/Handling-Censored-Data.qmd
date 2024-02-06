@@ -1,0 +1,326 @@
+---
+title: "Handling Censored Data"
+format:
+  html:
+    code-fold: false  
+    code-summary: "Code"
+    code-tools: true
+    number-sections: true
+    toc-depth: 5
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| label: package-load
+#| include: true
+#| message: false
+#| warning: false
+#| echo: false
+
+# library(kableExtra)
+# library(patchwork)
+# library(plotly)
+# library(latex2exp)
+# library(magick)
+# library(gganimate)
+# library(bayesplot)
+# library(tidybayes)
+# library(loo)
+# library(posterior)
+# library(cmdstanr)
+library(tidyverse)
+
+theme_set(theme_bw(base_size = 16, base_line_size = 2))
+# register_knitr_engine()
+
+```
+
+```{css, echo = FALSE}
+.scrolling_500 {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.scrolling_700 {
+  max-height: 700px;
+  overflow-y: auto;
+}
+```
+
+# Data Below the Limit of Quantification
+
+Oftentimes, we have observations that are below the limit of quantification 
+(BLOQ), meaning that the assay has only been validated down to a certain value, 
+(the lower limit of quantification, LLOQ). A 
+[paper by Stuart Beal](https://link.springer.com/content/pdf/10.1023/A:1012299115260.pdf) 
+goes through 7 methods of handling this BLOQ data in NONMEM. While in my 
+experience M1 (dropping any BLOQ values completely) and M5 (replace BLOQ values 
+with $LLOQ/2$) are the most common in the pharmacometrics world, M3 (treat the 
+BLOQ values as left-censored data) and M4 (treat the BLOQ values as 
+left-censored data and truncated below at 0) are more technically correct and 
+tend to produce better results.
+
+## Treat the BLOQ values as Left-Censored Data (M3) {#m3-model}
+
+Instead of tossing out the BLOQ data (M1) or assigning them some arbitrary value
+(M5-M7), we should keep them in the data set and treat them as left-censored 
+data. This means that the likelihood contribution for observation $c_{ij}$ is 
+calculated differently for observed values than for BLOQ values:
+
+\begin{align}
+\mbox{observed data} &- f\left(c_{ij} \, | \, \theta_i, \sigma, t_{ij} \right) \notag \\
+\mbox{BLOQ data} &- F\left(LLOQ \, | \, \theta_i, \sigma, t_{ij} \right) \notag \\
+\end{align}
+
+where $f\left(c_{ij} \, | \, \theta_i, \sigma, t_{ij} \right)$ is the density 
+(pdf) and 
+$F\left(LLOQ \, | \, \theta_i, \sigma, t_{ij} \right) = P\left(c_{ij} \leq LLOQ\, | \, \theta_i, \sigma, t_{ij} \right)$ is the cumulative distribution function (cdf).
+
+### Stan Code Example
+
+This example shows the code within a function that implements 
+[within-chain parallelization](Threading-for-Within-Chain-Parallelization.qmd).
+The relevant lines here for calculating the likelihood are lines 69-73:
+
+::::{.scrolling_500}
+
+```{.verbatim code-line-numbers="true"}
+real partial_sum_lpmf(array[] int seq_subj, int start, int end,
+                      vector dv_obs, array[] int dv_obs_id, array[] int i_obs,
+                      array[] real amt, array[] int cmt, array[] int evid, 
+                      array[] real time, array[] real rate, array[] real ii, 
+                      array[] int addl, array[] int ss,
+                      array[] int subj_start, array[] int subj_end, 
+                      vector CL, vector VC, vector Q, vector VP, 
+                      real sigma_sq_p, real sigma_sq_a, real sigma_p_a, 
+                      vector lloq, array[] int bloq,
+                      int n_random, int n_subjects, int n_total,
+                      array[] real bioav, array[] real tlag, int n_cmt){
+                           
+  real ptarget = 0;
+                              
+  int N = end - start + 1;    // number of subjects in this slice  
+  vector[n_total] dv_ipred;   
+  matrix[n_total, n_cmt] x_ipred;
+  
+  int n_obs_slice = num_between(subj_start[start], subj_end[end], i_obs);
+  array[n_obs_slice] int i_obs_slice = find_between(subj_start[start], 
+                                                    subj_end[end], i_obs);
+                                              
+  vector[n_obs_slice] dv_obs_slice = find_between_vec(start, end, 
+                                                      dv_obs_id, dv_obs);
+  
+  vector[n_obs_slice] ipred_slice;
+    
+  vector[n_obs_slice] lloq_slice = lloq[i_obs_slice];
+  array[n_obs_slice] int bloq_slice = bloq[i_obs_slice];
+    
+    
+  for(n in 1:N){            // loop over subjects in this slice
+    
+    int j = n + start - 1; // j is the ID of the current subject
+        
+    real ke = CL[j]/VC[j];
+    real k_cp = Q[j]/VC[j];
+    real k_pc = Q[j]/VP[j];
+        
+    matrix[n_cmt, n_cmt] K = rep_matrix(0, n_cmt, n_cmt);
+    K[1, 1] = -(ke + k_cp);
+    K[1, 2] = k_pc;
+    K[2, 1] = k_cp;
+    K[2, 2] = -k_pc;
+      
+    x_ipred[subj_start[j]:subj_end[j], ] =
+      pmx_solve_linode(time[subj_start[j]:subj_end[j]],
+                       amt[subj_start[j]:subj_end[j]],
+                       rate[subj_start[j]:subj_end[j]],
+                       ii[subj_start[j]:subj_end[j]],
+                       evid[subj_start[j]:subj_end[j]],
+                       cmt[subj_start[j]:subj_end[j]],
+                       addl[subj_start[j]:subj_end[j]],
+                       ss[subj_start[j]:subj_end[j]],
+                       K, bioav, tlag)';
+                      
+    dv_ipred[subj_start[j]:subj_end[j]] = 
+      x_ipred[subj_start[j]:subj_end[j], 1] ./ VC[j];
+    
+  }
+  
+  ipred_slice = dv_ipred[i_obs_slice];
+    
+  for(i in 1:n_obs_slice){
+    real ipred_tmp = ipred_slice[i];
+    real sigma_tmp = sqrt(square(ipred_tmp) * sigma_sq_p + sigma_sq_a + 
+                          2*ipred_tmp*sigma_p_a);
+      
+    if(bloq_slice[i] == 1){
+        ptarget += normal_lcdf(lloq_slice[i] | ipred_slice[i], sigma_tmp);
+      }else{
+        ptarget += normal_lpdf(dv_obs_slice[i] | ipred_slice[i], sigma_tmp);
+    }
+      
+  }                                         
+                              
+  return ptarget;
+                           
+}
+
+```
+
+::::
+
+These lines implement the math (on the log scale, since Stan calculates the 
+*log-posterior*). 
+
+\begin{align}
+\mathtt{normal\_lcdf(x)} &= log(F(x)), \notag \\
+\mathtt{normal\_lpdf(x)} &= log(f(x)) \notag \\
+\end{align}
+
+where $f(\cdot)$ and $F(\cdot)$ are the normal density and cumulative 
+distribution functions, respectively^[For more information, see the Stan 
+documentation for 
+[normal_lcdf()](https://mc-stan.org/docs/functions-reference/normal-distribution.html),
+and [normal_lpdf()](https://mc-stan.org/docs/functions-reference/normal-distribution.html).].
+
+
+## Treat the BLOQ values as Left-Censored Data and Truncated Below at 0 (M4) {#sec-m4-model}
+
+We know that drug concentrations cannot be $< 0$, but the normal distribution 
+has support over ($-\infty, \, \infty$)[^poppk-15], so we will assume a normal 
+distribution *truncated below at 0.* This will have the effect of limiting the 
+support of our assumed distribution to $(0, \, \infty)$. Since we're assuming a 
+truncated distribution, we need to adjust the likelihood contributions of our 
+data[^poppk-16]: 
+\begin{align}
+\mbox{observed data} &- \frac{f\left(c_{ij} \, | \, \theta_i, \sigma, t_{ij} \right)}{1 - F\left(0 \, | \, \theta_i, \sigma, t_{ij} \right)}  \\
+\mbox{BLOQ data} &- \frac{F\left(LLOQ \, | \, \theta_i, \sigma, t_{ij} \right) - F\left(0 \, | \, \theta_i, \sigma, t_{ij} \right)}{1 - F\left(0 \, | \, \theta_i, \sigma, t_{ij} \right)} \\
+\end{align}
+
+[^poppk-15]: A model that assumes *log-normal* error has support over
+$(0, \, \infty)$, so truncation is not an issue. In that case, M3 and M4 are 
+equivalent. Mathematically, you can see this by noting that 
+$F\left(0 \, | \, \theta_i, \sigma, t_{ij} \right) = 0$.
+
+
+[^poppk-16]: For observed data with this truncated distribution, we need to 
+"correct" the density so it integrates to 1. Division by 
+$1 - F(\cdot \, | \, \cdot)$ has this effect. For the censored data, the 
+numerator is similar to the M3 method, but we must also account for the fact 
+that it must be $>0$, hence $P(0 \leq c_{ij} \leq LLOQ) = F(LLOQ) - F(0)$. The 
+denominator is corrected in the same manner as for the observed data.
+
+### Stan Code Example
+
+This example shows the code within a function that implements 
+[within-chain parallelization](Threading-for-Within-Chain-Parallelization.qmd).
+The relevant lines here for calculating the likelihood are lines 69-77:
+
+::::{.scrolling_500}
+
+```{.verbatim code-line-numbers="true"}
+real partial_sum_lpmf(array[] int seq_subj, int start, int end,
+                      vector dv_obs, array[] int dv_obs_id, array[] int i_obs,
+                      array[] real amt, array[] int cmt, array[] int evid, 
+                      array[] real time, array[] real rate, array[] real ii, 
+                      array[] int addl, array[] int ss,
+                      array[] int subj_start, array[] int subj_end, 
+                      vector CL, vector VC, vector Q, vector VP, 
+                      real sigma_sq_p, real sigma_sq_a, real sigma_p_a, 
+                      vector lloq, array[] int bloq,
+                      int n_random, int n_subjects, int n_total,
+                      array[] real bioav, array[] real tlag, int n_cmt){
+                           
+  real ptarget = 0;
+                              
+  int N = end - start + 1;    // number of subjects in this slice  
+  vector[n_total] dv_ipred;   
+  matrix[n_total, n_cmt] x_ipred;
+  
+  int n_obs_slice = num_between(subj_start[start], subj_end[end], i_obs);
+  array[n_obs_slice] int i_obs_slice = find_between(subj_start[start], 
+                                                    subj_end[end], i_obs);
+                                              
+  vector[n_obs_slice] dv_obs_slice = find_between_vec(start, end, 
+                                                      dv_obs_id, dv_obs);
+  
+  vector[n_obs_slice] ipred_slice;
+    
+  vector[n_obs_slice] lloq_slice = lloq[i_obs_slice];
+  array[n_obs_slice] int bloq_slice = bloq[i_obs_slice];
+    
+    
+  for(n in 1:N){            // loop over subjects in this slice
+    
+    int j = n + start - 1; // j is the ID of the current subject
+        
+    real ke = CL[j]/VC[j];
+    real k_cp = Q[j]/VC[j];
+    real k_pc = Q[j]/VP[j];
+        
+    matrix[n_cmt, n_cmt] K = rep_matrix(0, n_cmt, n_cmt);
+    K[1, 1] = -(ke + k_cp);
+    K[1, 2] = k_pc;
+    K[2, 1] = k_cp;
+    K[2, 2] = -k_pc;
+      
+    x_ipred[subj_start[j]:subj_end[j], ] =
+      pmx_solve_linode(time[subj_start[j]:subj_end[j]],
+                       amt[subj_start[j]:subj_end[j]],
+                       rate[subj_start[j]:subj_end[j]],
+                       ii[subj_start[j]:subj_end[j]],
+                       evid[subj_start[j]:subj_end[j]],
+                       cmt[subj_start[j]:subj_end[j]],
+                       addl[subj_start[j]:subj_end[j]],
+                       ss[subj_start[j]:subj_end[j]],
+                       K, bioav, tlag)';
+                      
+    dv_ipred[subj_start[j]:subj_end[j]] = 
+      x_ipred[subj_start[j]:subj_end[j], 1] ./ VC[j];
+    
+  }
+  
+  ipred_slice = dv_ipred[i_obs_slice];
+    
+  for(i in 1:n_obs_slice){
+    real ipred_tmp = ipred_slice[i];
+    real sigma_tmp = sqrt(square(ipred_tmp) * sigma_sq_p + sigma_sq_a + 
+                          2*ipred_tmp*sigma_p_a);
+      
+    if(bloq_slice[i] == 1){
+      ptarget += log_diff_exp(normal_lcdf(lloq_slice[i] | ipred_tmp, 
+                                                          sigma_tmp),
+                              normal_lcdf(0.0 | ipred_tmp, sigma_tmp)) -
+                 normal_lccdf(0.0 | ipred_tmp, sigma_tmp); 
+    }else{
+      ptarget += normal_lpdf(dv_obs_slice[i] | ipred_tmp, sigma_tmp) -
+                 normal_lccdf(0.0 | ipred_tmp, sigma_tmp);
+    }
+  }                                         
+                              
+  return ptarget;
+                           
+}
+
+```
+
+::::
+
+These lines implement the math (on the log scale, since Stan calculates the 
+*log-posterior*). 
+
+\begin{align}
+\mathtt{log\_diff\_exp(normal\_lcdf(lloq), normal\_lcdf(0))} &= log(F(lloq) - F(0)), \notag \\
+\mathtt{normal\_lcdf(x)} &= log(F(x)), \notag \\
+\mathtt{normal\_lccdf(x)} &= log(1 - F(x)), \notag \\
+\mathtt{normal\_lpdf(x)} &= log(f(x)) \notag \\
+\end{align}
+
+where $f(\cdot)$ and $F(\cdot)$ are the normal density and cumulative 
+distribution functions, respectively^[For more information, see the Stan 
+documentation for 
+[log_diff_exp()](https://mc-stan.org/docs/functions-reference/composed-functions.html),
+[normal_lcdf()](https://mc-stan.org/docs/functions-reference/normal-distribution.html),
+[normal_lccdf()](https://mc-stan.org/docs/functions-reference/normal-distribution.html), 
+and [normal_lpdf()](https://mc-stan.org/docs/functions-reference/normal-distribution.html).].
