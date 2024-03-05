@@ -4,6 +4,7 @@ project:
 
 website:
   site-url: "https://bayespmx.github.io"
+  google-analytics: "G-K8J3PLGHMZ"
   page-navigation: true
   title: "Bayes PMx"
 
